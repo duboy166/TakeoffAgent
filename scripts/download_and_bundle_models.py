@@ -142,8 +142,10 @@ def main():
         # Suppress verbose logging
         import logging
         logging.getLogger('ppocr').setLevel(logging.WARNING)
+        logging.getLogger('paddle').setLevel(logging.WARNING)
 
-        ocr = PaddleOCR(use_angle_cls=True, lang='en', show_log=False)
+        # Note: use_textline_orientation replaces deprecated use_angle_cls in PaddleOCR 3.x
+        ocr = PaddleOCR(use_textline_orientation=True, lang='en')
         print("  PaddleOCR initialized successfully")
 
     except ImportError as e:
