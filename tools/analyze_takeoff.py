@@ -1,0 +1,1403 @@
+#!/usr/bin/env python3
+"""
+Construction Takeoff Analyzer
+Parses extracted text from construction plans and matches to FL 2025 price list.
+"""
+
+import csv
+import re
+import json
+from pathlib import Path
+from typing import Dict, List, Optional, Tuple
+
+# Standard FDOT round pipe sizes (inches) - used for validation
+# These are the only valid pipe diameters in the FL 2025 price catalog
+VALID_PIPE_SIZES = {12, 15, 18, 24, 30, 36, 42, 48, 54, 60, 64, 66, 72, 84, 96}
+
+# Maximum round pipe size in catalog - anything larger is likely a quantity, not a size
+MAX_PIPE_SIZE = 96
+
+# Valid elliptical pipe sizes (rise x span format) from FL 2025 catalog
+# Format: (rise, span) - e.g., 14"x23" means 14" rise by 23" span
+VALID_ELLIPTICAL_SIZES = {
+    (12, 18), (14, 23), (19, 30), (24, 38), (29, 45),
+    (34, 53), (38, 60), (43, 68), (48, 76), (53, 83), (58, 91)
+}
+
+# Structure types for endwalls and end sections
+STRUCTURE_TYPES = {
+    'STRAIGHT_ENDWALL': ['straight endwall', 'straight end wall', 'straight concrete endwall'],
+    'WINGED_ENDWALL': ['winged endwall', 'winged end wall', 'wing endwall', 'wing wall'],
+    'U_TYPE_ENDWALL': ['u-type endwall', 'u type endwall', 'u-type end wall', 'utype'],
+    'MES': ['mes', 'mitered end section', 'mitered end', 'mitered'],
+    'FLARED_END': ['flared end', 'flared end section', 'fes']
+}
+
+
+class TakeoffAnalyzer:
+    """Analyzes construction plan text and generates takeoff reports."""
+
+    def __init__(self, price_list_path: str = None):
+        """Initialize with optional price list path."""
+        self.price_list = {}
+        self.price_list_by_fdot = {}  # Index by FDOT code for fast lookup
+        self.price_list_loaded = False
+        if price_list_path:
+            self.load_price_list(price_list_path)
+
+    def load_price_list(self, path: str) -> bool:
+        """
+        Load Florida 2025 price list from CSV.
+
+        Builds two indexes:
+        - price_list: keyed by size_configuration_product_type
+        - price_list_by_fdot: keyed by normalized FDOT code (e.g., "430-030")
+
+        Returns:
+            True if successfully loaded, False otherwise
+        """
+        try:
+            with open(path, 'r', encoding='utf-8') as f:
+                reader = csv.DictReader(f)
+                for row in reader:
+                    product = {
+                        'product_type': row.get('Product_Type', ''),
+                        'size': row.get('Size', ''),
+                        'configuration': row.get('Configuration', ''),
+                        'price': self._parse_price(row.get('Price', '$0')),
+                        'unit': row.get('Unit', ''),
+                        'fdot_code': row.get('FDOT_Code', '')
+                    }
+
+                    # Primary index by size/config/type
+                    key = f"{product['size']}_{product['configuration']}_{product['product_type']}"
+                    self.price_list[key] = product
+
+                    # Secondary index by FDOT code (normalized)
+                    fdot_raw = row.get('FDOT_Code', '')
+                    if fdot_raw:
+                        # Normalize: "FDOT 430-030" -> "430-030"
+                        fdot_normalized = fdot_raw.replace('FDOT ', '').replace('FDOT', '').strip()
+                        if fdot_normalized:
+                            # Group by FDOT code (multiple products may share same code)
+                            if fdot_normalized not in self.price_list_by_fdot:
+                                self.price_list_by_fdot[fdot_normalized] = []
+                            self.price_list_by_fdot[fdot_normalized].append(product)
+
+            self.price_list_loaded = True
+            return True
+        except Exception as e:
+            print(f"Warning: Could not load price list: {e}")
+            return False
+
+    def _parse_price(self, price_str: str) -> float:
+        """Parse price string to float."""
+        try:
+            return float(price_str.replace('$', '').replace(',', ''))
+        except:
+            return 0.0
+
+    def extract_pay_items(self, text: str) -> List[Dict]:
+        """
+        Extract pay items from plan text using multiple pattern strategies.
+
+        Args:
+            text: Extracted text from construction plans
+
+        Returns:
+            List of pay item dictionaries
+        """
+        seen = set()  # Avoid duplicates across all strategies
+        return self._extract_items_from_page(text, seen)
+
+    def _extract_items_from_page(self, page_text: str, seen: set) -> List[Dict]:
+        """
+        Extract all pay items from text.
+
+        Args:
+            page_text: Text content to extract from
+            seen: Set of already-seen items (for deduplication)
+
+        Returns:
+            List of pay items
+        """
+        items = []
+
+        # Strategy 1: FDOT pay item codes (highest confidence)
+        items.extend(self._extract_fdot_items(page_text, seen))
+
+        # Strategy 2: Quantity-first format (federal/military style)
+        items.extend(self._extract_quantity_first_items(page_text, seen))
+
+        # Strategy 3: Elliptical pipe (14"x23" RCP HE, ERCP, etc.)
+        items.extend(self._extract_elliptical_pipe_items(page_text, seen))
+
+        # Strategy 4: Structures (endwalls, MES, flared ends)
+        items.extend(self._extract_structure_items(page_text, seen))
+
+        # Strategy 5: Table extraction (pipe schedules, quantity tables)
+        items.extend(self._extract_table_items(page_text, seen))
+
+        # Strategy 6: Pipe callouts (CAD annotations)
+        items.extend(self._extract_callout_items(page_text, seen))
+
+        # Strategy 7: Drainage structure labels
+        items.extend(self._extract_drainage_labels(page_text, seen))
+
+        return items
+
+    def _extract_fdot_items(self, text: str, seen: set) -> List[Dict]:
+        """Extract FDOT pay item codes (e.g., 430-175-118)."""
+        items = []
+        patterns = [
+            # Standard format: 430-175-118 or 425-1-549
+            r'(\d{3}-\d{1,3}-\d{1,3})\s+(.+?)\s+(LS|EA|LF|SY|CY|SF|TON|GAL|AC)\s+(\d+(?:\.\d+)?)',
+            # Alternative: 101-1
+            r'(\d{3}-\d{1,2})\s+(.+?)\s+(LS|EA|LF|SY|CY|SF|TON|GAL|AC)\s+(\d+(?:\.\d+)?)',
+        ]
+
+        for pattern in patterns:
+            matches = re.findall(pattern, text, re.IGNORECASE | re.MULTILINE)
+            for match in matches:
+                item_key = f"fdot_{match[0]}_{match[3]}"
+                if item_key in seen:
+                    continue
+                seen.add(item_key)
+
+                items.append({
+                    'pay_item_no': match[0],
+                    'description': match[1].strip(),
+                    'unit': match[2].upper(),
+                    'quantity': float(match[3]),
+                    'matched': False,
+                    'unit_price': None,
+                    'line_cost': None,
+                    'source': 'fdot',
+                    'confidence': 'high'
+                })
+
+        return items
+
+    def _extract_quantity_first_items(self, text: str, seen: set) -> List[Dict]:
+        """
+        Extract items in various quantity-first formats.
+
+        Handles multiple common formats found in construction plans:
+        - Federal/military: "51 LF 15" RCP CLASS V"
+        - Size-first: "18" RCP - 51 LF"
+        - Parenthetical: "18" RCP (51 LF)"
+        - SDR pipe: "125 LF 6" PVC SDR 35"
+
+        Uses validation to catch swapped size/quantity values.
+        """
+        items = []
+
+        # Pattern definitions: (pattern, qty_group, unit_group, size_group, material_group, spec_group_or_none)
+        # Using re.MULTILINE | re.IGNORECASE for all patterns
+        patterns = [
+            # Format 1: QTY UNIT SIZE" MATERIAL [CLASS/SDR SPEC]
+            # Example: "51 LF 15" RCP CLASS V @ 0.5%"
+            (r'(\d+(?:\.\d+)?)\s*(LF|EA|SF|SY|CY)\s+(\d+)\s*["\u201d\u2033]?\s*(RCP|PVC|HDPE|CMP|DIP|SRCP)(?:\s*(?:CLASS\s*)?([IVX]+))?',
+             1, 2, 3, 4, 5),
+
+            # Format 2: QTY UNIT SIZE" MATERIAL SDR ##
+            # Example: "125 LF 6" PVC SDR 35"
+            (r'(\d+(?:\.\d+)?)\s*(LF|EA)\s+(\d+)\s*["\u201d\u2033]?\s*(PVC|HDPE)\s*(?:SDR\s*)?(\d+)?',
+             1, 2, 3, 4, 5),
+
+            # Format 3: SIZE" MATERIAL - QTY UNIT (with dash separator)
+            # Example: "18" RCP - 51 LF"
+            (r'(\d+)\s*["\u201d\u2033]\s*(RCP|PVC|HDPE|CMP|DIP|SRCP)\s*[-\u2013\u2014]\s*(\d+(?:\.\d+)?)\s*(LF|EA|SF|SY)',
+             3, 4, 1, 2, None),
+
+            # Format 4: SIZE" MATERIAL (QTY UNIT) (parenthetical)
+            # Example: "18" RCP (51 LF)"
+            (r'(\d+)\s*["\u201d\u2033]\s*(RCP|PVC|HDPE|CMP|DIP|SRCP)\s*\(\s*(\d+(?:\.\d+)?)\s*(LF|EA|SF|SY)\s*\)',
+             3, 4, 1, 2, None),
+
+            # Format 5: QTY UNIT of SIZE" MATERIAL
+            # Example: "51 LF of 18" RCP"
+            (r'(\d+(?:\.\d+)?)\s*(LF|EA|SF|SY|CY)\s+(?:of\s+)?(\d+)\s*["\u201d\u2033]\s*(RCP|PVC|HDPE|CMP|DIP|SRCP)',
+             1, 2, 3, 4, None),
+
+            # Format 6: MATERIAL SIZE" @ QTY UNIT or MATERIAL SIZE" = QTY UNIT
+            # Example: "RCP 18" @ 51 LF" or "RCP 18" = 51 LF"
+            (r'(RCP|PVC|HDPE|CMP|DIP|SRCP)\s*(\d+)\s*["\u201d\u2033]?\s*[@=]\s*(\d+(?:\.\d+)?)\s*(LF|EA|SF|SY)',
+             3, 4, 2, 1, None),
+
+            # Format 7: Simple quantity with pipe - "51 LF RCP 18" or "51 LF 18 RCP"
+            # Example: "51 LF RCP 18""
+            (r'(\d+(?:\.\d+)?)\s*(LF|EA)\s+(RCP|PVC|HDPE|CMP|DIP|SRCP)\s*(\d+)\s*["\u201d\u2033]?',
+             1, 2, 4, 3, None),
+        ]
+
+        for pattern_tuple in patterns:
+            pattern = pattern_tuple[0]
+            qty_grp = pattern_tuple[1]
+            unit_grp = pattern_tuple[2]
+            size_grp = pattern_tuple[3]
+            mat_grp = pattern_tuple[4]
+            spec_grp = pattern_tuple[5]
+
+            for match in re.finditer(pattern, text, re.IGNORECASE | re.MULTILINE):
+                try:
+                    raw_qty = float(match.group(qty_grp))
+                    unit = match.group(unit_grp).upper()
+                    raw_size = int(match.group(size_grp))
+                    material = match.group(mat_grp).upper()
+                    spec = ""
+                    if spec_grp and len(match.groups()) >= spec_grp and match.group(spec_grp):
+                        spec = match.group(spec_grp)
+
+                    # VALIDATION: Check if size and quantity appear swapped
+                    size, qty = self._validate_and_swap_size_qty(raw_size, raw_qty)
+
+                    # Skip if size is still invalid after validation
+                    if not self._is_valid_pipe_size(size):
+                        # Log for debugging but don't skip - might be valid non-standard size
+                        pass
+
+                    # Build description
+                    desc = f'{size}" {material}'
+                    if spec:
+                        if material == 'RCP' or material == 'SRCP':
+                            desc += f' CLASS {spec}'
+                        else:
+                            desc += f' SDR {spec}'
+
+                    item_key = f"qty_{material}_{size}_{qty}"
+                    if item_key in seen:
+                        continue
+                    seen.add(item_key)
+
+                    items.append({
+                        'pay_item_no': f'{material}-{size}',
+                        'description': desc,
+                        'unit': unit,
+                        'quantity': qty,
+                        'matched': False,
+                        'unit_price': None,
+                        'line_cost': None,
+                        'source': 'quantity_first',
+                        'confidence': 'medium'
+                    })
+                except (ValueError, IndexError):
+                    # Skip malformed matches
+                    continue
+
+        return items
+
+    def _extract_callout_items(self, text: str, seen: set) -> List[Dict]:
+        """
+        Extract pipe callouts like 'RCP 24' or '15" HDPE' from CAD annotations.
+
+        NOTE: Callouts are annotations/labels on drawings, NOT actual quantities.
+        Each unique callout type is recorded once with quantity=0 to flag it for
+        manual verification. The 'mentions' field tracks how many times it appeared.
+
+        VALIDATION: Only accepts sizes that match valid FDOT pipe diameters
+        to avoid capturing quantities as sizes.
+        """
+        items = []
+        callout_data = {}  # Track unique callouts and their mention counts
+
+        patterns = [
+            (r'\b(RCP|PVC|HDPE|CMP|DIP|SRCP)\s*-?\s*(\d+)\b', 1, 2),  # RCP 24, RCP-24
+            (r'\b(\d+)["\s]*(RCP|PVC|HDPE|CMP|DIP|SRCP)\b', 2, 1),    # 24" RCP
+        ]
+
+        for pattern, mat_group, size_group in patterns:
+            for match in re.finditer(pattern, text, re.IGNORECASE):
+                material = match.group(mat_group).upper()
+                size_str = match.group(size_group)
+
+                # VALIDATION: Only accept valid pipe sizes from catalog
+                try:
+                    size_int = int(size_str)
+                    if not self._is_valid_pipe_size(size_int):
+                        # Skip - likely a quantity, not a pipe size
+                        continue
+                except ValueError:
+                    continue
+
+                key = f"{material}_{size_str}"
+
+                # Track unique callouts and count mentions (for reference only)
+                if key not in callout_data:
+                    callout_data[key] = {'material': material, 'size': size_str, 'mentions': 0}
+                callout_data[key]['mentions'] += 1
+
+        # Convert to items - each unique callout is ONE item needing verification
+        for key, data in callout_data.items():
+            item_key = f"callout_{key}"
+            if item_key in seen:
+                continue
+            seen.add(item_key)
+
+            items.append({
+                'pay_item_no': f"{data['material']}-{data['size']}",
+                'description': f"{data['size']}\" {data['material']} PIPE (VERIFY QTY)",
+                'unit': 'LF',  # Pipes are typically measured in LF, not EA
+                'quantity': 0,  # Unknown - requires manual verification
+                'matched': False,
+                'unit_price': None,
+                'line_cost': None,
+                'source': 'callout',
+                'confidence': 'low',
+                'needs_verification': True,
+                'mentions': data['mentions']  # How many times seen (for reference)
+            })
+
+        return items
+
+    def _extract_drainage_labels(self, text: str, seen: set) -> List[Dict]:
+        """
+        Extract named drainage structures like 'STORM DRAIN MANHOLE #1'.
+
+        NOTE: Only structures with explicit IDs (e.g., "#1", "-1") are counted as
+        actual items. Generic mentions without IDs are recorded with quantity=0
+        and flagged for manual verification to avoid inflating counts.
+        """
+        items = []
+        structures_with_id = {}  # Structures with explicit IDs (reliable)
+        generic_mentions = {}    # Generic mentions needing verification
+
+        patterns = [
+            # STORM DRAIN MANHOLE #1, SANITARY SEWER MANHOLE #2, MH-1
+            r'(?:STORM\s*DRAIN|SANITARY\s*SEWER|SD|SS)?\s*(MANHOLE|MH)\s*[#-]?\s*(\d+)',
+            # GRATE INLET #1, TYPE D INLET #2, INLET-1
+            r'(?:GRATE|TYPE\s*[A-Z])?\s*(INLET)\s*[#-]?\s*(\d+)',
+            # CATCH BASIN #1, CB-1
+            r'(CATCH\s*BASIN|CB)\s*[#-]?\s*(\d+)',
+            # JUNCTION BOX #1, JB-1
+            r'(JUNCTION\s*BOX|JB)\s*[#-]?\s*(\d+)',
+        ]
+
+        # Patterns for generic mentions (without IDs)
+        generic_patterns = [
+            (r'\b(MANHOLE|MH)\b(?!\s*[#-]?\s*\d)', 'MANHOLE'),
+            (r'\b(INLET)\b(?!\s*[#-]?\s*\d)', 'INLET'),
+            (r'\b(CATCH\s*BASIN|CB)\b(?!\s*[#-]?\s*\d)', 'CATCH BASIN'),
+            (r'\b(JUNCTION\s*BOX|JB)\b(?!\s*[#-]?\s*\d)', 'JUNCTION BOX'),
+        ]
+
+        # Extract structures with explicit IDs
+        for pattern in patterns:
+            for match in re.finditer(pattern, text, re.IGNORECASE):
+                struct_type = match.group(1).upper()
+                struct_id = match.group(2)
+
+                # Normalize structure type
+                if struct_type in ('MH', 'MANHOLE'):
+                    struct_type = 'MANHOLE'
+                elif struct_type in ('CB', 'CATCH BASIN'):
+                    struct_type = 'CATCH BASIN'
+                elif struct_type in ('JB', 'JUNCTION BOX'):
+                    struct_type = 'JUNCTION BOX'
+
+                # Track unique structures by ID
+                key = f"{struct_type}_{struct_id}"
+                structures_with_id[key] = {
+                    'type': struct_type,
+                    'id': struct_id
+                }
+
+        # Track generic mentions (for reference, not as quantities)
+        for pattern, struct_type in generic_patterns:
+            mentions = len(re.findall(pattern, text, re.IGNORECASE))
+            if mentions > 0:
+                if struct_type not in generic_mentions:
+                    generic_mentions[struct_type] = 0
+                generic_mentions[struct_type] += mentions
+
+        # Convert structures with IDs to items (reliable quantities)
+        for key, data in structures_with_id.items():
+            item_key = f"struct_{key}"
+            if item_key in seen:
+                continue
+            seen.add(item_key)
+
+            items.append({
+                'pay_item_no': data['type'],
+                'description': f"{data['type']} #{data['id']}",
+                'unit': 'EA',
+                'quantity': 1,  # Each unique ID = 1 structure
+                'matched': False,
+                'unit_price': None,
+                'line_cost': None,
+                'source': 'drainage_label',
+                'confidence': 'high'  # High confidence when ID is present
+            })
+
+        # Record generic mentions needing verification (if not already counted via IDs)
+        for struct_type, mention_count in generic_mentions.items():
+            # Only add if we didn't find any with explicit IDs
+            has_ids = any(d['type'] == struct_type for d in structures_with_id.values())
+            if has_ids:
+                continue  # Skip - we already have specific structures
+
+            item_key = f"struct_generic_{struct_type}"
+            if item_key in seen:
+                continue
+            seen.add(item_key)
+
+            items.append({
+                'pay_item_no': struct_type,
+                'description': f"{struct_type} (VERIFY QTY)",
+                'unit': 'EA',
+                'quantity': 0,  # Unknown - requires manual verification
+                'matched': False,
+                'unit_price': None,
+                'line_cost': None,
+                'source': 'drainage_label',
+                'confidence': 'low',  # Low confidence for generic mentions
+                'needs_verification': True,
+                'mentions': mention_count  # How many times mentioned (for reference)
+            })
+
+        return items
+
+    def _is_valid_elliptical_size(self, rise: int, span: int) -> bool:
+        """Check if rise x span is a valid elliptical pipe size."""
+        return (rise, span) in VALID_ELLIPTICAL_SIZES
+
+    def _extract_elliptical_pipe_items(self, text: str, seen: set) -> List[Dict]:
+        """
+        Extract elliptical pipe items from text.
+
+        Elliptical pipes have two-dimensional sizes like:
+        - 14"x23" RCP HE (Horizontal Elliptical)
+        - 14 X 23 ERCP
+        - ERCP 14x23
+        - 19"X30" ELLIPTICAL RCP CLASS III
+
+        Args:
+            text: Page text to search
+            seen: Set of already-seen items
+
+        Returns:
+            List of extracted elliptical pipe items
+        """
+        items = []
+
+        # Patterns for elliptical pipe detection
+        # Format variations: 14"x23", 14x23, 14" x 23", 14 X 23
+        patterns = [
+            # QTY UNIT SIZE ERCP/HE - e.g., "51 LF 14"x23" RCP HE"
+            (r'(\d+(?:\.\d+)?)\s*(LF|EA)\s+(\d+)\s*["\u201d]?\s*[xX×]\s*(\d+)\s*["\u201d]?\s*(?:RCP|ERCP)?\s*(?:HE|ELLIP(?:TICAL)?)?(?:\s*(?:CL(?:ASS)?\s*)?([IVX]+))?',
+             1, 2, 3, 4, 5),
+
+            # SIZE ERCP/HE - QTY UNIT - e.g., "14"x23" ERCP - 51 LF"
+            (r'(\d+)\s*["\u201d]?\s*[xX×]\s*(\d+)\s*["\u201d]?\s*(?:RCP\s*HE|ERCP|ELLIP(?:TICAL)?\s*RCP)\s*[-\u2013\u2014]\s*(\d+(?:\.\d+)?)\s*(LF|EA)',
+             3, 4, 1, 2, None),
+
+            # ERCP SIZE - e.g., "ERCP 14x23" or "RCP HE 14"x23""
+            (r'(?:ERCP|RCP\s*HE|ELLIP(?:TICAL)?\s*RCP)\s*(\d+)\s*["\u201d]?\s*[xX×]\s*(\d+)\s*["\u201d]?',
+             None, None, 1, 2, None),
+
+            # SIZE ERCP with class - e.g., "14"X23" RCP HE CLASS III"
+            (r'(\d+)\s*["\u201d]?\s*[xX×]\s*(\d+)\s*["\u201d]?\s*(?:RCP\s*HE|ERCP|ELLIP(?:TICAL)?\s*RCP)(?:\s*(?:CL(?:ASS)?\s*)?([IVX]+))?',
+             None, None, 1, 2, 3),
+        ]
+
+        for pattern_tuple in patterns:
+            pattern = pattern_tuple[0]
+            qty_grp = pattern_tuple[1]
+            unit_grp = pattern_tuple[2]
+            rise_grp = pattern_tuple[3]
+            span_grp = pattern_tuple[4]
+            class_grp = pattern_tuple[5]
+
+            for match in re.finditer(pattern, text, re.IGNORECASE | re.MULTILINE):
+                try:
+                    rise = int(match.group(rise_grp))
+                    span = int(match.group(span_grp))
+
+                    # Validate elliptical size
+                    if not self._is_valid_elliptical_size(rise, span):
+                        continue
+
+                    # Get quantity and unit if available
+                    if qty_grp and match.group(qty_grp):
+                        qty = float(match.group(qty_grp))
+                        unit = match.group(unit_grp).upper() if unit_grp else 'LF'
+                    else:
+                        qty = 0  # Callout only, needs verification
+                        unit = 'LF'
+
+                    # Get class if available
+                    pipe_class = ""
+                    if class_grp and len(match.groups()) >= class_grp and match.group(class_grp):
+                        pipe_class = match.group(class_grp)
+
+                    # Build description
+                    size_str = f'{rise}"x{span}"'
+                    desc = f'{size_str} ERCP'
+                    if pipe_class:
+                        desc += f' CLASS {pipe_class}'
+
+                    item_key = f"ellip_{rise}x{span}_{qty}"
+                    if item_key in seen:
+                        continue
+                    seen.add(item_key)
+
+                    items.append({
+                        'pay_item_no': f'ERCP-{rise}x{span}',
+                        'description': desc,
+                        'unit': unit,
+                        'quantity': qty,
+                        'matched': False,
+                        'unit_price': None,
+                        'line_cost': None,
+                        'source': 'elliptical_pipe',
+                        'confidence': 'medium' if qty > 0 else 'low',
+                        'pipe_type': 'elliptical',
+                        'rise': rise,
+                        'span': span,
+                        'needs_verification': qty == 0
+                    })
+                except (ValueError, IndexError):
+                    continue
+
+        return items
+
+    def _extract_structure_items(self, text: str, seen: set) -> List[Dict]:
+        """
+        Extract endwall and end section structures from text.
+
+        Types:
+        - Straight Endwalls (single, double, triple, quad)
+        - Winged Endwalls (45 degree, U-type)
+        - U-Type Endwalls
+        - MES (Mitered End Sections)
+        - Flared Ends
+
+        Args:
+            text: Page text to search
+            seen: Set of already-seen items
+
+        Returns:
+            List of extracted structure items
+        """
+        items = []
+
+        # Patterns for structure detection
+        patterns = [
+            # STRAIGHT ENDWALL with size and configuration
+            # e.g., "18" STRAIGHT ENDWALL SINGLE" or "STRAIGHT CONCRETE ENDWALL 24" DOUBLE"
+            (r'(\d+)\s*["\u201d]?\s*STRAIGHT\s*(?:CONCRETE\s*)?END\s*WALL[S]?\s*(SINGLE|DOUBLE|TRIPLE|QUAD)?',
+             'STRAIGHT_ENDWALL', 1, 2),
+            (r'STRAIGHT\s*(?:CONCRETE\s*)?END\s*WALL[S]?\s*(\d+)\s*["\u201d]?\s*(SINGLE|DOUBLE|TRIPLE|QUAD)?',
+             'STRAIGHT_ENDWALL', 1, 2),
+
+            # WINGED ENDWALL
+            # e.g., "18" WINGED ENDWALL 45 DEG" or "WING WALL 24" U-TYPE"
+            (r'(\d+)\s*["\u201d]?\s*(?:WINGED?|WING)\s*(?:END\s*)?WALL[S]?\s*(45\s*DEG(?:REE)?|U[-\s]?TYPE)?',
+             'WINGED_ENDWALL', 1, 2),
+            (r'(?:WINGED?|WING)\s*(?:END\s*)?WALL[S]?\s*(\d+)\s*["\u201d]?\s*(45\s*DEG(?:REE)?|U[-\s]?TYPE)?',
+             'WINGED_ENDWALL', 1, 2),
+
+            # U-TYPE ENDWALL
+            # e.g., "U-TYPE ENDWALL 18"" or "18" U-TYPE END WALL"
+            (r'(\d+)\s*["\u201d]?\s*U[-\s]?TYPE\s*END\s*WALL',
+             'U_TYPE_ENDWALL', 1, None),
+            (r'U[-\s]?TYPE\s*END\s*WALL\s*(\d+)\s*["\u201d]?',
+             'U_TYPE_ENDWALL', 1, None),
+
+            # MES (Mitered End Section) for round pipe
+            # e.g., "18" MES 4:1" or "MES 24"" or "MITERED END SECTION 18""
+            (r'(\d+)\s*["\u201d]?\s*MES(?:\s*4:1)?',
+             'MES', 1, None),
+            (r'MES(?:\s*4:1)?\s*(\d+)\s*["\u201d]?',
+             'MES', 1, None),
+            (r'MITERED\s*END(?:\s*SECTION)?\s*(\d+)\s*["\u201d]?',
+             'MES', 1, None),
+            (r'(\d+)\s*["\u201d]?\s*MITERED\s*END(?:\s*SECTION)?',
+             'MES', 1, None),
+
+            # MES for elliptical pipe
+            # e.g., "14"x23" MES" or "MES 14x23"
+            (r'(\d+)\s*["\u201d]?\s*[xX×]\s*(\d+)\s*["\u201d]?\s*MES',
+             'MES_ELLIPTICAL', 1, 2),
+            (r'MES\s*(\d+)\s*["\u201d]?\s*[xX×]\s*(\d+)\s*["\u201d]?',
+             'MES_ELLIPTICAL', 1, 2),
+
+            # FLARED END
+            # e.g., "FLARED END 18"" or "18" FLARED END SECTION"
+            (r'(\d+)\s*["\u201d]?\s*FLARED\s*END(?:\s*SECTION)?',
+             'FLARED_END', 1, None),
+            (r'FLARED\s*END(?:\s*SECTION)?\s*(\d+)\s*["\u201d]?',
+             'FLARED_END', 1, None),
+        ]
+
+        for pattern_tuple in patterns:
+            pattern = pattern_tuple[0]
+            struct_type = pattern_tuple[1]
+            size_grp = pattern_tuple[2]
+            config_grp = pattern_tuple[3]
+
+            for match in re.finditer(pattern, text, re.IGNORECASE | re.MULTILINE):
+                try:
+                    # Handle elliptical MES separately (has rise x span)
+                    if struct_type == 'MES_ELLIPTICAL':
+                        rise = int(match.group(size_grp))
+                        span = int(match.group(config_grp))
+                        if not self._is_valid_elliptical_size(rise, span):
+                            continue
+                        size_str = f'{rise}"x{span}"'
+                        config = ''
+                        item_key = f"struct_MES_{rise}x{span}"
+                    else:
+                        # Round pipe structures
+                        size = int(match.group(size_grp))
+                        if not self._is_valid_pipe_size(size):
+                            continue
+                        size_str = f'{size}"'
+
+                        # Get configuration if available
+                        config = ''
+                        if config_grp and len(match.groups()) >= config_grp and match.group(config_grp):
+                            config = match.group(config_grp).upper()
+                            # Normalize configuration - be specific to avoid false matches
+                            if '45' in config and 'DEG' in config:
+                                config = '45 DEGREE'
+                            elif config.startswith('U') and ('TYPE' in config or config == 'U'):
+                                config = 'U-TYPE'
+                            # Keep SINGLE, DOUBLE, TRIPLE, QUAD as-is
+
+                        item_key = f"struct_{struct_type}_{size}_{config}"
+
+                    if item_key in seen:
+                        continue
+                    seen.add(item_key)
+
+                    # Build description
+                    type_name = struct_type.replace('_', ' ')
+                    if struct_type == 'MES_ELLIPTICAL':
+                        type_name = 'MES (ELLIPTICAL)'
+                    desc = f'{size_str} {type_name}'
+                    if config:
+                        desc += f' {config}'
+
+                    items.append({
+                        'pay_item_no': f'{struct_type}-{size_str}',
+                        'description': desc,
+                        'unit': 'EA',
+                        'quantity': 1,  # Structures are typically counted
+                        'matched': False,
+                        'unit_price': None,
+                        'line_cost': None,
+                        'source': 'structure',
+                        'confidence': 'medium',
+                        'structure_type': struct_type,
+                        'configuration': config if config else None
+                    })
+                except (ValueError, IndexError):
+                    continue
+
+        return items
+
+    def _extract_table_items(self, text: str, seen: set) -> List[Dict]:
+        """
+        Extract items from tabular data (pipe schedules, quantity takeoff tables).
+
+        Handles table formats like:
+        - Qty | Unit | Size | Material
+        - Description | Size | Qty | Unit
+
+        Tables typically use multiple spaces or tabs as delimiters.
+
+        Args:
+            text: Page text to search
+            seen: Set of already-seen items
+        """
+        items = []
+
+        # Split text into lines
+        lines = text.split('\n')
+
+        # Track consecutive table-like lines
+        table_buffer = []
+
+        for line in lines:
+            # Check if line looks like a table row (has multiple delimiters)
+            cells = re.split(r'\s{2,}|\t', line.strip())
+            cells = [c.strip() for c in cells if c.strip()]
+
+            if len(cells) >= 3:
+                table_buffer.append(cells)
+            else:
+                # Process any accumulated table data
+                if len(table_buffer) >= 2:
+                    items.extend(self._parse_table_rows(table_buffer, seen))
+                table_buffer = []
+
+        # Don't forget last table
+        if len(table_buffer) >= 2:
+            items.extend(self._parse_table_rows(table_buffer, seen))
+
+        return items
+
+    def _parse_table_rows(self, rows: List[List[str]], seen: set) -> List[Dict]:
+        """
+        Parse table rows to extract pay items.
+
+        Tries to identify columns containing:
+        - Quantity (numbers)
+        - Unit (LF, EA, etc.)
+        - Size (pipe diameter)
+        - Material (RCP, PVC, etc.)
+
+        Args:
+            rows: List of table rows (each row is a list of cell values)
+            seen: Set of already-seen items
+        """
+        items = []
+
+        # Material and unit keywords
+        materials = {'RCP', 'PVC', 'HDPE', 'CMP', 'DIP', 'SRCP', 'ERCP', 'ADS'}
+        units = {'LF', 'EA', 'SF', 'SY', 'CY', 'TON', 'GAL'}
+
+        for row in rows:
+            qty = None
+            unit = None
+            size = None
+            material = None
+            description_parts = []
+
+            for cell in row:
+                cell_upper = cell.upper().strip()
+
+                # Check for material
+                for mat in materials:
+                    if mat in cell_upper:
+                        material = mat
+                        break
+
+                # Check for unit
+                for u in units:
+                    if cell_upper == u or cell_upper.endswith(f' {u}'):
+                        unit = u
+                        break
+
+                # Check for size (number followed by " or number in typical pipe sizes)
+                size_match = re.search(r'^(\d{1,2})\s*["\u201d\u2033]?\s*$', cell)
+                if size_match:
+                    potential_size = int(size_match.group(1))
+                    if self._is_valid_pipe_size(potential_size):
+                        size = potential_size
+
+                # Check for quantity (number, possibly with decimal)
+                qty_match = re.match(r'^(\d+(?:\.\d+)?)\s*$', cell)
+                if qty_match and not size_match:
+                    potential_qty = float(qty_match.group(1))
+                    # Quantities are typically > 1 and not standard pipe sizes
+                    # Unless they're EA counts which can be 1-10
+                    if potential_qty > 0:
+                        qty = potential_qty
+
+                # Add to description if it has text
+                if re.search(r'[A-Za-z]', cell) and cell_upper not in units:
+                    description_parts.append(cell)
+
+            # Validate we have enough info to create an item
+            if material and qty is not None and qty > 0:
+                # Apply size/qty validation if we have size
+                if size:
+                    size, qty = self._validate_and_swap_size_qty(size, qty)
+                else:
+                    # Try to extract size from description
+                    for part in description_parts:
+                        size_in_desc = re.search(r'(\d{1,2})\s*["\u201d\u2033]', part)
+                        if size_in_desc:
+                            potential_size = int(size_in_desc.group(1))
+                            if self._is_valid_pipe_size(potential_size):
+                                size = potential_size
+                                break
+
+                # Build description
+                desc = ' '.join(description_parts) if description_parts else f'{size}" {material}' if size else material
+
+                item_key = f"table_{material}_{size}_{qty}"
+                if item_key in seen:
+                    continue
+                seen.add(item_key)
+
+                items.append({
+                    'pay_item_no': f'{material}-{size}' if size else material,
+                    'description': desc[:100] + ('...' if len(desc) > 100 else ''),
+                    'unit': unit or 'LF',  # Default to LF for pipes
+                    'quantity': qty,
+                    'matched': False,
+                    'unit_price': None,
+                    'line_cost': None,
+                    'source': 'table',
+                    'confidence': 'medium'
+                })
+
+        return items
+
+    def _normalize_size(self, size_str: str) -> str:
+        """Normalize size string to standard format (e.g., '15"')."""
+        if not size_str:
+            return ''
+        # Extract numeric part
+        match = re.search(r'(\d+(?:\.\d+)?)', str(size_str))
+        if match:
+            return f'{match.group(1)}"'
+        return ''
+
+    def _is_valid_pipe_size(self, size: int) -> bool:
+        """Check if size is a valid catalog pipe diameter."""
+        return size in VALID_PIPE_SIZES
+
+    def _validate_and_swap_size_qty(self, size: int, qty: float) -> Tuple[int, float]:
+        """
+        Validate size/quantity and swap if they appear reversed.
+
+        Common OCR/parsing error: size and quantity get swapped because:
+        - "51 LF 18" RCP" could be parsed as size=51, qty=18 (wrong)
+        - Should be size=18, qty=51
+
+        Rules:
+        1. If size is not in catalog but qty is a valid size → swap
+        2. If size > MAX_PIPE_SIZE (96"), it's likely the quantity → swap
+        3. Otherwise keep as-is
+
+        Args:
+            size: Extracted pipe size (inches)
+            qty: Extracted quantity
+
+        Returns:
+            Tuple of (corrected_size, corrected_qty)
+        """
+        qty_int = int(qty) if qty == int(qty) else None
+
+        # Rule 1: If size not in catalog but qty is a valid pipe size, swap
+        if size not in VALID_PIPE_SIZES and qty_int in VALID_PIPE_SIZES:
+            return qty_int, float(size)
+
+        # Rule 2: If size is impossibly large (>96"), it's probably the quantity
+        if size > MAX_PIPE_SIZE and qty <= MAX_PIPE_SIZE:
+            # Only swap if qty looks like a valid pipe size
+            if qty_int in VALID_PIPE_SIZES:
+                return qty_int, float(size)
+
+        # Keep as-is
+        return size, qty
+
+    def _extract_fdot_prefix(self, pay_item_no: str) -> Optional[str]:
+        """
+        Extract FDOT code prefix for matching.
+        e.g., "430-175-118" -> try "430-175-118", then "430-175", then "430"
+        """
+        if not pay_item_no:
+            return None
+        # Clean up the pay item number
+        code = pay_item_no.strip().upper()
+        return code
+
+    def match_to_price_list(self, pay_item: Dict) -> Optional[Dict]:
+        """
+        Match a pay item to the price list.
+
+        Matching priority:
+        1. FDOT code exact match (e.g., "430-030")
+        2. FDOT code prefix match (e.g., "430-030" from "430-030-118")
+        3. Size + product type keyword match (fallback)
+        """
+        pay_item_no = pay_item.get('pay_item_no', '')
+        desc = pay_item.get('description', '').lower()
+
+        # Extract and normalize size from description
+        size_match = re.search(r'(\d{1,2})["\s]*(?:inch)?', desc)
+        extracted_size = f'{size_match.group(1)}"' if size_match else ''
+
+        # Strategy 1: Try FDOT code matching
+        if pay_item_no and self.price_list_by_fdot:
+            # Try exact match first
+            if pay_item_no in self.price_list_by_fdot:
+                candidates = self.price_list_by_fdot[pay_item_no]
+                return self._select_best_candidate(candidates, extracted_size, desc)
+
+            # Try prefix match (e.g., "430-030" from "430-030-118")
+            parts = pay_item_no.split('-')
+            for i in range(len(parts), 0, -1):
+                prefix = '-'.join(parts[:i])
+                if prefix in self.price_list_by_fdot:
+                    candidates = self.price_list_by_fdot[prefix]
+                    return self._select_best_candidate(candidates, extracted_size, desc)
+
+        # Strategy 2: Fallback to size + keyword matching
+        for key, product in self.price_list.items():
+            product_size = self._normalize_size(product.get('size', ''))
+
+            if extracted_size and extracted_size == product_size:
+                # Check product type keywords
+                product_type = product.get('product_type', '').lower()
+                if 'endwall' in desc and 'endwall' in product_type:
+                    return product
+                if ('rcp' in desc or 'pipe' in desc or 'culvert' in desc) and 'pipe' in product_type:
+                    return product
+                if 'inlet' in desc and 'inlet' in product_type:
+                    return product
+                if 'manhole' in desc and 'manhole' in product_type:
+                    return product
+                if 'mes' in desc and 'mes' in product_type:
+                    return product
+
+        # Strategy 3: Fuzzy matching fallback
+        fuzzy_match = self._fuzzy_match_product(desc, extracted_size)
+        if fuzzy_match:
+            return fuzzy_match
+
+        return None
+
+    def _fuzzy_match_product(self, description: str, size: str) -> Optional[Dict]:
+        """
+        Fuzzy match a description to products in the price list.
+
+        Uses token-based similarity scoring to find the best match.
+        Only returns a match if the score exceeds a confidence threshold.
+        """
+        if not self.price_list:
+            return None
+
+        # Tokenize and normalize the description
+        desc_tokens = self._tokenize(description)
+        if not desc_tokens:
+            return None
+
+        best_match = None
+        best_score = 0
+        min_score_threshold = 0.4  # Minimum 40% token match required
+
+        for key, product in self.price_list.items():
+            score = 0
+            product_type = product.get('product_type', '')
+            product_size = self._normalize_size(product.get('size', ''))
+            config = product.get('configuration', '')
+
+            # Tokenize product info
+            product_tokens = self._tokenize(f"{product_type} {config}")
+
+            # Calculate token overlap score
+            if product_tokens:
+                common_tokens = desc_tokens & product_tokens
+                token_score = len(common_tokens) / max(len(desc_tokens), len(product_tokens))
+                score += token_score * 60  # Up to 60 points for token match
+
+            # Size match bonus
+            if size and size == product_size:
+                score += 30  # 30 points for size match
+
+            # Partial size match (same diameter, different format)
+            elif size and product_size:
+                size_num = re.search(r'(\d+)', size)
+                prod_size_num = re.search(r'(\d+)', product_size)
+                if size_num and prod_size_num and size_num.group(1) == prod_size_num.group(1):
+                    score += 20  # 20 points for partial size match
+
+            # Normalize score to 0-1 range
+            normalized_score = score / 100
+
+            if normalized_score > best_score and normalized_score >= min_score_threshold:
+                best_score = normalized_score
+                best_match = product
+
+        return best_match
+
+    def _tokenize(self, text: str) -> set:
+        """
+        Tokenize text into normalized words for matching.
+        Removes common stop words and normalizes terms.
+        """
+        if not text:
+            return set()
+
+        # Convert to lowercase and split
+        words = re.findall(r'\b[a-z0-9]+\b', text.lower())
+
+        # Remove common stop words that don't help matching
+        stop_words = {'the', 'a', 'an', 'and', 'or', 'for', 'to', 'of', 'in', 'on', 'at', 'by', 'with'}
+
+        # Normalize common variations
+        normalizations = {
+            'endwalls': 'endwall',
+            'pipes': 'pipe',
+            'inlets': 'inlet',
+            'manholes': 'manhole',
+            'culverts': 'culvert',
+            'rcp': 'pipe',
+            'hdpe': 'pipe',
+            'pvc': 'pipe',
+            'cmp': 'pipe',
+            'srcp': 'pipe',
+        }
+
+        tokens = set()
+        for word in words:
+            if word not in stop_words and len(word) > 1:
+                # Apply normalization if available
+                normalized = normalizations.get(word, word)
+                tokens.add(normalized)
+
+        return tokens
+
+    def _select_best_candidate(self, candidates: List[Dict], size: str, desc: str) -> Optional[Dict]:
+        """
+        Select the best matching product from candidates with the same FDOT code.
+        Uses size and description keywords to narrow down.
+        """
+        if not candidates:
+            return None
+
+        if len(candidates) == 1:
+            return candidates[0]
+
+        # Score each candidate
+        scored = []
+        for product in candidates:
+            score = 0
+            product_size = self._normalize_size(product.get('size', ''))
+            product_type = product.get('product_type', '').lower()
+            config = product.get('configuration', '').lower()
+
+            # Size match is most important
+            if size and size == product_size:
+                score += 100
+
+            # Configuration matching
+            if 'single' in desc and 'single' in config:
+                score += 50
+            elif 'double' in desc and 'double' in config:
+                score += 50
+            elif 'triple' in desc and 'triple' in config:
+                score += 50
+            elif 'quad' in desc and 'quad' in config:
+                score += 50
+            elif 'single' in config and 'double' not in desc and 'triple' not in desc and 'quad' not in desc:
+                # Default to single if no configuration specified
+                score += 10
+
+            # Product type keyword matching
+            if 'straight' in desc and 'straight' in product_type:
+                score += 25
+            if 'winged' in desc and 'winged' in product_type:
+                score += 25
+            if 'u-type' in desc and 'u-type' in product_type:
+                score += 25
+
+            scored.append((score, product))
+
+        # Return highest scoring candidate
+        scored.sort(key=lambda x: x[0], reverse=True)
+        return scored[0][1] if scored else None
+
+    def match_all_items(self, pay_items: List[Dict]) -> List[Dict]:
+        """
+        Match all pay items to the price list.
+
+        Args:
+            pay_items: List of pay item dictionaries
+
+        Returns:
+            Updated list with matched prices
+        """
+        for item in pay_items:
+            matched_price = self.match_to_price_list(item)
+            if matched_price:
+                item['matched'] = True
+                item['unit_price'] = matched_price['price']
+                item['line_cost'] = item['quantity'] * matched_price['price']
+                item['matched_product'] = matched_price
+
+        return pay_items
+
+    def categorize_drainage(self, pay_items: List[Dict]) -> List[Dict]:
+        """
+        Categorize pay items into drainage structure types.
+
+        Types: Pipe, Endwall, Inlet, Manhole
+        """
+        drainage_items = []
+
+        for item in pay_items:
+            pay_no = item.get('pay_item_no', '')
+            desc = item.get('description', '').upper()
+
+            drainage_item = None
+
+            # Pipes (430-175-XXX, 430-084-XXX)
+            if pay_no.startswith('430-175') or pay_no.startswith('430-084') or 'PIPE' in desc:
+                size_match = re.search(r'(\d{1,2})["\s]*(?:INCH)?', desc)
+                size = f'{size_match.group(1)}"' if size_match else "-"
+
+                drainage_item = {
+                    "type": "Pipe",
+                    "size": size,
+                    "description": desc[:80] + ('...' if len(desc) > 80 else ''),
+                    "station": "-",
+                    "quantity": item.get('quantity', 0),
+                    "unit": item.get('unit', 'LF'),
+                    "unit_price": item.get('unit_price'),
+                    "line_total": item.get('line_cost')
+                }
+
+            # Endwalls (430-030, 430-040, 430-010, 430-518, 430-982)
+            elif any(pay_no.startswith(prefix) for prefix in ['430-03', '430-04', '430-01', '430-5', '430-98']):
+                size_match = re.search(r'(\d{1,2})["\s]*(?:INCH)?', desc)
+                size = f'{size_match.group(1)}"' if size_match else "-"
+
+                endwall_type = "Straight"
+                if "WINGED" in desc or "WING" in desc:
+                    endwall_type = "Winged"
+                elif "U-TYPE" in desc or "U TYPE" in desc:
+                    endwall_type = "U-Type"
+                elif "MES" in desc or "MITERED" in desc:
+                    endwall_type = "MES"
+
+                drainage_item = {
+                    "type": "Endwall",
+                    "size": size,
+                    "description": f"{endwall_type} - {desc[:60]}",
+                    "station": "-",
+                    "quantity": item.get('quantity', 0),
+                    "unit": item.get('unit', 'EA'),
+                    "unit_price": item.get('unit_price'),
+                    "line_total": item.get('line_cost')
+                }
+
+            # Inlets (425-1-XXX)
+            elif pay_no.startswith('425-1') or 'INLET' in desc:
+                inlet_type = "Standard"
+                if "TYPE D" in desc:
+                    inlet_type = "Type D"
+                elif "TYPE E" in desc:
+                    inlet_type = "Type E"
+                elif "TYPE P" in desc:
+                    inlet_type = "Type P"
+                elif "DITCH BOTTOM" in desc:
+                    inlet_type = "Ditch Bottom"
+
+                drainage_item = {
+                    "type": "Inlet",
+                    "size": inlet_type,
+                    "description": desc[:80] + ('...' if len(desc) > 80 else ''),
+                    "station": "-",
+                    "quantity": item.get('quantity', 0),
+                    "unit": item.get('unit', 'EA'),
+                    "unit_price": item.get('unit_price'),
+                    "line_total": item.get('line_cost')
+                }
+
+            # Manholes (425-2-XX)
+            elif pay_no.startswith('425-2') or 'MANHOLE' in desc:
+                mh_type = "Standard"
+                if "TYPE 7" in desc:
+                    mh_type = "Type 7"
+                elif "TYPE P" in desc or "P-7" in desc:
+                    mh_type = "Type P-7"
+
+                drainage_item = {
+                    "type": "Manhole",
+                    "size": mh_type,
+                    "description": desc[:80] + ('...' if len(desc) > 80 else ''),
+                    "station": "-",
+                    "quantity": item.get('quantity', 0),
+                    "unit": item.get('unit', 'EA'),
+                    "unit_price": item.get('unit_price'),
+                    "line_total": item.get('line_cost')
+                }
+
+            if drainage_item:
+                drainage_items.append(drainage_item)
+
+        return drainage_items
+
+    def extract_project_info(self, text: str, filename: str = "") -> Dict:
+        """Extract project information from document text."""
+        project_info = {
+            "name": filename.replace(".pdf", "").replace(".PDF", "").replace("_", " "),
+            "location": "",
+            "owner": "",
+            "engineer": ""
+        }
+
+        # Try to find project name
+        name_patterns = [
+            r"PROJECT[:\s]+(.+?)(?:\n|$)",
+            r"PROJECT NAME[:\s]+(.+?)(?:\n|$)",
+            r"TITLE[:\s]+(.+?)(?:\n|$)"
+        ]
+        for pattern in name_patterns:
+            match = re.search(pattern, text, re.IGNORECASE)
+            if match:
+                project_info["name"] = match.group(1).strip()
+                break
+
+        # Try to find location
+        location_patterns = [
+            r"(?:LOCATION|COUNTY)[:\s]+(.+?)(?:\n|$)",
+            r"(.+?COUNTY),?\s*(?:FLORIDA|FL)",
+        ]
+        for pattern in location_patterns:
+            match = re.search(pattern, text, re.IGNORECASE)
+            if match:
+                project_info["location"] = match.group(1).strip()
+                break
+
+        # Try to find owner
+        owner_patterns = [
+            r"(?:OWNER|CLIENT)[:\s]+(.+?)(?:\n|$)",
+            r"(?:FOR|PREPARED FOR)[:\s]+(.+?)(?:\n|$)"
+        ]
+        for pattern in owner_patterns:
+            match = re.search(pattern, text, re.IGNORECASE)
+            if match:
+                project_info["owner"] = match.group(1).strip()
+                break
+
+        # Try to find engineer
+        engineer_patterns = [
+            r"(?:ENGINEER|P\.?E\.?)[:\s]+(.+?)(?:\n|$)",
+            r"PREPARED BY[:\s]+(.+?)(?:\n|$)"
+        ]
+        for pattern in engineer_patterns:
+            match = re.search(pattern, text, re.IGNORECASE)
+            if match:
+                project_info["engineer"] = match.group(1).strip()
+                break
+
+        return project_info
+
+    def generate_report(self, pay_items: List[Dict], project_info: Dict = None) -> Dict:
+        """Generate complete takeoff report."""
+        matched_items = [p for p in pay_items if p.get('matched')]
+        total_cost = sum(p.get('line_cost', 0) or 0 for p in pay_items)
+
+        report = {
+            'project': project_info or {},
+            'pay_items': pay_items,
+            'summary': {
+                'total_items': len(pay_items),
+                'matched_items': len(matched_items),
+                'match_rate': len(matched_items) / len(pay_items) * 100 if pay_items else 0,
+                'estimated_total': round(total_cost, 2)
+            }
+        }
+
+        return report
+
+
+def analyze_text(
+    text: str,
+    price_list_path: str = None,
+    filename: str = ""
+) -> Dict:
+    """
+    Convenience function to analyze extracted text.
+
+    Args:
+        text: Extracted text from PDF
+        price_list_path: Path to FL 2025 price list CSV
+        filename: Original filename for project info
+
+    Returns:
+        Dictionary with analysis results
+    """
+    analyzer = TakeoffAnalyzer(price_list_path)
+
+    # Extract pay items
+    pay_items = analyzer.extract_pay_items(text)
+
+    # Match to price list
+    pay_items = analyzer.match_all_items(pay_items)
+
+    # Categorize drainage
+    drainage_structures = analyzer.categorize_drainage(pay_items)
+
+    # Extract project info
+    project_info = analyzer.extract_project_info(text, filename)
+
+    # Generate summary
+    matched_items = [p for p in pay_items if p.get('matched')]
+    total_cost = sum(p.get('line_cost', 0) or 0 for p in pay_items)
+
+    return {
+        "project_info": project_info,
+        "pay_items": pay_items,
+        "drainage_structures": drainage_structures,
+        "summary": {
+            "total_items": len(pay_items),
+            "matched_items": len(matched_items),
+            "match_rate": len(matched_items) / len(pay_items) * 100 if pay_items else 0,
+            "total_cost": round(total_cost, 2)
+        }
+    }
+
+
+if __name__ == '__main__':
+    # Example usage with multiple format types including new patterns
+    sample_text = """
+    SUMMARY OF PAY ITEMS
+    101-1 MOBILIZATION LS 1
+    102-1 MAINTENANCE OF TRAFFIC LS 1
+    425-1-549 INLET, TYPE D (MODIFIED) STRUCTURE EA 1
+    425-2-41 MANHOLE, TYPE 7 STRUCTURE EA 2
+    430-175-118 PIPE CULVERT, SRCP-CLASS III, ROUND 18" LF 98
+    430-518-120 STRAIGHT CONCRETE ENDWALLS, 18", SINGLE, ROUND EA 1
+
+    STORM DRAINAGE SCHEDULE
+    51 LF 15" RCP CLASS V @ 0.5%
+    125 LF 6" PVC SDR 35
+    79 LF 3" PVC SDR 35
+
+    NEW FORMAT TESTS:
+    18" RCP - 51 LF
+    24" HDPE (75 LF)
+    RCP 18" @ 100 LF
+    30" RCP = 200 LF
+
+    ELLIPTICAL PIPE TESTS:
+    75 LF 14"x23" RCP HE CLASS III
+    ERCP 19x30
+    24"X38" ERCP - 100 LF
+    43"x68" ELLIPTICAL RCP
+
+    STRUCTURES / ENDWALLS:
+    18" STRAIGHT ENDWALL SINGLE
+    STRAIGHT CONCRETE ENDWALL 24" DOUBLE
+    WINGED ENDWALL 30" 45 DEG
+    18" U-TYPE ENDWALL
+    24" MES 4:1
+    MES 18"
+    14"x23" MES
+    FLARED END 36"
+
+    PIPE SCHEDULE TABLE:
+    Size    Material    Qty    Unit
+    18"     RCP         150    LF
+    24"     PVC         85     LF
+    36"     HDPE        120    LF
+
+    STORM DRAIN MANHOLE #1
+    STORM DRAIN MANHOLE #2
+    GRATE INLET #1
+    CATCH BASIN
+
+    CAD CALLOUTS:
+    RCP 24
+    RCP 24
+    PVC 12
+    15" HDPE
+    """
+
+    result = analyze_text(sample_text, filename="sample_project.pdf")
+    print(json.dumps(result, indent=2))
+    print(f"\n=== Summary ===")
+    print(f"Total items detected: {result['summary']['total_items']}")
+    for item in result['pay_items']:
+        source = item.get('source', 'unknown')
+        conf = item.get('confidence', 'unknown')
+        print(f"  [{source}/{conf}] {item['pay_item_no']}: {item['description']} - {item['quantity']} {item['unit']}")

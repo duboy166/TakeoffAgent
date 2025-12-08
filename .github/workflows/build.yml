@@ -1,0 +1,111 @@
+name: Build Installers
+
+on:
+  # Trigger on version tags
+  push:
+    tags:
+      - 'v*'
+
+  # Allow manual trigger from Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: macos-latest
+            artifact_name: TakeoffAgent-macOS
+            artifact_path: dist/TakeoffAgent.app
+          - os: windows-latest
+            artifact_name: TakeoffAgent-Windows
+            artifact_path: dist/TakeoffAgent
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Build application
+        run: python build.py --all
+
+      - name: Create DMG (macOS only)
+        if: runner.os == 'macOS'
+        run: |
+          brew install create-dmg
+          create-dmg \
+            --volname "Takeoff Agent" \
+            --app-drop-link 400 200 \
+            "dist/TakeoffAgent.dmg" \
+            "dist/TakeoffAgent.app" || true
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: ${{ matrix.artifact_path }}
+          retention-days: 30
+
+      - name: Upload DMG (macOS only)
+        if: runner.os == 'macOS'
+        uses: actions/upload-artifact@v4
+        with:
+          name: TakeoffAgent-macOS-DMG
+          path: dist/TakeoffAgent.dmg
+          if-no-files-found: ignore
+          retention-days: 30
+
+  # Create GitHub Release when triggered by a tag
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Prepare release files
+        run: |
+          cd artifacts
+          # Zip macOS app
+          if [ -d "TakeoffAgent-macOS" ]; then
+            cd TakeoffAgent-macOS
+            zip -r ../TakeoffAgent-macOS.zip TakeoffAgent.app
+            cd ..
+          fi
+          # Zip Windows folder
+          if [ -d "TakeoffAgent-Windows" ]; then
+            cd TakeoffAgent-Windows
+            zip -r ../TakeoffAgent-Windows.zip TakeoffAgent
+            cd ..
+          fi
+          ls -la
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            artifacts/TakeoffAgent-macOS.zip
+            artifacts/TakeoffAgent-macOS-DMG/TakeoffAgent.dmg
+            artifacts/TakeoffAgent-Windows.zip
+          draft: false
+          generate_release_notes: true

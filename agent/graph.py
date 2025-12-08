@@ -1,0 +1,334 @@
+"""
+LangGraph Workflow Definition
+Wires together nodes and edges for the construction takeoff agent.
+"""
+
+import logging
+from typing import Dict, Any, Optional
+
+from langgraph.graph import StateGraph, END
+from langgraph.checkpoint.memory import MemorySaver
+
+from .state import TakeoffState, create_initial_state
+from .nodes import (
+    scan_pdfs_node,
+    check_split_pdf_node,
+    route_after_split_check,
+    extract_pdf_node,
+    parse_items_node,
+    match_prices_node,
+    generate_report_node,
+    batch_summary_node,
+)
+from .edges import (
+    route_after_extraction,
+    route_after_report,
+    increment_retry,
+    mark_file_failed,
+    advance_to_next_file,
+)
+
+logger = logging.getLogger(__name__)
+
+
+def create_takeoff_graph(checkpointer: Optional[MemorySaver] = None) -> StateGraph:
+    """
+    Create the LangGraph workflow for construction takeoff processing.
+
+    Graph structure:
+    ```
+    START (scan_pdfs)
+        │
+        ▼
+    check_split_pdf ◄─┐
+        │             │
+        ▼             │
+    [route_split]     │
+        │ extract     │
+        ▼             │
+    extract_pdf ◄─────┤
+        │             │
+        ▼             │
+    [route_after_extraction]
+        │ success     │ retry
+        ▼             │
+    parse_items ──────┘
+        │       │ skip
+        ▼       ▼
+    match_prices  mark_failed
+        │             │
+        ▼             │
+    generate_report   │
+        │             │
+        ▼             │
+    [route_after_report]
+        │ next_file   │
+        ▼             │
+    advance_file ─────┘
+        │ summary
+        ▼
+    batch_summary
+        │
+        ▼
+       END
+    ```
+
+    Args:
+        checkpointer: Optional checkpointer for state persistence
+
+    Returns:
+        Compiled StateGraph
+    """
+
+    # Create the graph with our state schema
+    workflow = StateGraph(TakeoffState)
+
+    # ========================
+    # Add Nodes
+    # ========================
+
+    # START: Scan for PDFs
+    workflow.add_node("scan_pdfs", scan_pdfs_node)
+
+    # Node 0: Check if PDF needs splitting
+    workflow.add_node("check_split_pdf", check_split_pdf_node)
+
+    # Node 1: Extract PDF text
+    workflow.add_node("extract_pdf", extract_pdf_node)
+
+    # Retry helper: Increment retry count
+    workflow.add_node("increment_retry", increment_retry)
+
+    # Skip helper: Mark file as failed
+    workflow.add_node("mark_failed", mark_file_failed)
+
+    # Node 2: Parse pay items
+    workflow.add_node("parse_items", parse_items_node)
+
+    # Node 3: Match prices
+    workflow.add_node("match_prices", match_prices_node)
+
+    # Node 4: Generate report
+    workflow.add_node("generate_report", generate_report_node)
+
+    # File transition: Advance to next file
+    workflow.add_node("advance_file", advance_to_next_file)
+
+    # Node 5: Batch summary
+    workflow.add_node("batch_summary", batch_summary_node)
+
+    # ========================
+    # Add Edges
+    # ========================
+
+    # Entry point
+    workflow.set_entry_point("scan_pdfs")
+
+    # After scanning, check if split needed
+    workflow.add_edge("scan_pdfs", "check_split_pdf")
+
+    # After split check: conditional routing
+    workflow.add_conditional_edges(
+        "check_split_pdf",
+        route_after_split_check,
+        {
+            "extract": "extract_pdf",
+            "skip": "mark_failed"
+        }
+    )
+
+    # After extraction: conditional routing
+    workflow.add_conditional_edges(
+        "extract_pdf",
+        route_after_extraction,
+        {
+            "parse": "parse_items",
+            "retry": "increment_retry",
+            "skip": "mark_failed"
+        }
+    )
+
+    # After retry increment, try extraction again
+    workflow.add_edge("increment_retry", "extract_pdf")
+
+    # After marking failed, check if more files
+    workflow.add_conditional_edges(
+        "mark_failed",
+        lambda state: "next_file" if state.get("current_file") else "summary",
+        {
+            "next_file": "check_split_pdf",
+            "summary": "batch_summary"
+        }
+    )
+
+    # Linear flow: parse -> match -> report
+    workflow.add_edge("parse_items", "match_prices")
+    workflow.add_edge("match_prices", "generate_report")
+
+    # After report: conditional routing
+    workflow.add_conditional_edges(
+        "generate_report",
+        route_after_report,
+        {
+            "next_file": "advance_file",
+            "summary": "batch_summary"
+        }
+    )
+
+    # After advancing, check if next file needs split
+    workflow.add_edge("advance_file", "check_split_pdf")
+
+    # Batch summary is the end
+    workflow.add_edge("batch_summary", END)
+
+    # Compile the graph
+    if checkpointer:
+        return workflow.compile(checkpointer=checkpointer)
+    return workflow.compile()
+
+
+def run_takeoff_workflow(
+    input_path: str,
+    output_path: str,
+    price_list_path: str = None,
+    dpi: int = 200,
+    parallel: bool = False,
+    max_retries: int = 3,
+    enable_checkpoints: bool = True
+) -> Dict[str, Any]:
+    """
+    Run the complete takeoff workflow.
+
+    Args:
+        input_path: PDF file or folder path
+        output_path: Directory for output reports
+        price_list_path: Path to FL 2025 price list CSV
+        dpi: OCR resolution
+        parallel: Enable parallel processing (future)
+        max_retries: Max retries per file
+        enable_checkpoints: Enable state persistence
+
+    Returns:
+        Final workflow state with results
+    """
+
+    # Create checkpointer if enabled
+    checkpointer = MemorySaver() if enable_checkpoints else None
+
+    # Create the graph
+    graph = create_takeoff_graph(checkpointer)
+
+    # Create initial state
+    initial_state = create_initial_state(
+        input_path=input_path,
+        output_path=output_path,
+        price_list_path=price_list_path,
+        dpi=dpi,
+        parallel=parallel,
+        max_retries=max_retries
+    )
+
+    logger.info(f"Starting takeoff workflow: {input_path} -> {output_path}")
+
+    # Run the graph
+    # Recursion limit: each file uses ~6 nodes, so 150 handles ~20+ files
+    if enable_checkpoints:
+        config = {
+            "configurable": {"thread_id": "takeoff-1"},
+            "recursion_limit": 150
+        }
+    else:
+        config = {"recursion_limit": 150}
+
+    try:
+        final_state = graph.invoke(initial_state, config)
+        logger.info("Workflow completed successfully")
+        return final_state
+    except Exception as e:
+        logger.error(f"Workflow failed: {e}")
+        raise
+
+
+def get_workflow_visualization() -> str:
+    """
+    Get ASCII visualization of the workflow graph.
+
+    Returns:
+        ASCII art representation of the graph
+    """
+    return """
+    Construction Takeoff Workflow
+    =============================
+
+                    ┌─────────────┐
+                    │  scan_pdfs  │
+                    │   (START)   │
+                    └──────┬──────┘
+                           │
+              ┌────────────▼────────────┐
+              │   check_split_pdf       │◄─────────────┐
+              │  (split if >25MB/90pg)  │              │
+              └────────────┬────────────┘              │
+                           │                           │
+                    ┌──────▼──────┐                    │
+                    │route_split  │                    │
+                    └──────┬──────┘                    │
+                           │                           │
+              ┌────────────▼────────────┐              │
+              │     extract_pdf         │◄──────────┐  │
+              │    (OCR or native)      │           │  │
+              └────────────┬────────────┘           │  │
+                           │                        │  │
+                    ┌──────▼──────┐                 │  │
+                    │route_after_ │                 │  │
+                    │ extraction  │                 │  │
+                    └──────┬──────┘                 │  │
+                           │                        │  │
+              ┌────────────┼────────────┐           │  │
+              │            │            │           │  │
+         success       retry        skip           │  │
+              │            │            │           │  │
+              ▼            ▼            ▼           │  │
+        ┌──────────┐ ┌──────────┐ ┌──────────┐     │  │
+        │  parse   │ │increment │ │  mark    │     │  │
+        │  items   │ │  retry   │ │ failed   │─────┼──┘
+        └────┬─────┘ └────┬─────┘ └──────────┘     │
+             │            │                        │
+             │            └────────────────────────┘
+             ▼
+        ┌──────────┐
+        │  match   │
+        │  prices  │
+        └────┬─────┘
+             │
+             ▼
+        ┌──────────┐
+        │ generate │
+        │  report  │
+        └────┬─────┘
+             │
+      ┌──────▼──────┐
+      │route_after_ │
+      │   report    │
+      └──────┬──────┘
+             │
+      ┌──────┴──────┐
+      │             │
+  next_file     summary
+      │             │
+      ▼             │
+ ┌──────────┐       │
+ │ advance  │───────┼─────────────────────────────────┐
+ │   file   │       │                                 │
+ └──────────┘       │                                 │
+                    ▼                                 │
+           ┌──────────────┐                           │
+           │    batch     │                           │
+           │   summary    │    (loops back to         │
+           └──────┬───────┘     check_split_pdf) ─────┘
+                  │
+                  ▼
+               ┌─────┐
+               │ END │
+               └─────┘
+    """

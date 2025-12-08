@@ -1,0 +1,37 @@
+# Construction Takeoff Agent Dependencies
+# =========================================
+
+# LangGraph - Workflow orchestration
+langgraph>=0.0.40
+langchain-core>=0.1.0
+
+# Anthropic - LLM for future AI-assisted features
+anthropic>=0.25.0
+langchain-anthropic>=0.1.0
+
+# PDF Processing
+PyMuPDF>=1.24.0             # PDF rendering and text extraction
+pdf2image>=1.17.0           # Fallback PDF to image conversion
+pypdf>=4.0.0                # PDF splitting and manipulation
+
+# OCR
+paddlepaddle>=2.6.0         # PaddleOCR backend
+paddleocr>=2.7.0            # OCR with table detection
+
+# Image handling
+Pillow>=10.0.0              # Image processing
+numpy>=1.24.0               # Array operations
+
+# Environment
+python-dotenv>=1.0.0        # Load .env files
+
+# GUI
+customtkinter>=5.2.0        # Modern Tkinter UI
+
+# Optional: GPU support for faster OCR
+# Uncomment for GPU acceleration:
+# paddlepaddle-gpu>=2.6.0
+
+# Development (optional)
+# pytest>=7.0.0
+# pytest-asyncio>=0.21.0
