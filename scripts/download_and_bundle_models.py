@@ -4,14 +4,14 @@ Download and bundle PaddleOCR models for distribution.
 
 This script:
 1. Initializes PaddleOCR to trigger model download (if not already cached)
-2. Locates the downloaded models in ~/.paddleocr/whl/
+2. Locates the downloaded models (supports both PaddleOCR 2.x and 3.x locations)
 3. Copies them to the models/ directory for bundling with PyInstaller
 
 Creates the models/ directory structure:
     models/
         det/           - Detection model files
         rec/           - Recognition model files
-        cls/           - Classification model files
+        cls/           - Classification/orientation model files
 
 Usage:
     python scripts/download_and_bundle_models.py
@@ -28,16 +28,21 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 PROJECT_ROOT = Path(__file__).parent.parent
 
 
-def get_paddle_cache() -> Path:
-    """Get the PaddleOCR cache directory."""
+def get_paddleocr_v2_cache() -> Path:
+    """Get the PaddleOCR 2.x cache directory."""
     return Path.home() / ".paddleocr" / "whl"
 
 
-def find_model_dirs(cache_dir: Path) -> dict:
-    """
-    Find detection, recognition, and classification model directories.
+def get_paddlex_cache() -> Path:
+    """Get the PaddleX/PaddleOCR 3.x cache directory."""
+    return Path.home() / ".paddlex" / "official_models"
 
-    PaddleOCR stores models in nested directories like:
+
+def find_models_v2(cache_dir: Path) -> dict:
+    """
+    Find models in PaddleOCR 2.x cache structure.
+
+    Structure:
         ~/.paddleocr/whl/det/en/en_PP-OCRv4_det_infer/
         ~/.paddleocr/whl/rec/en/en_PP-OCRv4_rec_infer/
         ~/.paddleocr/whl/cls/ch_ppocr_mobile_v2.0_cls_infer/
@@ -52,14 +57,11 @@ def find_model_dirs(cache_dir: Path) -> dict:
         if not type_dir.exists():
             continue
 
-        # Search for model directories (may be nested under language folders)
         for root, dirs, files in os.walk(type_dir):
             root_path = Path(root)
-            # Look for directories containing inference model files
             if any(f.endswith('.pdmodel') or f == 'inference.pdmodel' for f in files):
                 models[model_type] = root_path
                 break
-            # Also check for the _infer naming convention
             for d in dirs:
                 if '_infer' in d:
                     potential_path = root_path / d
@@ -70,6 +72,65 @@ def find_model_dirs(cache_dir: Path) -> dict:
                 break
 
     return models
+
+
+def find_models_v3(cache_dir: Path) -> dict:
+    """
+    Find models in PaddleOCR 3.x / PaddleX cache structure.
+
+    Structure:
+        ~/.paddlex/official_models/PP-OCRv5_server_det/
+        ~/.paddlex/official_models/en_PP-OCRv5_mobile_rec/
+        ~/.paddlex/official_models/PP-LCNet_x1_0_textline_ori/
+    """
+    models = {"det": None, "rec": None, "cls": None}
+
+    if not cache_dir.exists():
+        return models
+
+    # Map model name patterns to model types
+    model_patterns = {
+        "det": ["_det", "PP-OCRv5_server_det", "PP-OCRv4_det", "det_infer"],
+        "rec": ["_rec", "PP-OCRv5_mobile_rec", "PP-OCRv4_rec", "rec_infer"],
+        "cls": ["textline_ori", "doc_ori", "_cls", "cls_infer"],
+    }
+
+    for model_dir in cache_dir.iterdir():
+        if not model_dir.is_dir():
+            continue
+
+        dir_name = model_dir.name
+
+        for model_type, patterns in model_patterns.items():
+            if models[model_type]:
+                continue
+            for pattern in patterns:
+                if pattern in dir_name:
+                    # Find the actual inference directory
+                    inference_dir = find_inference_dir(model_dir)
+                    if inference_dir:
+                        models[model_type] = inference_dir
+                        break
+
+    return models
+
+
+def find_inference_dir(model_dir: Path) -> Path:
+    """Find the directory containing .pdmodel files within a model directory."""
+    # Check if model files are directly in the directory
+    if any(model_dir.glob("*.pdmodel")):
+        return model_dir
+
+    # Check for inference subdirectory
+    inference_dir = model_dir / "inference"
+    if inference_dir.exists() and any(inference_dir.glob("*.pdmodel")):
+        return inference_dir
+
+    # Search recursively for .pdmodel files
+    for pdmodel in model_dir.rglob("*.pdmodel"):
+        return pdmodel.parent
+
+    return None
 
 
 def copy_models(source_models: dict, dest_dir: Path) -> bool:
@@ -109,10 +170,7 @@ def verify_models(models_dir: Path) -> bool:
             return False
 
         # Check for inference model files
-        has_model = (
-            any(model_path.glob("*.pdmodel")) or
-            any(model_path.glob("inference.pdmodel"))
-        )
+        has_model = any(model_path.rglob("*.pdmodel"))
         if not has_model:
             print(f"  ERROR: {model_type}/ missing .pdmodel files")
             return False
@@ -161,17 +219,32 @@ def main():
     print()
     print("Step 2: Locating downloaded models...")
 
-    cache_dir = get_paddle_cache()
+    # Try PaddleOCR 3.x / PaddleX location first
+    paddlex_cache = get_paddlex_cache()
+    paddleocr_cache = get_paddleocr_v2_cache()
 
-    if not cache_dir.exists():
-        print(f"  ERROR: Cache directory not found: {cache_dir}")
+    models = {"det": None, "rec": None, "cls": None}
+    cache_used = None
+
+    if paddlex_cache.exists():
+        print(f"  Found PaddleX cache: {paddlex_cache}")
+        models = find_models_v3(paddlex_cache)
+        cache_used = "paddlex"
+
+    # Fall back to PaddleOCR 2.x if v3 models not found
+    if not any(models.values()) and paddleocr_cache.exists():
+        print(f"  Found PaddleOCR 2.x cache: {paddleocr_cache}")
+        models = find_models_v2(paddleocr_cache)
+        cache_used = "paddleocr_v2"
+
+    if not any(models.values()):
+        print(f"  ERROR: No model cache found at:")
+        print(f"         - {paddlex_cache}")
+        print(f"         - {paddleocr_cache}")
         print("         PaddleOCR may not have downloaded models correctly.")
         return 1
 
-    print(f"  Cache directory: {cache_dir}")
-
-    models = find_model_dirs(cache_dir)
-
+    print(f"  Using cache: {cache_used}")
     all_found = True
     for model_type, path in models.items():
         if path:
@@ -217,7 +290,7 @@ def main():
     else:
         print()
         print("  ERROR: Model verification failed.")
-        print("         Try deleting ~/.paddleocr/ and running again.")
+        print("         Try deleting ~/.paddleocr/ and ~/.paddlex/ and running again.")
         return 1
 
 
