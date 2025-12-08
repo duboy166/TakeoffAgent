@@ -246,10 +246,13 @@ Examples:
 
     # Full or incremental build
     if args.all:
-        # Bundle models
-        if not bundle_models():
-            print("\n  Error: Model bundling failed")
-            return 1
+        # Bundle models only if they don't already exist
+        if check_models():
+            print("\n  Models already exist, skipping download...")
+        else:
+            if not bundle_models():
+                print("\n  Error: Model bundling failed")
+                return 1
 
         # Create icons (non-fatal if fails)
         if not create_icons():
