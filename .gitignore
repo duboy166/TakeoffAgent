@@ -37,6 +37,10 @@ __pycache__/
 *~
 .DS_Store
 
+# Claude Code (development aids)
+CLAUDE.md
+.claude/
+
 # Testing
 .pytest_cache/
 .coverage
