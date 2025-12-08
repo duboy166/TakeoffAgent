@@ -57,6 +57,16 @@ try:
 except ImportError:
     print("WARNING: customtkinter not found")
 
+# PaddleX package data (includes .version file required at runtime)
+try:
+    import paddlex
+    paddlex_path = Path(paddlex.__file__).parent
+    # Include .version file and any other data files
+    datas.append((str(paddlex_path / '.version'), 'paddlex'))
+    print(f"Including paddlex .version from: {paddlex_path}")
+except ImportError:
+    print("WARNING: paddlex not found - OCR may not work")
+
 # Analysis
 a = Analysis(
     ['run_gui.py'],
@@ -85,6 +95,11 @@ a = Analysis(
         'paddle.utils',
         'paddle.dataset',
         'paddle.reader',
+
+        # PaddleX (required by PaddleOCR)
+        'paddlex',
+        'paddlex.inference',
+        'paddlex.utils',
 
         # PDF processing
         'fitz',
