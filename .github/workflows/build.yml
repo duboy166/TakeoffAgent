@@ -42,9 +42,61 @@ jobs:
       - name: Download OCR models
         shell: bash
         run: |
-          curl -L https://github.com/duboy166/TakeoffAgent/releases/download/models-v1/models.zip -o models.zip
+          # Download models from GitHub Release (models-v2 with PaddleOCR 3.x format)
+          curl -L https://github.com/duboy166/TakeoffAgent/releases/download/models-v2/models.zip -o models.zip
           unzip models.zip
           ls -la models/
+
+      - name: Verify model files
+        shell: bash
+        run: |
+          # Verify that models contain required files
+          echo "Verifying model files..."
+          MODELS_OK=true
+
+          for model_type in det rec cls; do
+            MODEL_DIR="models/${model_type}"
+            if [ ! -d "$MODEL_DIR" ]; then
+              echo "ERROR: Missing model directory: $MODEL_DIR"
+              MODELS_OK=false
+              continue
+            fi
+
+            # Check for .pdiparams (always required)
+            if ! ls "$MODEL_DIR"/*.pdiparams 1>/dev/null 2>&1 && [ ! -f "$MODEL_DIR/inference.pdiparams" ]; then
+              echo "ERROR: $MODEL_DIR missing .pdiparams file"
+              MODELS_OK=false
+              continue
+            fi
+
+            # Check for model definition (.pdmodel or inference.json)
+            HAS_PDMODEL=false
+            HAS_JSON=false
+            ls "$MODEL_DIR"/*.pdmodel 1>/dev/null 2>&1 && HAS_PDMODEL=true
+            [ -f "$MODEL_DIR/inference.json" ] && HAS_JSON=true
+
+            if [ "$HAS_PDMODEL" = false ] && [ "$HAS_JSON" = false ]; then
+              echo "ERROR: $MODEL_DIR missing model definition (.pdmodel or inference.json)"
+              MODELS_OK=false
+              continue
+            fi
+
+            # Report format
+            if [ "$HAS_JSON" = true ]; then
+              echo "  $model_type: OK (PaddleOCR 3.x - inference.json)"
+            else
+              echo "  $model_type: OK (PaddleOCR 2.x - .pdmodel)"
+            fi
+          done
+
+          if [ "$MODELS_OK" = false ]; then
+            echo ""
+            echo "ERROR: Model verification failed!"
+            echo "Please ensure models-v2 release contains complete model files."
+            exit 1
+          fi
+          echo ""
+          echo "Model verification complete."
 
       - name: Build application
         run: python build.py --all

@@ -116,19 +116,26 @@ def find_models_v3(cache_dir: Path) -> dict:
 
 
 def find_inference_dir(model_dir: Path) -> Path:
-    """Find the directory containing .pdmodel files within a model directory."""
+    """Find the directory containing model files within a model directory.
+
+    Supports both PaddleOCR 2.x (.pdmodel) and 3.x (inference.json) formats.
+    """
     # Check if model files are directly in the directory
-    if any(model_dir.glob("*.pdmodel")):
+    # PaddleOCR 2.x uses .pdmodel, 3.x uses inference.json
+    if any(model_dir.glob("*.pdmodel")) or (model_dir / "inference.json").exists():
         return model_dir
 
     # Check for inference subdirectory
     inference_dir = model_dir / "inference"
-    if inference_dir.exists() and any(inference_dir.glob("*.pdmodel")):
-        return inference_dir
+    if inference_dir.exists():
+        if any(inference_dir.glob("*.pdmodel")) or (inference_dir / "inference.json").exists():
+            return inference_dir
 
-    # Search recursively for .pdmodel files
+    # Search recursively for model files
     for pdmodel in model_dir.rglob("*.pdmodel"):
         return pdmodel.parent
+    for json_file in model_dir.rglob("inference.json"):
+        return json_file.parent
 
     return None
 
@@ -160,7 +167,10 @@ def copy_models(source_models: dict, dest_dir: Path) -> bool:
 
 
 def verify_models(models_dir: Path) -> bool:
-    """Verify that bundled models contain required files."""
+    """Verify that bundled models contain required files.
+
+    Supports both PaddleOCR 2.x (.pdmodel) and 3.x (inference.json) formats.
+    """
     required = ["det", "rec", "cls"]
 
     for model_type in required:
@@ -169,11 +179,23 @@ def verify_models(models_dir: Path) -> bool:
             print(f"  ERROR: {model_type}/ directory missing")
             return False
 
-        # Check for inference model files
-        has_model = any(model_path.rglob("*.pdmodel"))
-        if not has_model:
-            print(f"  ERROR: {model_type}/ missing .pdmodel files")
+        # Check for .pdiparams (always required)
+        has_params = any(model_path.rglob("*.pdiparams"))
+        if not has_params:
+            print(f"  ERROR: {model_type}/ missing .pdiparams files")
             return False
+
+        # Check for model definition (.pdmodel OR inference.json)
+        has_pdmodel = any(model_path.rglob("*.pdmodel"))
+        has_json = (model_path / "inference.json").exists()
+
+        if not has_pdmodel and not has_json:
+            print(f"  ERROR: {model_type}/ missing model definition (.pdmodel or inference.json)")
+            return False
+
+        # Show format detected
+        fmt = "PaddleOCR 2.x (.pdmodel)" if has_pdmodel else "PaddleOCR 3.x (inference.json)"
+        print(f"  {model_type}: OK ({fmt})")
 
     return True
 

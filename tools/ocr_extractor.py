@@ -11,21 +11,13 @@ from pathlib import Path
 from typing import List, Dict, Optional, Tuple
 from dataclasses import dataclass
 
-
-def get_bundled_model_dir() -> Optional[str]:
-    """
-    Get the path to bundled models when running as a frozen executable.
-
-    Returns:
-        Path to models directory if bundled, None otherwise.
-    """
-    if getattr(sys, 'frozen', False):
-        # Running as compiled executable (PyInstaller)
-        bundle_dir = Path(sys._MEIPASS)
-        models_dir = bundle_dir / 'models'
-        if models_dir.exists():
-            return str(models_dir)
-    return None
+# Import model manager for flexible model handling
+from tools.model_manager import (
+    get_bundled_model_dir,
+    ModelManager,
+    ModelStatus,
+    ensure_models_available,
+)
 
 # PDF handling
 try:
@@ -105,33 +97,95 @@ class OCRExtractor:
 
     def _init_ocr(self):
         """Initialize PaddleOCR if available."""
-        if PADDLEOCR_AVAILABLE:
-            try:
-                # Check for bundled models (when running as frozen executable)
-                bundled_dir = get_bundled_model_dir()
-
-                # Base OCR parameters (show_log removed - deprecated in newer versions)
-                ocr_params = {
-                    'use_angle_cls': True,
-                    'lang': self.lang,
-                }
-
-                if bundled_dir:
-                    # Use bundled models
-                    logger.info(f"Using bundled models from: {bundled_dir}")
-                    ocr_params.update({
-                        'det_model_dir': os.path.join(bundled_dir, 'det'),
-                        'rec_model_dir': os.path.join(bundled_dir, 'rec'),
-                        'cls_model_dir': os.path.join(bundled_dir, 'cls'),
-                    })
-
-                self.ocr = PaddleOCR(**ocr_params)
-                logger.info("PaddleOCR initialized successfully")
-            except Exception as e:
-                logger.warning(f"Failed to initialize PaddleOCR: {e}")
-                self.ocr = None
-        else:
+        if not PADDLEOCR_AVAILABLE:
             logger.warning("PaddleOCR not available. Install with: pip install paddlepaddle paddleocr")
+            return
+
+        try:
+            # Base OCR parameters (show_log removed - deprecated in newer versions)
+            ocr_params = {
+                'use_angle_cls': True,
+                'lang': self.lang,
+            }
+
+            # Check for bundled models first (frozen executable)
+            bundled_dir = get_bundled_model_dir()
+
+            if bundled_dir:
+                # Use bundled models (PyInstaller build)
+                logger.info(f"Using bundled models from: {bundled_dir}")
+                model_paths = {
+                    'det_model_dir': os.path.join(bundled_dir, 'det'),
+                    'rec_model_dir': os.path.join(bundled_dir, 'rec'),
+                    'cls_model_dir': os.path.join(bundled_dir, 'cls'),
+                }
+                # Verify bundled models exist
+                if not self._verify_model_paths(model_paths):
+                    raise RuntimeError("Bundled models are incomplete or missing")
+                ocr_params.update(model_paths)
+            else:
+                # Development mode - use ModelManager for app-controlled models
+                manager = ModelManager()
+                status = manager.get_model_status()
+
+                if status == ModelStatus.READY:
+                    # Use app-controlled models
+                    model_paths = manager.get_model_paths()
+                    logger.info(f"Using app models from: {manager.models_dir}")
+                    ocr_params.update(model_paths)
+                elif status == ModelStatus.NEEDS_DOWNLOAD:
+                    # Models not available - let PaddleOCR use system cache or download
+                    # The GUI should handle first-run download with progress
+                    logger.info("App models not found, using PaddleOCR default model location")
+                    # Try system cache as fallback
+                    system_models = manager.find_system_models()
+                    if system_models:
+                        logger.info("Found models in system cache")
+                        ocr_params.update(system_models)
+                else:
+                    # CORRUPTED - something is wrong
+                    logger.warning("App models appear corrupted, using PaddleOCR defaults")
+
+            self.ocr = PaddleOCR(**ocr_params)
+            logger.info("PaddleOCR initialized successfully")
+
+        except Exception as e:
+            logger.warning(f"Failed to initialize PaddleOCR: {e}")
+            self.ocr = None
+
+    def _verify_model_paths(self, model_paths: dict) -> bool:
+        """
+        Verify that model directories exist and contain required files.
+
+        Args:
+            model_paths: Dict with det_model_dir, rec_model_dir, cls_model_dir
+
+        Returns:
+            True if all paths exist and have model files
+        """
+        for key, path in model_paths.items():
+            path_obj = Path(path)
+            if not path_obj.exists():
+                logger.error(f"Model path does not exist: {path}")
+                return False
+
+            # Check for required files (.pdiparams is always needed)
+            has_pdiparams = any(path_obj.glob("*.pdiparams")) or \
+                           (path_obj / "inference.pdiparams").exists()
+
+            if not has_pdiparams:
+                logger.error(f"Model path missing .pdiparams: {path}")
+                return False
+
+            # Check for model definition (.pdmodel or inference.json)
+            has_pdmodel = any(path_obj.glob("*.pdmodel"))
+            has_inference_json = (path_obj / "inference.json").exists()
+
+            if not has_pdmodel and not has_inference_json:
+                logger.error(f"Model path missing model definition: {path}")
+                return False
+
+        return True
 
     def extract_from_pdf(self, pdf_path: str, dpi: int = 200) -> ExtractedDocument:
         """
