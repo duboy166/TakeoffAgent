@@ -93,19 +93,22 @@ jobs:
       - name: Prepare release files
         run: |
           cd artifacts
-          # Zip macOS app
+          echo "Artifact contents:"
+          ls -laR
+          # Zip macOS app (the .app is directly in the artifact folder)
           if [ -d "TakeoffAgent-macOS" ]; then
             cd TakeoffAgent-macOS
-            zip -r ../TakeoffAgent-macOS.zip TakeoffAgent.app
+            zip -r ../TakeoffAgent-macOS.zip .
             cd ..
           fi
           # Zip Windows folder
           if [ -d "TakeoffAgent-Windows" ]; then
             cd TakeoffAgent-Windows
-            zip -r ../TakeoffAgent-Windows.zip TakeoffAgent
+            zip -r ../TakeoffAgent-Windows.zip .
             cd ..
           fi
-          ls -la
+          echo "Release files:"
+          ls -la *.zip 2>/dev/null || echo "No zip files created"
 
       - name: Create Release
         uses: softprops/action-gh-release@v1
