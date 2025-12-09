@@ -191,7 +191,7 @@ a = Analysis(
     ],
     hookspath=[],
     hooksconfig={},
-    runtime_hooks=[],
+    runtime_hooks=[str(PROJECT_ROOT / 'hooks' / 'hook-paddlex-runtime.py')],
     excludes=[
         # Test frameworks
         'pytest',
