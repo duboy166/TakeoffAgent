@@ -60,9 +60,22 @@ try:
 except ImportError:
     print("WARNING: customtkinter not found")
 
-# PaddleX package data - MUST collect ALL data files, not just .version
+# PaddleX package data - MUST collect ALL data files including hidden files
 # PaddleX uses __file__ to find its package directory at runtime
 try:
+    import paddlex
+    paddlex_path = Path(paddlex.__file__).parent
+
+    # collect_data_files doesn't pick up hidden files (starting with .)
+    # So we must explicitly add .version file
+    version_file = paddlex_path / '.version'
+    if version_file.exists():
+        datas.append((str(version_file), 'paddlex'))
+        print(f"Including paddlex .version from: {paddlex_path}")
+    else:
+        print(f"WARNING: paddlex .version not found at {version_file}")
+
+    # Also collect any other data files
     paddlex_datas = collect_data_files('paddlex')
     datas.extend(paddlex_datas)
     print(f"Including paddlex data files: {len(paddlex_datas)} files")
