@@ -18,6 +18,9 @@ import sys
 import os
 from pathlib import Path
 
+# PyInstaller hook utilities for collecting package data
+from PyInstaller.utils.hooks import collect_data_files, collect_submodules
+
 # Get the project root directory
 PROJECT_ROOT = Path(SPECPATH)
 
@@ -57,21 +60,43 @@ try:
 except ImportError:
     print("WARNING: customtkinter not found")
 
-# PaddleX package data (includes .version file required at runtime)
+# PaddleX package data - MUST collect ALL data files, not just .version
+# PaddleX uses __file__ to find its package directory at runtime
 try:
-    import paddlex
-    paddlex_path = Path(paddlex.__file__).parent
-    # Include .version file and any other data files
-    datas.append((str(paddlex_path / '.version'), 'paddlex'))
-    print(f"Including paddlex .version from: {paddlex_path}")
-except ImportError:
-    print("WARNING: paddlex not found - OCR may not work")
+    paddlex_datas = collect_data_files('paddlex')
+    datas.extend(paddlex_datas)
+    print(f"Including paddlex data files: {len(paddlex_datas)} files")
+except Exception as e:
+    print(f"WARNING: Could not collect paddlex data: {e}")
+
+# PaddleOCR package data
+try:
+    paddleocr_datas = collect_data_files('paddleocr')
+    datas.extend(paddleocr_datas)
+    print(f"Including paddleocr data files: {len(paddleocr_datas)} files")
+except Exception as e:
+    print(f"WARNING: Could not collect paddleocr data: {e}")
+
+# Paddle binaries (especially important for Windows)
+binaries = []
+try:
+    import paddle
+    paddle_path = Path(paddle.__file__).parent
+    libs_dir = paddle_path / 'libs'
+    if libs_dir.exists():
+        # Collect all DLLs/SOs from paddle/libs
+        for lib_file in libs_dir.glob('*'):
+            if lib_file.is_file():
+                binaries.append((str(lib_file), 'paddle/libs'))
+        print(f"Including paddle libs: {len(binaries)} binaries")
+except Exception as e:
+    print(f"WARNING: Could not collect paddle libs: {e}")
 
 # Analysis
 a = Analysis(
     ['run_gui.py'],
     pathex=[str(PROJECT_ROOT)],
-    binaries=[],
+    binaries=binaries,
     datas=datas,
     hiddenimports=[
         # LangGraph and LangChain
@@ -100,6 +125,12 @@ a = Analysis(
         'paddlex',
         'paddlex.inference',
         'paddlex.utils',
+        'paddlex.modules',
+        'paddlex.modules.text_recognition',
+
+        # Additional scipy imports often needed
+        'scipy._lib.messagestream',
+        'scipy.special._cdflib',
 
         # PDF processing
         'fitz',
@@ -162,7 +193,7 @@ a = Analysis(
         # Heavy unused libraries
         'matplotlib',
         'matplotlib.pyplot',
-        'scipy',
+        # Note: scipy is needed by PaddleOCR - do not exclude
         'pandas',
 
         # Development tools
