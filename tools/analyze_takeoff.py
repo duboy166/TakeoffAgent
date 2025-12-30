@@ -30,8 +30,18 @@ STRUCTURE_TYPES = {
     'WINGED_ENDWALL': ['winged endwall', 'winged end wall', 'wing endwall', 'wing wall'],
     'U_TYPE_ENDWALL': ['u-type endwall', 'u type endwall', 'u-type end wall', 'utype'],
     'MES': ['mes', 'mitered end section', 'mitered end', 'mitered'],
-    'FLARED_END': ['flared end', 'flared end section', 'fes']
+    'FLARED_END': ['flared end', 'flared end section', 'fes'],
+    'PIPE_CRADLE': ['pipe cradle', 'cradle']
 }
+
+# Valid U-Type Endwall slope ratios from FL 2025 catalog
+VALID_SLOPE_RATIOS = {'2:1', '3:1', '4:1', '6:1'}
+
+# Valid MES run configurations
+VALID_MES_CONFIGS = {'SINGLE RUN', 'DOUBLE RUN', 'TRIPLE RUN'}
+
+# Valid MES frame options
+VALID_MES_FRAME_OPTIONS = {'WITH FRAME', 'NO FRAME'}
 
 
 class TakeoffAnalyzer:
@@ -132,16 +142,22 @@ class TakeoffAnalyzer:
         # Strategy 3: Elliptical pipe (14"x23" RCP HE, ERCP, etc.)
         items.extend(self._extract_elliptical_pipe_items(page_text, seen))
 
-        # Strategy 4: Structures (endwalls, MES, flared ends)
+        # Strategy 4: Elliptical accessories (Flared End, MES for elliptical)
+        items.extend(self._extract_elliptical_accessories(page_text, seen))
+
+        # Strategy 5: Structures (endwalls, MES, flared ends, pipe cradles)
         items.extend(self._extract_structure_items(page_text, seen))
 
-        # Strategy 5: Table extraction (pipe schedules, quantity tables)
+        # Strategy 6: Galvanized Steel MES (round and elliptical)
+        items.extend(self._extract_galvanized_mes_items(page_text, seen))
+
+        # Strategy 7: Table extraction (pipe schedules, quantity tables)
         items.extend(self._extract_table_items(page_text, seen))
 
-        # Strategy 6: Pipe callouts (CAD annotations)
+        # Strategy 8: Pipe callouts (CAD annotations)
         items.extend(self._extract_callout_items(page_text, seen))
 
-        # Strategy 7: Drainage structure labels
+        # Strategy 9: Drainage structure labels
         items.extend(self._extract_drainage_labels(page_text, seen))
 
         return items
@@ -561,6 +577,128 @@ class TakeoffAnalyzer:
 
         return items
 
+    def _extract_elliptical_accessories(self, text: str, seen: set) -> List[Dict]:
+        """
+        Extract elliptical pipe accessories: Flared Ends and MES.
+
+        These are separate from regular elliptical pipe detection because they're
+        accessories/end treatments, not the pipe itself.
+
+        Formats detected:
+        - 14"x23" FLARED END, FLARED END 14x23, 14X23 FE
+        - 14"x23" MES, MES 14x23, 14X23 MES 4:1
+
+        Args:
+            text: Page text to search
+            seen: Set of already-seen items
+
+        Returns:
+            List of extracted elliptical accessory items
+        """
+        items = []
+
+        # Patterns for elliptical FLARED END
+        flared_patterns = [
+            # SIZE FLARED END - e.g., "14"x23" FLARED END" or "14x23 FE"
+            (r'(\d+)\s*["\u201d]?\s*[xX×]\s*(\d+)\s*["\u201d]?\s*(?:FLARED\s*END(?:\s*SECTION)?|FE|FES)',
+             1, 2),
+            # FLARED END SIZE - e.g., "FLARED END 14x23" or "FE 14"x23""
+            (r'(?:FLARED\s*END(?:\s*SECTION)?|FE|FES)\s*(\d+)\s*["\u201d]?\s*[xX×]\s*(\d+)\s*["\u201d]?',
+             1, 2),
+        ]
+
+        # Patterns for elliptical MES (concrete, not galvanized)
+        mes_patterns = [
+            # SIZE MES - e.g., "14"x23" MES 4:1" or "14x23 MES"
+            (r'(\d+)\s*["\u201d]?\s*[xX×]\s*(\d+)\s*["\u201d]?\s*MES(?:\s*4:1)?',
+             1, 2),
+            # MES SIZE - e.g., "MES 14x23" or "MES 14"x23" 4:1"
+            (r'MES\s*(\d+)\s*["\u201d]?\s*[xX×]\s*(\d+)\s*["\u201d]?(?:\s*4:1)?',
+             1, 2),
+            # MITERED END SECTION SIZE - e.g., "MITERED END SECTION 14x23"
+            (r'MITERED\s*END(?:\s*SECTION)?\s*(\d+)\s*["\u201d]?\s*[xX×]\s*(\d+)\s*["\u201d]?',
+             1, 2),
+        ]
+
+        # Process FLARED END patterns
+        for pattern, rise_grp, span_grp in flared_patterns:
+            for match in re.finditer(pattern, text, re.IGNORECASE | re.MULTILINE):
+                try:
+                    rise = int(match.group(rise_grp))
+                    span = int(match.group(span_grp))
+
+                    # Validate elliptical size
+                    if not self._is_valid_elliptical_size(rise, span):
+                        continue
+
+                    size_str = f'{rise}"x{span}"'
+                    item_key = f"ellip_flared_{rise}x{span}"
+
+                    if item_key in seen:
+                        continue
+                    seen.add(item_key)
+
+                    items.append({
+                        'pay_item_no': f'ERCP-FE-{rise}x{span}',
+                        'description': f'{size_str} ELLIPTICAL FLARED END',
+                        'unit': 'EA',
+                        'quantity': 1,
+                        'matched': False,
+                        'unit_price': None,
+                        'line_cost': None,
+                        'source': 'elliptical_accessory',
+                        'confidence': 'medium',
+                        'structure_type': 'FLARED_END_ELLIPTICAL',
+                        'rise': rise,
+                        'span': span
+                    })
+                except (ValueError, IndexError):
+                    continue
+
+        # Process MES patterns (but avoid galvanized - those handled separately)
+        for pattern, rise_grp, span_grp in mes_patterns:
+            for match in re.finditer(pattern, text, re.IGNORECASE | re.MULTILINE):
+                try:
+                    # Skip if this looks like a galvanized MES (has GALV nearby)
+                    start = max(0, match.start() - 30)
+                    end = min(len(text), match.end() + 30)
+                    context = text[start:end].upper()
+                    if 'GALV' in context or 'STEEL' in context:
+                        continue
+
+                    rise = int(match.group(rise_grp))
+                    span = int(match.group(span_grp))
+
+                    # Validate elliptical size
+                    if not self._is_valid_elliptical_size(rise, span):
+                        continue
+
+                    size_str = f'{rise}"x{span}"'
+                    item_key = f"ellip_mes_{rise}x{span}"
+
+                    if item_key in seen:
+                        continue
+                    seen.add(item_key)
+
+                    items.append({
+                        'pay_item_no': f'ERCP-MES-{rise}x{span}',
+                        'description': f'{size_str} ELLIPTICAL MES 4:1',
+                        'unit': 'EA',
+                        'quantity': 1,
+                        'matched': False,
+                        'unit_price': None,
+                        'line_cost': None,
+                        'source': 'elliptical_accessory',
+                        'confidence': 'medium',
+                        'structure_type': 'MES_ELLIPTICAL',
+                        'rise': rise,
+                        'span': span
+                    })
+                except (ValueError, IndexError):
+                    continue
+
+        return items
+
     def _extract_structure_items(self, text: str, seen: set) -> List[Dict]:
         """
         Extract endwall and end section structures from text.
@@ -597,12 +735,20 @@ class TakeoffAnalyzer:
             (r'(?:WINGED?|WING)\s*(?:END\s*)?WALL[S]?\s*(\d+)\s*["\u201d]?\s*(45\s*DEG(?:REE)?|U[-\s]?TYPE)?',
              'WINGED_ENDWALL', 1, 2),
 
-            # U-TYPE ENDWALL
-            # e.g., "U-TYPE ENDWALL 18"" or "18" U-TYPE END WALL"
-            (r'(\d+)\s*["\u201d]?\s*U[-\s]?TYPE\s*END\s*WALL',
-             'U_TYPE_ENDWALL', 1, None),
-            (r'U[-\s]?TYPE\s*END\s*WALL\s*(\d+)\s*["\u201d]?',
-             'U_TYPE_ENDWALL', 1, None),
+            # U-TYPE ENDWALL with slope ratios (2:1, 3:1, 4:1, 6:1)
+            # e.g., "U-TYPE ENDWALL 18"", "18" U-TYPE 2:1", "U-TYPE 24" 4:1 WITH GRATE"
+            # Note: Longer alternatives must come first in regex alternation
+            (r'(\d+)\s*["\u201d]?\s*U[-\s]?TYPE\s*(?:END\s*WALL)?\s*([2-6]:1)?(?:\s*(?:WITH\s*)?(GRATE\s*AND\s*BAFFLES|GRATE|BAFFLES))?',
+             'U_TYPE_ENDWALL', 1, 2, 3),
+            (r'U[-\s]?TYPE\s*(?:END\s*WALL)?\s*(\d+)\s*["\u201d]?\s*([2-6]:1)?(?:\s*(?:WITH\s*)?(GRATE\s*AND\s*BAFFLES|GRATE|BAFFLES))?',
+             'U_TYPE_ENDWALL', 1, 2, 3),
+
+            # PIPE CRADLE
+            # e.g., "18" PIPE CRADLE", "PIPE CRADLE 24"", "24" CRADLE"
+            (r'(\d+)\s*["\u201d]?\s*(?:PIPE\s*)?CRADLE',
+             'PIPE_CRADLE', 1, None, None),
+            (r'(?:PIPE\s*)?CRADLE\s*(\d+)\s*["\u201d]?',
+             'PIPE_CRADLE', 1, None, None),
 
             # MES (Mitered End Section) for round pipe
             # e.g., "18" MES 4:1" or "MES 24"" or "MITERED END SECTION 18""
@@ -635,6 +781,8 @@ class TakeoffAnalyzer:
             struct_type = pattern_tuple[1]
             size_grp = pattern_tuple[2]
             config_grp = pattern_tuple[3]
+            # Handle extended tuple format (5 elements) for U-TYPE with slope/option
+            option_grp = pattern_tuple[4] if len(pattern_tuple) > 4 else None
 
             for match in re.finditer(pattern, text, re.IGNORECASE | re.MULTILINE):
                 try:
@@ -646,6 +794,7 @@ class TakeoffAnalyzer:
                             continue
                         size_str = f'{rise}"x{span}"'
                         config = ''
+                        option = ''
                         item_key = f"struct_MES_{rise}x{span}"
                     else:
                         # Round pipe structures
@@ -656,6 +805,8 @@ class TakeoffAnalyzer:
 
                         # Get configuration if available
                         config = ''
+                        option = ''
+
                         if config_grp and len(match.groups()) >= config_grp and match.group(config_grp):
                             config = match.group(config_grp).upper()
                             # Normalize configuration - be specific to avoid false matches
@@ -663,9 +814,20 @@ class TakeoffAnalyzer:
                                 config = '45 DEGREE'
                             elif config.startswith('U') and ('TYPE' in config or config == 'U'):
                                 config = 'U-TYPE'
-                            # Keep SINGLE, DOUBLE, TRIPLE, QUAD as-is
+                            # Keep SINGLE, DOUBLE, TRIPLE, QUAD, slope ratios (2:1, 3:1, etc.) as-is
 
-                        item_key = f"struct_{struct_type}_{size}_{config}"
+                        # Get option (grate, baffles) for U-TYPE endwalls
+                        if option_grp and len(match.groups()) >= option_grp and match.group(option_grp):
+                            option = match.group(option_grp).upper()
+                            # Normalize options
+                            if 'GRATE' in option and 'BAFFLE' in option:
+                                option = 'WITH GRATE AND BAFFLES'
+                            elif 'GRATE' in option:
+                                option = 'WITH GRATE'
+                            elif 'BAFFLE' in option:
+                                option = 'WITH BAFFLES'
+
+                        item_key = f"struct_{struct_type}_{size}_{config}_{option}"
 
                     if item_key in seen:
                         continue
@@ -675,9 +837,14 @@ class TakeoffAnalyzer:
                     type_name = struct_type.replace('_', ' ')
                     if struct_type == 'MES_ELLIPTICAL':
                         type_name = 'MES (ELLIPTICAL)'
+                    elif struct_type == 'PIPE_CRADLE':
+                        type_name = 'PIPE CRADLE'
+
                     desc = f'{size_str} {type_name}'
                     if config:
                         desc += f' {config}'
+                    if option:
+                        desc += f' {option}'
 
                     items.append({
                         'pay_item_no': f'{struct_type}-{size_str}',
@@ -690,7 +857,153 @@ class TakeoffAnalyzer:
                         'source': 'structure',
                         'confidence': 'medium',
                         'structure_type': struct_type,
-                        'configuration': config if config else None
+                        'configuration': config if config else None,
+                        'option': option if option else None
+                    })
+                except (ValueError, IndexError):
+                    continue
+
+        return items
+
+    def _extract_galvanized_mes_items(self, text: str, seen: set) -> List[Dict]:
+        """
+        Extract Galvanized Steel 4:1 MES items.
+
+        These are distinct from concrete MES and come in both round and elliptical
+        sizes with various configurations:
+        - Run configurations: Single Run, Double Run, Triple Run
+        - Frame options: With Frame, No Frame
+
+        Formats detected:
+        - 18" GALVANIZED MES SINGLE RUN WITH FRAME
+        - GALV STEEL MES 14x23 DOUBLE RUN NO FRAME
+        - 24" GALV MES
+        - GALVANIZED STEEL 4:1 MES 19X30
+
+        Args:
+            text: Page text to search
+            seen: Set of already-seen items
+
+        Returns:
+            List of extracted galvanized MES items
+        """
+        items = []
+
+        # Patterns for ROUND pipe Galvanized MES
+        round_patterns = [
+            # SIZE GALV MES [RUN CONFIG] [FRAME] - e.g., "18" GALVANIZED MES SINGLE RUN WITH FRAME"
+            (r'(\d+)\s*["\u201d]?\s*(?:GALV(?:ANIZED)?(?:\s*STEEL)?)\s*(?:4:1\s*)?MES(?:\s*(SINGLE|DOUBLE|TRIPLE)\s*RUN)?(?:\s*(WITH|NO)\s*FRAME)?',
+             1, 2, 3),
+            # GALV MES SIZE [RUN CONFIG] [FRAME] - e.g., "GALV MES 24" DOUBLE RUN NO FRAME"
+            (r'(?:GALV(?:ANIZED)?(?:\s*STEEL)?)\s*(?:4:1\s*)?MES\s*(\d+)\s*["\u201d]?(?:\s*(SINGLE|DOUBLE|TRIPLE)\s*RUN)?(?:\s*(WITH|NO)\s*FRAME)?',
+             1, 2, 3),
+        ]
+
+        # Patterns for ELLIPTICAL pipe Galvanized MES
+        elliptical_patterns = [
+            # SIZE GALV MES [RUN CONFIG] [FRAME] - e.g., "14x23 GALVANIZED MES SINGLE RUN"
+            (r'(\d+)\s*["\u201d]?\s*[xX×]\s*(\d+)\s*["\u201d]?\s*(?:GALV(?:ANIZED)?(?:\s*STEEL)?)\s*(?:4:1\s*)?MES(?:\s*(SINGLE|DOUBLE|TRIPLE)\s*RUN)?(?:\s*(WITH|NO)\s*FRAME)?',
+             1, 2, 3, 4),
+            # GALV MES SIZE [RUN CONFIG] [FRAME] - e.g., "GALV STEEL MES 14 X 23 DOUBLE RUN"
+            (r'(?:GALV(?:ANIZED)?(?:\s*STEEL)?)\s*(?:4:1\s*)?MES\s*(\d+)\s*["\u201d]?\s*[xX×]\s*(\d+)\s*["\u201d]?(?:\s*(SINGLE|DOUBLE|TRIPLE)\s*RUN)?(?:\s*(WITH|NO)\s*FRAME)?',
+             1, 2, 3, 4),
+        ]
+
+        # Process ROUND patterns
+        for pattern, size_grp, run_grp, frame_grp in round_patterns:
+            for match in re.finditer(pattern, text, re.IGNORECASE | re.MULTILINE):
+                try:
+                    size = int(match.group(size_grp))
+                    if not self._is_valid_pipe_size(size):
+                        continue
+
+                    # Get run configuration
+                    run_config = ''
+                    if run_grp and len(match.groups()) >= run_grp and match.group(run_grp):
+                        run_config = f'{match.group(run_grp).upper()} RUN'
+                    else:
+                        run_config = 'SINGLE RUN'  # Default
+
+                    # Get frame option
+                    frame_option = ''
+                    if frame_grp and len(match.groups()) >= frame_grp and match.group(frame_grp):
+                        frame_option = f'{match.group(frame_grp).upper()} FRAME'
+                    else:
+                        frame_option = 'NO FRAME'  # Default
+
+                    size_str = f'{size}"'
+                    item_key = f"galv_mes_{size}_{run_config}_{frame_option}"
+
+                    if item_key in seen:
+                        continue
+                    seen.add(item_key)
+
+                    desc = f'{size_str} GALVANIZED STEEL 4:1 MES {run_config} {frame_option}'
+
+                    items.append({
+                        'pay_item_no': f'GALV-MES-{size}',
+                        'description': desc,
+                        'unit': 'EA',
+                        'quantity': 1,
+                        'matched': False,
+                        'unit_price': None,
+                        'line_cost': None,
+                        'source': 'galvanized_mes',
+                        'confidence': 'medium',
+                        'structure_type': 'GALVANIZED_MES_ROUND',
+                        'run_config': run_config,
+                        'frame_option': frame_option
+                    })
+                except (ValueError, IndexError):
+                    continue
+
+        # Process ELLIPTICAL patterns
+        for pattern, rise_grp, span_grp, run_grp, frame_grp in elliptical_patterns:
+            for match in re.finditer(pattern, text, re.IGNORECASE | re.MULTILINE):
+                try:
+                    rise = int(match.group(rise_grp))
+                    span = int(match.group(span_grp))
+                    if not self._is_valid_elliptical_size(rise, span):
+                        continue
+
+                    # Get run configuration
+                    run_config = ''
+                    if run_grp and len(match.groups()) >= run_grp and match.group(run_grp):
+                        run_config = f'{match.group(run_grp).upper()} RUN'
+                    else:
+                        run_config = 'SINGLE RUN'  # Default
+
+                    # Get frame option
+                    frame_option = ''
+                    if frame_grp and len(match.groups()) >= frame_grp and match.group(frame_grp):
+                        frame_option = f'{match.group(frame_grp).upper()} FRAME'
+                    else:
+                        frame_option = 'NO FRAME'  # Default
+
+                    size_str = f'{rise}x{span}'
+                    item_key = f"galv_mes_{rise}x{span}_{run_config}_{frame_option}"
+
+                    if item_key in seen:
+                        continue
+                    seen.add(item_key)
+
+                    desc = f'{rise}"x{span}" GALVANIZED STEEL 4:1 MES {run_config} {frame_option}'
+
+                    items.append({
+                        'pay_item_no': f'GALV-MES-{rise}x{span}',
+                        'description': desc,
+                        'unit': 'EA',
+                        'quantity': 1,
+                        'matched': False,
+                        'unit_price': None,
+                        'line_cost': None,
+                        'source': 'galvanized_mes',
+                        'confidence': 'medium',
+                        'structure_type': 'GALVANIZED_MES_ELLIPTICAL',
+                        'rise': rise,
+                        'span': span,
+                        'run_config': run_config,
+                        'frame_option': frame_option
                     })
                 except (ValueError, IndexError):
                     continue
@@ -1374,6 +1687,35 @@ if __name__ == '__main__':
     MES 18"
     14"x23" MES
     FLARED END 36"
+
+    NEW STRUCTURE TESTS (U-TYPE SLOPE RATIOS):
+    U-TYPE 18" 2:1
+    24" U-TYPE 4:1 WITH GRATE
+    U-TYPE ENDWALL 30" 6:1 WITH BAFFLES
+    15" U-TYPE 3:1 WITH GRATE AND BAFFLES
+
+    PIPE CRADLE TESTS:
+    18" PIPE CRADLE
+    PIPE CRADLE 24"
+    36" CRADLE
+
+    ELLIPTICAL ACCESSORIES:
+    14"x23" FLARED END
+    FLARED END 19x30
+    24x38 FE
+    14"x23" MES 4:1
+    MITERED END SECTION 19x30
+
+    GALVANIZED STEEL MES (ROUND):
+    18" GALVANIZED MES
+    GALV MES 24" SINGLE RUN WITH FRAME
+    30" GALVANIZED STEEL MES DOUBLE RUN NO FRAME
+    GALV STEEL 4:1 MES 36" TRIPLE RUN
+
+    GALVANIZED STEEL MES (ELLIPTICAL):
+    14x23 GALVANIZED MES
+    GALV MES 19 X 30 DOUBLE RUN WITH FRAME
+    24"x38" GALVANIZED STEEL MES SINGLE RUN NO FRAME
 
     PIPE SCHEDULE TABLE:
     Size    Material    Qty    Unit
