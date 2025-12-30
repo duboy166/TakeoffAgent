@@ -19,6 +19,9 @@ from tkinter import filedialog, messagebox
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+# Import version info
+from version import __version__, APP_NAME
+
 # Import progress message types
 from gui.progress import (
     ProgressMessage,
@@ -30,6 +33,10 @@ from gui.progress import (
     create_error_message,
 )
 
+# Import update functionality
+from gui.updater import UpdateChecker
+from gui.update_dialog import UpdateDialog
+
 
 class TakeoffAgentApp(ctk.CTk):
     """Main application window for Takeoff Agent."""
@@ -38,7 +45,7 @@ class TakeoffAgentApp(ctk.CTk):
         super().__init__()
 
         # Configure window
-        self.title("Takeoff Agent")
+        self.title(f"{APP_NAME} v{__version__}")
         self.geometry("800x700")
         self.minsize(600, 500)
 
@@ -59,6 +66,9 @@ class TakeoffAgentApp(ctk.CTk):
 
         # Build UI
         self._create_widgets()
+
+        # Check for updates after window is shown
+        self.after(100, self._check_for_updates)
 
     def _create_widgets(self):
         """Create all UI widgets."""
@@ -289,6 +299,26 @@ class TakeoffAgentApp(ctk.CTk):
         self.results_text.pack(fill="both", expand=True, padx=10, pady=(0, 10))
         self.results_text.insert("1.0", "No results yet. Select input files and click 'Start Processing'.")
         self.results_text.configure(state="disabled")
+
+    def _check_for_updates(self):
+        """Check for application updates on startup."""
+        try:
+            checker = UpdateChecker()
+            release_info = checker.check_for_update()
+
+            if release_info:
+                # Update available - show update dialog
+                dialog = UpdateDialog(self, release_info)
+                dialog.wait_window()
+
+                # If user chose to quit (either via quit button or after install)
+                if dialog.should_quit:
+                    self.destroy()
+                    return
+
+        except Exception as e:
+            # Don't block the app if update check fails
+            print(f"Update check failed: {e}")
 
     def _reset_state(self):
         """Reset the application to initial state for a new run."""

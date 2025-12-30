@@ -29,9 +29,12 @@ IS_WINDOWS = sys.platform == 'win32'
 IS_MACOS = sys.platform == 'darwin'
 IS_LINUX = sys.platform.startswith('linux')
 
+# Import version from version.py (single source of truth)
+sys.path.insert(0, str(PROJECT_ROOT))
+from version import __version__ as APP_VERSION, APP_NAME as APP_NAME_FROM_VERSION
+
 # Application info
-APP_NAME = 'TakeoffAgent'
-APP_VERSION = '1.0.0'
+APP_NAME = APP_NAME_FROM_VERSION
 
 # Collect datas - check each path before including
 datas = []
@@ -50,6 +53,12 @@ references_dir = PROJECT_ROOT / 'references'
 if references_dir.exists():
     datas.append((str(references_dir), 'references'))
     print(f"Including references from: {references_dir}")
+
+# Version file (for auto-updater)
+version_file = PROJECT_ROOT / 'version.py'
+if version_file.exists():
+    datas.append((str(version_file), '.'))
+    print(f"Including version from: {version_file}")
 
 # CustomTkinter assets (themes, etc.)
 try:

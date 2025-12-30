@@ -28,6 +28,7 @@ from datetime import datetime
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent))
 
+from version import __version__, APP_NAME
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -110,6 +111,12 @@ Examples:
         "--verbose", "-v",
         action="store_true",
         help="Enable verbose/debug logging"
+    )
+
+    parser.add_argument(
+        "--version", "-V",
+        action="version",
+        version=f"%(prog)s {__version__}"
     )
 
     args = parser.parse_args()
