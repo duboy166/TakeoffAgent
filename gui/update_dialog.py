@@ -294,27 +294,79 @@ class UpdateDialog(ctk.CTkToplevel):
         self.quit_btn.pack_forget()
 
     def _install_update(self):
-        """Open the installer and quit the app."""
+        """Perform automatic update installation."""
         if self.download_path:
-            # Get install instructions
+            # Update UI
+            self.download_btn.configure(state="disabled", text="Installing...")
+            self.status_label.configure(
+                text="Preparing automatic update...",
+                text_color=("gray30", "gray70")
+            )
+
+            # Try auto-update first
+            def progress_callback(msg: str):
+                # Update status label on main thread
+                self.after(0, lambda: self.status_label.configure(text=msg))
+
+            success, message = self.checker.perform_auto_update(
+                self.download_path,
+                progress_callback
+            )
+
+            if success:
+                # Auto-update initiated successfully
+                self.status_label.configure(
+                    text="Update prepared! The app will now close and update automatically.\n\n"
+                         "A console window will show the update progress.",
+                    text_color="#2CC985"
+                )
+
+                # Give user a moment to read the message
+                self.after(2000, self._quit_for_update)
+            else:
+                # Auto-update failed, fall back to manual
+                self._fallback_to_manual(message)
+
+    def _quit_for_update(self):
+        """Quit the app to allow update to proceed."""
+        self.should_quit = True
+        self.destroy()
+
+    def _fallback_to_manual(self, error_msg: str):
+        """Fall back to manual installation if auto-update fails."""
+        instructions = self.checker.get_install_instructions(self.download_path)
+
+        self.status_label.configure(
+            text=f"Auto-update failed: {error_msg}\n\n"
+                 f"Falling back to manual installation...",
+            text_color="#FFA500"  # Orange warning color
+        )
+
+        # Re-enable button for manual install
+        self.download_btn.configure(
+            state="normal",
+            text="Open Installer Manually",
+            command=self._manual_install
+        )
+
+    def _manual_install(self):
+        """Open installer manually (fallback method)."""
+        if self.download_path:
             instructions = self.checker.get_install_instructions(self.download_path)
 
-            # Update status
             self.status_label.configure(
                 text=f"Opening installer...\n\n{instructions}",
                 text_color=("gray30", "gray70")
             )
 
-            # Open the installer
             success = self.checker.open_installer(self.download_path)
 
             if success:
-                # Signal that app should quit
                 self.should_quit = True
                 self.destroy()
             else:
                 self.status_label.configure(
-                    text=f"Could not open installer automatically.\n\n"
+                    text=f"Could not open installer.\n\n"
                          f"Please manually open:\n{self.download_path}\n\n{instructions}",
                     text_color="#FF6B6B"
                 )

@@ -12,6 +12,8 @@ import urllib.request
 import urllib.error
 import json
 import subprocess
+import zipfile
+import shutil
 from pathlib import Path
 from typing import Optional, Dict, Callable, Tuple
 from dataclasses import dataclass
@@ -313,6 +315,410 @@ class UpdateChecker:
             )
 
         return "Extract the downloaded file and run the new version."
+
+    @staticmethod
+    def get_app_directory() -> Optional[Path]:
+        """
+        Get the directory where the current app is installed.
+
+        Returns:
+            Path to app directory, or None if running from source
+        """
+        if getattr(sys, 'frozen', False):
+            # Running as compiled executable
+            exe_path = Path(sys.executable)
+            system = platform.system()
+
+            if system == "Darwin":
+                # macOS: executable is inside .app/Contents/MacOS/
+                # We want the .app directory's parent
+                if ".app" in str(exe_path):
+                    # Find the .app bundle
+                    parts = exe_path.parts
+                    for i, part in enumerate(parts):
+                        if part.endswith('.app'):
+                            return Path(*parts[:i])
+                return exe_path.parent
+            else:
+                # Windows/Linux: executable is in the app folder
+                return exe_path.parent
+        else:
+            # Running from source - return project root
+            return Path(__file__).parent.parent
+
+    @staticmethod
+    def get_app_executable() -> Optional[Path]:
+        """Get the path to the current executable or .app bundle."""
+        if getattr(sys, 'frozen', False):
+            exe_path = Path(sys.executable)
+            system = platform.system()
+
+            if system == "Darwin":
+                # Find the .app bundle path
+                if ".app" in str(exe_path):
+                    parts = exe_path.parts
+                    for i, part in enumerate(parts):
+                        if part.endswith('.app'):
+                            return Path(*parts[:i+1])
+                return exe_path
+            else:
+                return exe_path
+        return None
+
+    def perform_auto_update(
+        self,
+        installer_path: Path,
+        progress_callback: Optional[Callable[[str], None]] = None
+    ) -> Tuple[bool, str]:
+        """
+        Perform an automatic update by replacing the current app.
+
+        This creates a platform-specific update script that:
+        1. Waits for the current app to exit
+        2. Extracts/copies the new version
+        3. Launches the new version
+        4. Cleans up temporary files
+
+        Args:
+            installer_path: Path to downloaded ZIP or DMG
+            progress_callback: Optional callback for status updates
+
+        Returns:
+            Tuple of (success, message)
+        """
+        system = platform.system()
+
+        if system == "Windows":
+            return self._auto_update_windows(installer_path, progress_callback)
+        elif system == "Darwin":
+            return self._auto_update_macos(installer_path, progress_callback)
+        else:
+            return False, "Auto-update not supported on this platform"
+
+    def _auto_update_windows(
+        self,
+        installer_path: Path,
+        progress_callback: Optional[Callable[[str], None]] = None
+    ) -> Tuple[bool, str]:
+        """
+        Perform auto-update on Windows.
+
+        Creates a batch script that:
+        1. Waits for the current process to exit
+        2. Extracts the ZIP to the app directory
+        3. Launches the new executable
+        4. Cleans up
+        """
+        def log(msg: str):
+            if progress_callback:
+                progress_callback(msg)
+            print(f"[AutoUpdate] {msg}")
+
+        try:
+            app_dir = self.get_app_directory()
+            app_exe = self.get_app_executable()
+
+            if not app_dir or not app_exe:
+                return False, "Could not determine app location"
+
+            log(f"App directory: {app_dir}")
+            log(f"App executable: {app_exe}")
+
+            # Create extraction directory in temp
+            extract_dir = Path(tempfile.gettempdir()) / "TakeoffAgent_Update_Extract"
+            if extract_dir.exists():
+                shutil.rmtree(extract_dir)
+            extract_dir.mkdir(parents=True)
+
+            # Extract ZIP first to verify it's valid
+            log("Extracting update package...")
+            try:
+                with zipfile.ZipFile(installer_path, 'r') as zf:
+                    zf.extractall(extract_dir)
+            except zipfile.BadZipFile:
+                return False, "Downloaded file is not a valid ZIP archive"
+
+            # Find the extracted app folder (should be TakeoffAgent/)
+            extracted_contents = list(extract_dir.iterdir())
+            if len(extracted_contents) == 1 and extracted_contents[0].is_dir():
+                source_dir = extracted_contents[0]
+            else:
+                source_dir = extract_dir
+
+            log(f"Source directory: {source_dir}")
+
+            # Verify the new executable exists
+            new_exe = source_dir / "TakeoffAgent.exe"
+            if not new_exe.exists():
+                # Check if it's directly in extract_dir
+                new_exe = extract_dir / "TakeoffAgent.exe"
+                if not new_exe.exists():
+                    return False, "Update package does not contain TakeoffAgent.exe"
+
+            # Get current process ID
+            current_pid = os.getpid()
+
+            # Create the update batch script
+            script_path = Path(tempfile.gettempdir()) / "TakeoffAgent_Update.bat"
+
+            # Batch script content
+            batch_script = f'''@echo off
+setlocal enabledelayedexpansion
+
+echo ============================================
+echo TakeoffAgent Auto-Updater
+echo ============================================
+echo.
+
+:: Wait for the main application to exit
+echo Waiting for TakeoffAgent to close...
+:wait_loop
+tasklist /FI "PID eq {current_pid}" 2>NUL | find /I "{current_pid}" >NUL
+if not errorlevel 1 (
+    timeout /t 1 /nobreak >NUL
+    goto wait_loop
+)
+
+echo Application closed. Installing update...
+timeout /t 2 /nobreak >NUL
+
+:: Copy new files to app directory
+echo Copying files to {app_dir}...
+xcopy /E /Y /Q "{source_dir}\\*" "{app_dir}\\" >NUL 2>&1
+if errorlevel 1 (
+    echo ERROR: Failed to copy files.
+    echo The update may require administrator privileges.
+    echo Please manually extract: {installer_path}
+    echo To: {app_dir}
+    pause
+    exit /b 1
+)
+
+echo Update installed successfully!
+echo.
+
+:: Launch the new version
+echo Starting TakeoffAgent...
+start "" "{app_dir}\\TakeoffAgent.exe"
+
+:: Clean up
+echo Cleaning up...
+timeout /t 2 /nobreak >NUL
+rmdir /S /Q "{extract_dir}" 2>NUL
+del /F /Q "{installer_path}" 2>NUL
+
+:: Self-delete this script
+(goto) 2>nul & del "%~f0"
+'''
+
+            # Write the batch script
+            log("Creating update script...")
+            with open(script_path, 'w', encoding='utf-8') as f:
+                f.write(batch_script)
+
+            # Launch the script in a new console window (detached from current process)
+            log("Launching updater and exiting...")
+
+            # Use CREATE_NEW_CONSOLE and DETACHED_PROCESS flags
+            CREATE_NEW_CONSOLE = 0x00000010
+            DETACHED_PROCESS = 0x00000008
+
+            subprocess.Popen(
+                ['cmd', '/c', str(script_path)],
+                creationflags=CREATE_NEW_CONSOLE | DETACHED_PROCESS,
+                close_fds=True,
+                cwd=str(script_path.parent)
+            )
+
+            return True, "Update will be installed after app closes"
+
+        except Exception as e:
+            return False, f"Auto-update failed: {str(e)}"
+
+    def _auto_update_macos(
+        self,
+        installer_path: Path,
+        progress_callback: Optional[Callable[[str], None]] = None
+    ) -> Tuple[bool, str]:
+        """
+        Perform auto-update on macOS.
+
+        Creates a shell script that:
+        1. Waits for the current process to exit
+        2. Mounts DMG or extracts ZIP
+        3. Copies the new .app to the same location
+        4. Launches the new app
+        5. Cleans up
+        """
+        def log(msg: str):
+            if progress_callback:
+                progress_callback(msg)
+            print(f"[AutoUpdate] {msg}")
+
+        try:
+            app_exe = self.get_app_executable()
+            app_dir = self.get_app_directory()
+
+            if not app_exe or not app_dir:
+                return False, "Could not determine app location"
+
+            log(f"App bundle: {app_exe}")
+            log(f"App directory: {app_dir}")
+
+            # Get current process ID
+            current_pid = os.getpid()
+
+            # Determine if we have a DMG or ZIP
+            is_dmg = installer_path.suffix.lower() == '.dmg'
+
+            # Create the update shell script
+            script_path = Path(tempfile.gettempdir()) / "TakeoffAgent_Update.sh"
+
+            if is_dmg:
+                shell_script = f'''#!/bin/bash
+set -e
+
+echo "============================================"
+echo "TakeoffAgent Auto-Updater"
+echo "============================================"
+echo ""
+
+# Wait for the main application to exit
+echo "Waiting for TakeoffAgent to close..."
+while kill -0 {current_pid} 2>/dev/null; do
+    sleep 1
+done
+
+echo "Application closed. Installing update..."
+sleep 2
+
+# Mount the DMG
+echo "Mounting disk image..."
+MOUNT_POINT=$(hdiutil attach "{installer_path}" -nobrowse -readonly | grep "/Volumes" | cut -f3)
+
+if [ -z "$MOUNT_POINT" ]; then
+    echo "ERROR: Failed to mount DMG"
+    exit 1
+fi
+
+echo "Mounted at: $MOUNT_POINT"
+
+# Find the .app in the mounted volume
+APP_SOURCE=$(find "$MOUNT_POINT" -maxdepth 1 -name "*.app" | head -1)
+
+if [ -z "$APP_SOURCE" ]; then
+    echo "ERROR: No .app found in DMG"
+    hdiutil detach "$MOUNT_POINT" -quiet
+    exit 1
+fi
+
+echo "Found app: $APP_SOURCE"
+
+# Remove old app and copy new one
+echo "Installing to {app_dir}..."
+rm -rf "{app_exe}"
+cp -R "$APP_SOURCE" "{app_dir}/"
+
+# Unmount DMG
+echo "Unmounting disk image..."
+hdiutil detach "$MOUNT_POINT" -quiet
+
+echo "Update installed successfully!"
+echo ""
+
+# Launch the new version
+echo "Starting TakeoffAgent..."
+open "{app_exe}"
+
+# Clean up
+echo "Cleaning up..."
+sleep 2
+rm -f "{installer_path}"
+rm -f "$0"
+
+echo "Done!"
+'''
+            else:
+                # ZIP file
+                shell_script = f'''#!/bin/bash
+set -e
+
+echo "============================================"
+echo "TakeoffAgent Auto-Updater"
+echo "============================================"
+echo ""
+
+# Wait for the main application to exit
+echo "Waiting for TakeoffAgent to close..."
+while kill -0 {current_pid} 2>/dev/null; do
+    sleep 1
+done
+
+echo "Application closed. Installing update..."
+sleep 2
+
+# Create extraction directory
+EXTRACT_DIR="/tmp/TakeoffAgent_Update_Extract"
+rm -rf "$EXTRACT_DIR"
+mkdir -p "$EXTRACT_DIR"
+
+# Extract ZIP
+echo "Extracting update package..."
+unzip -q "{installer_path}" -d "$EXTRACT_DIR"
+
+# Find the .app in extracted contents
+APP_SOURCE=$(find "$EXTRACT_DIR" -maxdepth 2 -name "*.app" | head -1)
+
+if [ -z "$APP_SOURCE" ]; then
+    echo "ERROR: No .app found in ZIP"
+    rm -rf "$EXTRACT_DIR"
+    exit 1
+fi
+
+echo "Found app: $APP_SOURCE"
+
+# Remove old app and copy new one
+echo "Installing to {app_dir}..."
+rm -rf "{app_exe}"
+cp -R "$APP_SOURCE" "{app_dir}/"
+
+echo "Update installed successfully!"
+echo ""
+
+# Launch the new version
+echo "Starting TakeoffAgent..."
+open "{app_exe}"
+
+# Clean up
+echo "Cleaning up..."
+sleep 2
+rm -rf "$EXTRACT_DIR"
+rm -f "{installer_path}"
+rm -f "$0"
+
+echo "Done!"
+'''
+
+            # Write the shell script
+            log("Creating update script...")
+            with open(script_path, 'w') as f:
+                f.write(shell_script)
+
+            # Make it executable
+            os.chmod(script_path, 0o755)
+
+            # Launch the script in Terminal (so user can see progress)
+            log("Launching updater and exiting...")
+
+            subprocess.Popen(
+                ['osascript', '-e', f'tell application "Terminal" to do script "{script_path}"'],
+                close_fds=True
+            )
+
+            return True, "Update will be installed after app closes"
+
+        except Exception as e:
+            return False, f"Auto-update failed: {str(e)}"
 
 
 # Convenience function for simple update check
