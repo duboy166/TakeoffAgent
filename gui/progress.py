@@ -52,11 +52,17 @@ NODE_DESCRIPTIONS = {
     "scan_pdfs": ("Scanning for PDFs...", "Scan PDFs"),
     "check_split_pdf": ("Checking file size...", "Check PDF"),
     "split_pdf": ("Splitting large PDF...", "Split PDF"),
+    "analyze_document": ("Analyzing document quality...", "Analyze"),
     "extract_pdf": ("Running OCR extraction...", "Extract text"),
+    "route_hybrid": ("Checking OCR confidence...", "Route hybrid"),
+    "selective_vision": ("Running Vision on low-confidence pages...", "Selective Vision"),
     "increment_retry": ("Retrying extraction...", "Retry"),
     "mark_failed": ("File failed, moving to next...", "Mark failed"),
     "parse_items": ("Parsing pay items...", "Parse items"),
+    "validate_items": ("Validating extracted items...", "Validate"),
+    "verify_low_confidence": ("Verifying low-confidence items...", "Verify"),
     "match_prices": ("Matching to FL 2025 prices...", "Match prices"),
+    "ai_match_unmatched": ("AI matching unmatched items...", "AI Match"),
     "generate_report": ("Generating reports...", "Generate report"),
     "advance_file": ("Moving to next file...", "Next file"),
     "batch_summary": ("Creating batch summary...", "Finalize"),
@@ -67,12 +73,18 @@ NODE_WEIGHTS = {
     "scan_pdfs": 0.02,
     "check_split_pdf": 0.02,
     "split_pdf": 0.05,
-    "extract_pdf": 0.50,  # OCR is the heaviest operation
+    "analyze_document": 0.03,  # Quick document analysis
+    "extract_pdf": 0.35,  # OCR is the heaviest operation (reduced for hybrid)
+    "route_hybrid": 0.01,  # Quick routing decision
+    "selective_vision": 0.10,  # Vision API for flagged pages only
     "increment_retry": 0.01,
     "mark_failed": 0.01,
-    "parse_items": 0.15,
-    "match_prices": 0.10,
-    "generate_report": 0.10,
+    "parse_items": 0.12,
+    "validate_items": 0.05,  # AI validation (fast with Haiku)
+    "verify_low_confidence": 0.05,  # Low-confidence verification
+    "match_prices": 0.08,
+    "ai_match_unmatched": 0.05,  # AI matching (fast with Haiku)
+    "generate_report": 0.08,
     "advance_file": 0.02,
     "batch_summary": 0.02,
 }
@@ -119,16 +131,55 @@ def format_node_message(node_name: str, state_update: dict) -> ProgressMessage:
         dpi = state_update.get("dpi", 200)
         details = f"File: {filename} (DPI: {dpi})"
 
+    elif node_name == "analyze_document":
+        recommended = state_update.get("recommended_extraction", "")
+        quality = state_update.get("document_quality_score")
+        if recommended:
+            quality_str = f" (quality: {quality:.2f})" if quality else ""
+            details = f"Recommended: {recommended}{quality_str}"
+
+    elif node_name == "route_hybrid":
+        pages_flagged = state_update.get("pages_flagged_for_vision", [])
+        extraction_mode = state_update.get("extraction_mode", "ocr_only")
+        if extraction_mode == "hybrid" and pages_flagged:
+            details = f"{len(pages_flagged)} page(s) flagged for Vision"
+        elif extraction_mode == "hybrid":
+            details = "All pages passed OCR confidence check"
+
+    elif node_name == "selective_vision":
+        pages_flagged = state_update.get("pages_flagged_for_vision", [])
+        extraction_method = state_update.get("extraction_method", "")
+        if extraction_method == "hybrid_ocr_vision":
+            details = f"Processed {len(pages_flagged)} page(s) with Vision API"
+        elif pages_flagged:
+            details = f"Running Vision on pages: {pages_flagged[:5]}{'...' if len(pages_flagged) > 5 else ''}"
+
     elif node_name == "parse_items":
         items = state_update.get("pay_items", [])
         if items:
             details = f"Found {len(items)} pay items"
+
+    elif node_name == "validate_items":
+        issues = state_update.get("validation_issues", [])
+        corrected = state_update.get("items_corrected", 0)
+        if issues or corrected:
+            details = f"{len(issues)} issues found, {corrected} auto-corrected"
+
+    elif node_name == "verify_low_confidence":
+        for_review = state_update.get("items_for_review", [])
+        if for_review:
+            details = f"{len(for_review)} items flagged for review"
 
     elif node_name == "match_prices":
         priced = state_update.get("priced_items", [])
         if priced:
             matched = sum(1 for p in priced if p.get("matched"))
             details = f"Matched {matched}/{len(priced)} items"
+
+    elif node_name == "ai_match_unmatched":
+        ai_matched = state_update.get("ai_matched_items", [])
+        if ai_matched:
+            details = f"AI matched {len(ai_matched)} additional items"
 
     elif node_name == "generate_report":
         if current_file:
@@ -195,8 +246,10 @@ def calculate_progress(node_name: str, files_completed: int, files_total: int) -
     node_weight = NODE_WEIGHTS.get(node_name, 0.05)
 
     # Nodes that happen per-file
-    per_file_nodes = ["check_split_pdf", "split_pdf", "extract_pdf",
-                      "parse_items", "match_prices", "generate_report"]
+    per_file_nodes = ["check_split_pdf", "split_pdf", "analyze_document", "extract_pdf",
+                      "route_hybrid", "selective_vision",
+                      "parse_items", "validate_items", "verify_low_confidence",
+                      "match_prices", "ai_match_unmatched", "generate_report"]
 
     if node_name in per_file_nodes:
         # Add partial progress for current file

@@ -123,11 +123,13 @@ def mark_file_failed(state: TakeoffState) -> dict:
         "filename": Path(current_file).name if current_file else "Unknown",
         "filepath": current_file,
         "success": False,
+        "page_count": state.get("page_count", 0),
         "pay_items_count": 0,
         "matched_items_count": 0,
         "estimated_total": 0,
         "extraction_method": state.get("extraction_method", "error"),
         "report_path": None,
+        "csv_path": None,
         "errors": [last_error]
     }
 
@@ -151,7 +153,10 @@ def mark_file_failed(state: TakeoffState) -> dict:
         "project_info": None,
         "report_path": None,
         "last_error": None,
-        "retry_count": 0
+        "retry_count": 0,
+        # Reset hybrid extraction per-file state
+        "pages_ocr_results": None,
+        "pages_flagged_for_vision": None,
     }
 
 
@@ -190,5 +195,8 @@ def advance_to_next_file(state: TakeoffState) -> dict:
         "report_path": None,
         "last_error": None,
         "retry_count": 0,
-        "_file_result": None
+        "_file_result": None,
+        # Reset hybrid extraction per-file state
+        "pages_ocr_results": None,
+        "pages_flagged_for_vision": None,
     }

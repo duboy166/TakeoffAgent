@@ -39,6 +39,7 @@ class TakeoffState(TypedDict):
     price_list_path: str               # Path to FL 2025 price list CSV
     dpi: int                           # OCR resolution (default: 200)
     parallel: bool                     # Enable parallel processing
+    use_vision: bool                   # Use Claude Vision API for extraction
 
     # ========================
     # Progress Tracking
@@ -103,6 +104,45 @@ class TakeoffState(TypedDict):
     # ========================
     project_name: Optional[str]        # Derived from first PDF filename for output organization
 
+    # ========================
+    # Location Tracking (Phase 1)
+    # ========================
+    text_blocks: Optional[List[Dict]]  # OCR text blocks with bounding boxes
+
+    # ========================
+    # Intelligent Extraction Router (Phase 5)
+    # ========================
+    recommended_extraction: Optional[str]  # 'paddleocr', 'vision', or 'native'
+    document_quality_score: Optional[float]  # 0-1 quality estimate
+    analysis_notes: Optional[List[str]]  # Reasoning for extraction choice
+
+    # ========================
+    # AI Validation (Phase 3)
+    # ========================
+    validation_issues: Optional[List[Dict]]  # Items flagged with issues
+    items_corrected: Optional[int]      # Count of AI-corrected items
+    validation_confidence: Optional[float]  # Overall confidence 0-1
+
+    # ========================
+    # AI Price Matching (Phase 2)
+    # ========================
+    ai_matched_items: Optional[List[Dict]]  # Items matched by AI
+    match_explanations: Optional[Dict[str, str]]  # Item ID → explanation
+
+    # ========================
+    # Low-Confidence Verification (Phase 4)
+    # ========================
+    items_for_review: Optional[List[Dict]]  # Low-confidence items with locations
+    verification_results: Optional[List[Dict]]  # AI verification responses
+
+    # ========================
+    # Hybrid OCR + Vision (Phase 6)
+    # ========================
+    pages_ocr_results: Optional[List[Dict]]      # Per-page OCR with confidence scores
+    pages_flagged_for_vision: Optional[List[int]]  # Page numbers needing Vision API
+    vision_page_budget: int                        # Max pages to send to Vision (default: 5)
+    extraction_mode: str                           # 'ocr_only', 'hybrid', 'vision_only'
+
 
 def create_initial_state(
     input_path: str,
@@ -110,7 +150,10 @@ def create_initial_state(
     price_list_path: str = None,
     dpi: int = 200,
     parallel: bool = False,
-    max_retries: int = 3
+    max_retries: int = 3,
+    use_vision: bool = False,
+    extraction_mode: str = "ocr_only",
+    vision_page_budget: int = 5
 ) -> TakeoffState:
     """
     Create initial state for a new workflow run.
@@ -122,6 +165,9 @@ def create_initial_state(
         dpi: OCR resolution (higher = better quality, slower)
         parallel: Enable parallel PDF extraction
         max_retries: Maximum retries per file before skipping
+        use_vision: Use Claude Vision API for extraction (requires ANTHROPIC_API_KEY)
+        extraction_mode: 'ocr_only', 'hybrid', or 'vision_only'
+        vision_page_budget: Max pages to send to Vision API in hybrid mode (default: 5)
 
     Returns:
         Initialized TakeoffState
@@ -133,6 +179,7 @@ def create_initial_state(
         price_list_path=price_list_path or "",
         dpi=dpi,
         parallel=parallel,
+        use_vision=use_vision,
 
         # Progress
         current_file=None,
@@ -178,7 +225,34 @@ def create_initial_state(
         _file_result=None,
 
         # Project Organization
-        project_name=None
+        project_name=None,
+
+        # Location Tracking (Phase 1)
+        text_blocks=None,
+
+        # Intelligent Extraction Router (Phase 5)
+        recommended_extraction=None,
+        document_quality_score=None,
+        analysis_notes=None,
+
+        # AI Validation (Phase 3)
+        validation_issues=None,
+        items_corrected=None,
+        validation_confidence=None,
+
+        # AI Price Matching (Phase 2)
+        ai_matched_items=None,
+        match_explanations=None,
+
+        # Low-Confidence Verification (Phase 4)
+        items_for_review=None,
+        verification_results=None,
+
+        # Hybrid OCR + Vision (Phase 6)
+        pages_ocr_results=None,
+        pages_flagged_for_vision=None,
+        vision_page_budget=vision_page_budget,
+        extraction_mode=extraction_mode
     )
 
 
@@ -202,6 +276,24 @@ def reset_file_state(state: TakeoffState) -> TakeoffState:
     state["needs_split"] = False
     state["is_split_chunk"] = False
     state["original_file"] = None
+
+    # Reset agentic features per-file state
+    state["text_blocks"] = None
+    state["recommended_extraction"] = None
+    state["document_quality_score"] = None
+    state["analysis_notes"] = None
+    state["validation_issues"] = None
+    state["items_corrected"] = None
+    state["validation_confidence"] = None
+    state["ai_matched_items"] = None
+    state["match_explanations"] = None
+    state["items_for_review"] = None
+    state["verification_results"] = None
+
+    # Reset Hybrid OCR + Vision (Phase 6) per-file state
+    state["pages_ocr_results"] = None
+    state["pages_flagged_for_vision"] = None
+
     return state
 
 

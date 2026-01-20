@@ -96,6 +96,26 @@ Examples:
     )
 
     parser.add_argument(
+        "--vision",
+        action="store_true",
+        help="Use Claude Vision API for all pages (requires ANTHROPIC_API_KEY). Shorthand for --mode vision_only"
+    )
+
+    parser.add_argument(
+        "--mode", "-m",
+        choices=["ocr_only", "hybrid", "vision_only"],
+        default="ocr_only",
+        help="Extraction mode: ocr_only (default, free), hybrid (OCR + Vision for low-confidence pages), vision_only (all pages)"
+    )
+
+    parser.add_argument(
+        "--vision-budget",
+        type=int,
+        default=5,
+        help="Max pages to send to Vision API per PDF in hybrid mode (default: 5)"
+    )
+
+    parser.add_argument(
         "--no-checkpoints",
         action="store_true",
         help="Disable state checkpointing"
@@ -156,6 +176,18 @@ Examples:
     # Create output directory
     output_path.mkdir(parents=True, exist_ok=True)
 
+    # Determine extraction mode (--vision flag overrides --mode)
+    extraction_mode = args.mode
+    if args.vision:
+        extraction_mode = "vision_only"
+
+    # Format mode display
+    mode_display = {
+        "ocr_only": "PaddleOCR (local)",
+        "hybrid": "Hybrid (OCR + selective Vision)",
+        "vision_only": "Claude Vision API (all pages)"
+    }
+
     # Print banner
     print("\n" + "=" * 60)
     print("  Construction Takeoff Agent")
@@ -164,6 +196,9 @@ Examples:
     print(f"  Input:  {input_path}")
     print(f"  Output: {output_path}")
     print(f"  DPI:    {args.dpi}")
+    print(f"  Mode:   {mode_display.get(extraction_mode, extraction_mode)}")
+    if extraction_mode == "hybrid":
+        print(f"  Vision Budget: {args.vision_budget} pages/PDF")
     if price_list_path:
         print(f"  Prices: {price_list_path}")
     print("=" * 60 + "\n")
@@ -181,7 +216,10 @@ Examples:
             dpi=args.dpi,
             parallel=args.parallel,
             max_retries=args.max_retries,
-            enable_checkpoints=not args.no_checkpoints
+            enable_checkpoints=not args.no_checkpoints,
+            use_vision=(extraction_mode == "vision_only"),
+            extraction_mode=extraction_mode,
+            vision_page_budget=args.vision_budget
         )
 
         end_time = datetime.now()

@@ -19,6 +19,10 @@ from tkinter import filedialog, messagebox
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+# Load environment variables from .env file
+from dotenv import load_dotenv
+load_dotenv(Path(__file__).parent.parent / ".env")
+
 # Import version info
 from version import __version__, APP_NAME
 
@@ -180,7 +184,7 @@ class TakeoffAgentApp(ctk.CTk):
         browse_output_btn.pack(side="left")
 
     def _create_options_section(self):
-        """Create options section for DPI setting."""
+        """Create options section for DPI and extraction mode settings."""
         options_frame = ctk.CTkFrame(self.main_frame)
         options_frame.pack(fill="x", pady=(0, 10))
 
@@ -191,15 +195,16 @@ class TakeoffAgentApp(ctk.CTk):
         )
         options_label.pack(anchor="w", padx=10, pady=(10, 5))
 
-        options_row = ctk.CTkFrame(options_frame, fg_color="transparent")
-        options_row.pack(fill="x", padx=10, pady=(0, 10))
+        # Row 1: DPI setting
+        options_row1 = ctk.CTkFrame(options_frame, fg_color="transparent")
+        options_row1.pack(fill="x", padx=10, pady=(0, 5))
 
-        dpi_label = ctk.CTkLabel(options_row, text="OCR Resolution (DPI):")
+        dpi_label = ctk.CTkLabel(options_row1, text="OCR Resolution (DPI):")
         dpi_label.pack(side="left", padx=(0, 10))
 
         self.dpi_var = ctk.StringVar(value="200")
         dpi_menu = ctk.CTkOptionMenu(
-            options_row,
+            options_row1,
             values=["150", "200", "300"],
             variable=self.dpi_var,
             width=80
@@ -207,12 +212,67 @@ class TakeoffAgentApp(ctk.CTk):
         dpi_menu.pack(side="left")
 
         dpi_hint = ctk.CTkLabel(
-            options_row,
+            options_row1,
             text="(Higher = better quality, slower)",
             text_color="gray",
             font=ctk.CTkFont(size=11)
         )
         dpi_hint.pack(side="left", padx=(10, 0))
+
+        # Row 2: Extraction mode dropdown
+        options_row2 = ctk.CTkFrame(options_frame, fg_color="transparent")
+        options_row2.pack(fill="x", padx=10, pady=(0, 10))
+
+        extraction_label = ctk.CTkLabel(options_row2, text="Extraction Mode:")
+        extraction_label.pack(side="left", padx=(0, 10))
+
+        # Extraction mode options:
+        # - ocr_only: Local PaddleOCR only (free, fast)
+        # - hybrid: OCR first, then Vision for low-confidence pages (cost-effective)
+        # - vision_only: Full Vision API for all pages (most accurate, highest cost)
+        self.extraction_mode_var = ctk.StringVar(value="Local OCR Only")
+        self.extraction_mode_menu = ctk.CTkOptionMenu(
+            options_row2,
+            values=[
+                "Local OCR Only",
+                "Hybrid (OCR + Vision)",
+                "Vision Only"
+            ],
+            variable=self.extraction_mode_var,
+            width=180,
+            command=self._on_extraction_mode_change
+        )
+        self.extraction_mode_menu.pack(side="left")
+
+        self.extraction_hint = ctk.CTkLabel(
+            options_row2,
+            text="(Free, runs locally)",
+            text_color="gray",
+            font=ctk.CTkFont(size=11)
+        )
+        self.extraction_hint.pack(side="left", padx=(10, 0))
+
+    def _on_extraction_mode_change(self, choice):
+        """Handle extraction mode change - update hint and check API key."""
+        hints = {
+            "Local OCR Only": "(Free, runs locally)",
+            "Hybrid (OCR + Vision)": "(Vision only for low-confidence pages, ~85% cost savings)",
+            "Vision Only": "(AI-powered, requires ANTHROPIC_API_KEY)"
+        }
+        self.extraction_hint.configure(text=hints.get(choice, ""))
+
+        # Check for API key if Vision is involved
+        if choice in ["Hybrid (OCR + Vision)", "Vision Only"]:
+            api_key = os.environ.get("ANTHROPIC_API_KEY")
+            if not api_key:
+                messagebox.showwarning(
+                    "API Key Required",
+                    f"'{choice}' requires an ANTHROPIC_API_KEY environment variable.\n\n"
+                    "Set it in your .env file or system environment before using this mode.\n\n"
+                    "Reverting to 'Local OCR Only'."
+                )
+                self.extraction_mode_var.set("Local OCR Only")
+                self.extraction_hint.configure(text="(Free, runs locally)")
 
     def _create_action_buttons(self):
         """Create Start/New Run/Cancel buttons."""
@@ -356,6 +416,10 @@ class TakeoffAgentApp(ctk.CTk):
         # Reset DPI to default
         self.dpi_var.set("200")
 
+        # Reset extraction mode to default
+        self.extraction_mode_var.set("Local OCR Only")
+        self.extraction_hint.configure(text="(Free, runs locally)")
+
         # Reset button states
         self.start_btn.configure(state="normal")
         self.cancel_btn.configure(state="disabled")
@@ -427,10 +491,12 @@ class TakeoffAgentApp(ctk.CTk):
         self.status_label.configure(text="Starting...")
 
         # Clear results and show processing log header
+        mode_text = self.extraction_mode_var.get()
         self.results_text.configure(state="normal")
         self.results_text.delete("1.0", "end")
         self.results_text.insert("1.0", "=" * 50 + "\n")
         self.results_text.insert("end", "PROCESSING LOG\n")
+        self.results_text.insert("end", f"Mode: {mode_text}\n")
         self.results_text.insert("end", "=" * 50 + "\n\n")
         self.results_text.configure(state="disabled")
 
@@ -481,15 +547,28 @@ class TakeoffAgentApp(ctk.CTk):
                 if not manager.download_models():
                     raise RuntimeError("Failed to repair OCR models.")
 
+            # Map GUI extraction mode to workflow parameter
+            mode_mapping = {
+                "Local OCR Only": "ocr_only",
+                "Hybrid (OCR + Vision)": "hybrid",
+                "Vision Only": "vision_only"
+            }
+            extraction_mode = mode_mapping.get(self.extraction_mode_var.get(), "ocr_only")
+
             # Stream through workflow nodes
             final_state = {}
+            # use_vision is kept for backward compatibility, but extraction_mode takes precedence
+            use_vision = extraction_mode == "vision_only"
 
             for node_name, state_update in stream_takeoff_workflow(
                 input_path=self.input_path,
                 output_path=self.output_path,
                 dpi=dpi,
                 max_retries=3,
-                enable_checkpoints=True
+                enable_checkpoints=True,
+                use_vision=use_vision,
+                extraction_mode=extraction_mode,
+                vision_page_budget=5  # Max 5 pages to Vision API in hybrid mode
             ):
                 # Accumulate state updates
                 final_state.update(state_update)
