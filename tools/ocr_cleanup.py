@@ -15,94 +15,224 @@ logger = logging.getLogger(__name__)
 # Common OCR errors in construction plans
 # Format: (wrong_pattern, correct_text)
 COMMON_OCR_FIXES = [
-    # Type/Tipe confusion
+    # ============ Type/Inlet/Structure Names ============
+    # Type variations
     (r'\bTIPE\b', 'TYPE'),
     (r'\bTYPF\b', 'TYPE'),
+    (r'\bTYP[E3]\b', 'TYPE'),
+    (r'\b7YPE\b', 'TYPE'),
     (r'\bTYPE\s+C\b', 'TYPE C'),
     (r'\bTYPE\s+D\b', 'TYPE D'),
     (r'\bTYPE\s+E\b', 'TYPE E'),
     (r'\bTYPE\s+P\b', 'TYPE P'),
+    (r'\bTYPE\s+7\b', 'TYPE 7'),  # Manhole type
     
-    # Inlet/Iniet confusion
+    # Inlet variations
     (r'\bINIET\b', 'INLET'),
     (r'\bINLFT\b', 'INLET'),
     (r'\bINL[E3]T\b', 'INLET'),
     (r'\bN[I1]LET\b', 'INLET'),
+    (r'\bNLET\b', 'INLET'),
+    (r'\b1NLET\b', 'INLET'),
+    (r'\bINLE7\b', 'INLET'),
+    (r'\bLNLET\b', 'INLET'),
     
-    # Pipe types
+    # Manhole variations
+    (r'\bMANHOLE\b', 'MANHOLE'),
+    (r'\bMANHOI[E3]\b', 'MANHOLE'),
+    (r'\bMANH0LE\b', 'MANHOLE'),
+    (r'\bMH\b', 'MH'),
+    (r'\bM\.H\.\b', 'MH'),
+    
+    # Junction box
+    (r'\bJUNCT[I1]ON\b', 'JUNCTION'),
+    (r'\bJUNCTION\s+BOX\b', 'JUNCTION BOX'),
+    (r'\bJ\.B\.\b', 'JB'),
+    (r'\bJB\b', 'JB'),
+    
+    # ============ Pipe Types ============
     (r'\bROP\b', 'RCP'),  # Reinforced Concrete Pipe
     (r'\bR[C0]P\b', 'RCP'),
-    (r'\bHDPE\b', 'HDPE'),  # Already correct, just normalize
+    (r'\bRGP\b', 'RCP'),
+    (r'\bR\.C\.P\.\b', 'RCP'),
+    (r'\bHDPE\b', 'HDPE'),
     (r'\bH[O0]PE\b', 'HDPE'),
+    (r'\bHOPE\b', 'HDPE'),
+    (r'\bH\.D\.P\.E\.\b', 'HDPE'),
     (r'\bPVC\b', 'PVC'),
     (r'\bPV[C0]\b', 'PVC'),
+    (r'\bP\.V\.C\.\b', 'PVC'),
     (r'\bDIP\b', 'DIP'),  # Ductile Iron Pipe
     (r'\bD[I1]P\b', 'DIP'),
+    (r'\bD\.I\.P\.\b', 'DIP'),
+    (r'\bCMP\b', 'CMP'),  # Corrugated Metal Pipe
+    (r'\bC\.M\.P\.\b', 'CMP'),
+    (r'\bADS\b', 'ADS'),  # ADS drainage pipe
+    (r'\bCPP\b', 'CPP'),  # Corrugated Plastic Pipe
+    (r'\bPP\b', 'PP'),  # Plastic Pipe
     
-    # Common construction terms
+    # ============ Structure Components ============
     (r'\bENDWALL\b', 'ENDWALL'),
     (r'\bENDWAIL\b', 'ENDWALL'),
     (r'\bENDWAL[I1L]\b', 'ENDWALL'),
-    (r'\bMANHOLE\b', 'MANHOLE'),
-    (r'\bMANHOI[E3]\b', 'MANHOLE'),
+    (r'\bEND\s*WALL\b', 'ENDWALL'),
+    (r'\bE\.W\.\b', 'ENDWALL'),
     (r'\bMITERED\b', 'MITERED'),
     (r'\bMITURED\b', 'MITERED'),
     (r'\bM[I1]TERED\b', 'MITERED'),
+    (r'\bM[I1]TRED\b', 'MITERED'),
     (r'\bSECTION\b', 'SECTION'),
     (r'\bSECT[I1]ON\b', 'SECTION'),
     (r'\bSECTIONF\b', 'SECTION'),
-    
-    # MES (Mitered End Section)
-    (r'\bM[E3]S\b', 'MES'),
+    (r'\bSEC7ION\b', 'SECTION'),
+    (r'\bM[E3]S\b', 'MES'),  # Mitered End Section
     (r'\bFES\b', 'FES'),  # Flared End Section
+    (r'\bF\.E\.S\.\b', 'FES'),
+    (r'\bHEADWALL\b', 'HEADWALL'),
+    (r'\bHEADWAIL\b', 'HEADWALL'),
+    (r'\bAPRON\b', 'APRON'),
+    (r'\bAPR0N\b', 'APRON'),
+    (r'\bGRATE\b', 'GRATE'),
+    (r'\bGRA7E\b', 'GRATE'),
+    (r'\bFRAME\b', 'FRAME'),
+    (r'\bCOVER\b', 'COVER'),
     
-    # Units
+    # ============ Units ============
     (r'\bI[F1]\b', 'LF'),  # Linear Feet
     (r'\b[I1]F\b', 'LF'),
+    (r'\bL\.F\.\b', 'LF'),
+    (r'\bLIN\s*FT\b', 'LF'),
     (r'\bEA\b', 'EA'),  # Each
     (r'\bE[A4]\b', 'EA'),
     (r'\bSY\b', 'SY'),  # Square Yard
+    (r'\bS\.Y\.\b', 'SY'),
     (r'\bCY\b', 'CY'),  # Cubic Yard
+    (r'\bC\.Y\.\b', 'CY'),
     (r'\bSF\b', 'SF'),  # Square Feet
+    (r'\bS\.F\.\b', 'SF'),
+    (r'\bTON\b', 'TON'),
+    (r'\bTONS\b', 'TON'),
+    (r'\bLS\b', 'LS'),  # Lump Sum
+    (r'\bL\.S\.\b', 'LS'),
+    (r'\bGAL\b', 'GAL'),
     
-    # Numbers that look like letters
+    # ============ Size/Measurement Terms ============
     (r'\b(\d+)["\s]*[I1]NCH\b', r'\1 INCH'),
     (r'\b(\d+)["\s]*IN\b', r'\1 IN'),
+    (r'\bD[I1]AMETER\b', 'DIAMETER'),
+    (r'\bD[I1]A\b', 'DIA'),
+    (r'\bRAD[I1]US\b', 'RADIUS'),
     
-    # Common gibberish fixes
+    # ============ Construction/Engineering Terms ============
     (r'\bPEOROS[E3]D\b', 'PROPOSED'),
     (r'\bPROPOS[E3]D\b', 'PROPOSED'),
+    (r'\bPR0POSED\b', 'PROPOSED'),
     (r'\bUTUTY\b', 'UTILITY'),
     (r'\bUT[I1]L[I1]TY\b', 'UTILITY'),
+    (r'\bUTILITIES\b', 'UTILITIES'),
     (r'\bEX[I1]ST[I1]NG\b', 'EXISTING'),
     (r'\bEXSOVENT\b', 'EXISTING'),
+    (r'\bEXIST\b', 'EXIST'),
+    (r'\bEX\.\b', 'EXIST'),
     (r'\bCONDU[I1]T\b', 'CONDUIT'),
+    (r'\bC0NDUIT\b', 'CONDUIT'),
     (r'\bDRA[I1]NAGE\b', 'DRAINAGE'),
+    (r'\bDRA1NAGE\b', 'DRAINAGE'),
     (r'\bSTRUCTUR[E3]\b', 'STRUCTURE'),
+    (r'\bSTRUCTURES\b', 'STRUCTURES'),
+    (r'\bSTR\b', 'STR'),
     (r'\bCONCR[E3]T[E3]\b', 'CONCRETE'),
+    (r'\bCONC\b', 'CONC'),
     (r'\bR[E3][I1]NFORC[E3]D\b', 'REINFORCED'),
+    (r'\bREINF\b', 'REINF'),
     (r'\bGALVAN[I1]Z[E3]D\b', 'GALVANIZED'),
+    (r'\bGALV\b', 'GALV'),
     (r'\bST[E3][E3]L\b', 'STEEL'),
+    (r'\bSTL\b', 'STL'),
+    (r'\bALUM[I1]NUM\b', 'ALUMINUM'),
+    (r'\bALUM\b', 'ALUM'),
     
-    # More OCR errors seen in the wild
-    (r'\bNLET\b', 'INLET'),  # Missing I
-    (r'\bN[L1]ET\b', 'INLET'),
-    (r'\bENO\b', 'END'),  # END -> ENO
-    (r'\bEND\s+SECTION\b', 'END SECTION'),
-    (r'\bSECTIONF\b', 'SECTION'),
+    # ============ Directional/Location ============
+    (r'\bENO\b', 'END'),
     (r'\bWINGED\b', 'WINGED'),
     (r'\bW[I1]NGED\b', 'WINGED'),
     (r'\bSTRA[I1]GHT\b', 'STRAIGHT'),
     (r'\bBARREL\b', 'BARREL'),
     (r'\bBARR[E3]L\b', 'BARREL'),
+    (r'\bS[I1]NGLE\b', 'SINGLE'),
+    (r'\bDOUBL[E3]\b', 'DOUBLE'),
+    (r'\bTR[I1]PLE\b', 'TRIPLE'),
+    (r'\bQUAD\b', 'QUAD'),
+    (r'\bNORTH\b', 'NORTH'),
+    (r'\bSOUTH\b', 'SOUTH'),
+    (r'\bEAST\b', 'EAST'),
+    (r'\bWEST\b', 'WEST'),
+    (r'\bN\b(?=\s+\d)', 'N'),  # N direction
+    (r'\bS\b(?=\s+\d)', 'S'),
+    (r'\bE\b(?=\s+\d)', 'E'),
+    (r'\bW\b(?=\s+\d)', 'W'),
+    
+    # ============ Elevations/Grades ============
     (r'\bCLASS\b', 'CLASS'),
     (r'\bC[L1]ASS\b', 'CLASS'),
     (r'\bGRADE\b', 'GRADE'),
     (r'\bGRAD[E3]\b', 'GRADE'),
-    (r'\bSTATION\b', 'STATION'),
-    (r'\bSTA\b', 'STA'),  # Common abbreviation
+    (r'\bELEV\b', 'ELEV'),
+    (r'\bEL\.\b', 'EL'),
     (r'\bINV\b', 'INV'),  # Invert elevation
+    (r'\b[I1]NV\b', 'INV'),
+    (r'\bINVERT\b', 'INVERT'),
     (r'\bTC\b', 'TC'),   # Top of concrete
+    (r'\bT\.C\.\b', 'TC'),
+    (r'\bRIM\b', 'RIM'),
+    (r'\bR[I1]M\b', 'RIM'),
+    (r'\bFL\b', 'FL'),  # Flow line
+    (r'\bF\.L\.\b', 'FL'),
+    (r'\bSLOPE\b', 'SLOPE'),
+    (r'\bSL0PE\b', 'SLOPE'),
+    
+    # ============ Station/Offset ============
+    (r'\bSTATION\b', 'STATION'),
+    (r'\bSTA\b', 'STA'),
+    (r'\bSTA\.\b', 'STA'),
+    (r'\bOFFSET\b', 'OFFSET'),
+    (r'\b0FFSET\b', 'OFFSET'),
+    (r'\bLT\b', 'LT'),  # Left
+    (r'\bRT\b', 'RT'),  # Right
+    (r'\bCL\b', 'CL'),  # Centerline
+    (r'\bC\.L\.\b', 'CL'),
+    (r'\bR/W\b', 'R/W'),  # Right of Way
+    (r'\bROW\b', 'ROW'),
+    
+    # ============ FDOT/Pay Item Related ============
+    (r'\bFDOT\b', 'FDOT'),
+    (r'\bFD0T\b', 'FDOT'),
+    (r'\bPAY\s*[I1]TEM\b', 'PAY ITEM'),
+    (r'\bQTY\b', 'QTY'),
+    (r'\bQUANT[I1]TY\b', 'QUANTITY'),
+    (r'\bUN[I1]T\b', 'UNIT'),
+    (r'\bDESCR[I1]PT[I1]ON\b', 'DESCRIPTION'),
+    (r'\bDESC\b', 'DESC'),
+    (r'\bSPEC\b', 'SPEC'),
+    (r'\bSPEC[I1]F[I1]CAT[I1]ON\b', 'SPECIFICATION'),
+    
+    # ============ Sheet/Plan Terms ============
+    (r'\bSHEET\b', 'SHEET'),
+    (r'\bSH[E3]ET\b', 'SHEET'),
+    (r'\bPLAN\b', 'PLAN'),
+    (r'\bPROF[I1]LE\b', 'PROFILE'),
+    (r'\bDETAIL\b', 'DETAIL'),
+    (r'\bD[E3]TAIL\b', 'DETAIL'),
+    (r'\bNOTES\b', 'NOTES'),
+    (r'\bLEGEND\b', 'LEGEND'),
+    (r'\bSCALE\b', 'SCALE'),
+    (r'\bSCAL[E3]\b', 'SCALE'),
+    
+    # ============ Common Number/Letter Swaps ============
+    (r'\b0\b(?=[A-Z])', 'O'),  # 0 before letter -> O
+    (r'(?<=[A-Z])0(?=[A-Z])', 'O'),  # 0 between letters -> O
+    (r'\b1\b(?=[A-Z])', 'I'),  # 1 before letter -> I
+    (r'(?<=[A-Z])1(?=[A-Z])', 'I'),  # 1 between letters -> I
 ]
 
 # Size patterns to normalize

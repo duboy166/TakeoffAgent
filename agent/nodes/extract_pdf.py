@@ -152,9 +152,13 @@ def _extract_with_paddleocr(
         if doc.extraction_method in ('paddleocr', 'paddleocr_parallel'):
             try:
                 from tools.ocr_cleanup import cleanup_ocr_text
-                cleaned_text = cleanup_ocr_text(doc.full_text, use_ai=False)
+                import os
+                # Use AI cleanup if API key is available
+                api_key = state.get("vision_api_key") or os.getenv("ANTHROPIC_API_KEY")
+                use_ai = bool(api_key)
+                cleaned_text = cleanup_ocr_text(doc.full_text, use_ai=use_ai, api_key=api_key)
                 if cleaned_text != doc.full_text:
-                    logger.info("OCR text cleanup applied")
+                    logger.info(f"OCR text cleanup applied (AI: {use_ai})")
             except ImportError:
                 logger.debug("OCR cleanup module not available")
             except Exception as e:

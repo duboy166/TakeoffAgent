@@ -244,8 +244,8 @@ def run_takeoff_workflow(
     max_retries: int = 3,
     enable_checkpoints: bool = True,
     use_vision: bool = False,
-    extraction_mode: str = "ocr_only",
-    vision_page_budget: int = 5,
+    extraction_mode: str = "hybrid",  # Default to hybrid for better accuracy
+    vision_page_budget: int = 10,  # Allow up to 10 pages for Vision API
     vision_provider: str = "anthropic",
     vision_api_key: str = None
 ) -> Dict[str, Any]:
@@ -321,8 +321,8 @@ def stream_takeoff_workflow(
     max_retries: int = 3,
     enable_checkpoints: bool = True,
     use_vision: bool = False,
-    extraction_mode: str = "ocr_only",
-    vision_page_budget: int = 5,
+    extraction_mode: str = "hybrid",  # Default to hybrid for better accuracy
+    vision_page_budget: int = 10,  # Allow up to 10 pages for Vision API
     vision_provider: str = "anthropic",
     vision_api_key: str = None
 ) -> Iterator[Tuple[str, Dict[str, Any]]]:

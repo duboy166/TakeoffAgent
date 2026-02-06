@@ -105,15 +105,15 @@ Examples:
     parser.add_argument(
         "--mode", "-m",
         choices=["ocr_only", "hybrid", "vision_only"],
-        default="ocr_only",
-        help="Extraction mode: ocr_only (default, free), hybrid (OCR + Vision for low-confidence pages), vision_only (all pages)"
+        default="hybrid",
+        help="Extraction mode: hybrid (default, OCR + Vision for low-confidence), ocr_only (free), vision_only (all pages)"
     )
 
     parser.add_argument(
         "--vision-budget",
         type=int,
-        default=5,
-        help="Max pages to send to Vision API per PDF in hybrid mode (default: 5)"
+        default=10,
+        help="Max pages to send to Vision API per PDF in hybrid mode (default: 10)"
     )
 
     parser.add_argument(

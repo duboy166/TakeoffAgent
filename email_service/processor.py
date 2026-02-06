@@ -84,6 +84,8 @@ class AutoWorkProcessor:
                 str(self.main),
                 str(pdf_path),
                 str(output_dir),
+                '--mode', 'hybrid',  # Use hybrid mode for better accuracy
+                '--vision-budget', '10',  # Up to 10 pages per PDF for Vision API
             ]
             
             if self.parallel:
