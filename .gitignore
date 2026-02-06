@@ -66,3 +66,6 @@ test_annotated/
 
 # Debug scripts (development only)
 debug_*.py
+
+# Email service credentials
+config/email_config.yaml
