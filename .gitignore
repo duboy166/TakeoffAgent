@@ -63,3 +63,6 @@ models.zip
 # Test output (generated during testing)
 test_output/
 test_annotated/
+
+# Debug scripts (development only)
+debug_*.py
