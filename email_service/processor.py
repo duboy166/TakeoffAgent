@@ -19,6 +19,7 @@ class ProcessingResult:
     filename: str
     success: bool
     items: int = 0
+    matched_items: int = 0
     estimate: float = 0.0
     output_dir: Optional[Path] = None
     csv_path: Optional[Path] = None
@@ -139,17 +140,23 @@ class AutoWorkProcessor:
                 try:
                     with open(json_path) as f:
                         data = json.load(f)
-                    items = len(data.get('items', []))
-                    estimate = data.get('total_estimated_cost', 0) or 0
+                    # pay_items contains all detected materials
+                    items = len(data.get('pay_items', []))
+                    # total_cost and matched count are in the summary
+                    summary = data.get('summary', {})
+                    estimate = summary.get('total_cost', 0) or 0
+                    matched_items = summary.get('matched_items', 0) or 0
                 except Exception as e:
                     logger.warning(f"Could not parse JSON results: {e}")
+                    matched_items = 0
             
-            logger.info(f"Completed: {filename} - {items} items, ${estimate:,.2f}")
+            logger.info(f"Completed: {filename} - {items} materials found, {matched_items} priced, ${estimate:,.2f}")
             
             return ProcessingResult(
                 filename=filename,
                 success=True,
                 items=items,
+                matched_items=matched_items,
                 estimate=estimate,
                 output_dir=output_subdir,
                 csv_path=csv_path,

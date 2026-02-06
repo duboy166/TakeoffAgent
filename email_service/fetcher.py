@@ -30,6 +30,7 @@ class EmailAttachment:
 class IncomingEmail:
     """Represents an incoming email to process."""
     message_id: str
+    imap_id: str  # IMAP sequence number for marking as read
     from_addr: str
     from_name: str
     subject: str
@@ -171,6 +172,7 @@ class EmailFetcher:
         
         return IncomingEmail(
             message_id=message_id,
+            imap_id=msg_id.decode() if isinstance(msg_id, bytes) else str(msg_id),
             from_addr=from_addr,
             from_name=from_name,
             subject=subject,
@@ -261,8 +263,15 @@ class EmailFetcher:
     def mark_as_read(self, msg_id: str):
         """Mark an email as read."""
         if self.conn:
-            self.conn.store(msg_id.encode() if isinstance(msg_id, str) else msg_id, 
-                          '+FLAGS', '\\Seen')
+            # msg_id from fetch is bytes like b'1', need to decode for store
+            if isinstance(msg_id, bytes):
+                msg_id = msg_id.decode()
+            # Remove angle brackets if it's a Message-ID header value
+            if msg_id.startswith('<'):
+                # Can't use Message-ID for STORE, would need to search first
+                # For now, just skip marking - email will stay unread
+                return
+            self.conn.store(msg_id, '+FLAGS', '\\Seen')
     
     def mark_as_processed(self, msg_id: str, label: str = 'Processed'):
         """Mark email as processed (add label if supported)."""

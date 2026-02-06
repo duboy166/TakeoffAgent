@@ -122,8 +122,11 @@ class EmailSender:
                 total_estimate += estimate
                 
                 lines.append(f"   ✅ Success")
-                lines.append(f"   Items: {items}")
-                lines.append(f"   Estimate: ${estimate:,.2f}")
+                lines.append(f"   Materials Detected: {items}")
+                if estimate > 0:
+                    lines.append(f"   Estimated Cost: ${estimate:,.2f}")
+                else:
+                    lines.append(f"   Cost: Review CSV for details (some items may need prices or quantities)")
             else:
                 lines.append(f"   ❌ Error: {r.get('error', 'Unknown error')}")
             
@@ -131,8 +134,16 @@ class EmailSender:
         
         lines.extend([
             "-" * 40,
-            f"Total Items: {total_items}",
-            f"Total Estimate: ${total_estimate:,.2f}",
+            f"Total Materials Found: {total_items}",
+        ])
+        
+        if total_estimate > 0:
+            lines.append(f"Total Estimate: ${total_estimate:,.2f}")
+        else:
+            lines.append("Note: No items matched our price catalog. The CSV lists all")
+            lines.append("detected materials — prices can be added manually.")
+        
+        lines.extend([
             "",
             "Attached: CSV report(s) with full details",
             "",

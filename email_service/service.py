@@ -137,6 +137,7 @@ class EmailService:
                 'filename': result.filename,
                 'success': result.success,
                 'items': result.items,
+                'matched_items': result.matched_items,
                 'estimate': result.estimate,
                 'error': result.error,
             })
@@ -182,6 +183,7 @@ class EmailService:
             # Use OpenClaw's message tool if available
             # For now, just log
             total_items = sum(r.get('items', 0) for r in results)
+            matched_items = sum(r.get('matched_items', 0) for r in results)
             total_estimate = sum(r.get('estimate', 0) for r in results)
             success_count = sum(1 for r in results if r.get('success'))
             
@@ -189,7 +191,8 @@ class EmailService:
                 f"📧 AutoWork Job Complete\n"
                 f"From: {email.from_addr}\n"
                 f"Files: {success_count}/{len(results)} successful\n"
-                f"Items: {total_items}\n"
+                f"Materials Found: {total_items}\n"
+                f"Priced Items: {matched_items}\n"
                 f"Estimate: ${total_estimate:,.2f}"
             )
             
@@ -220,7 +223,7 @@ class EmailService:
                     try:
                         if self.process_email(email):
                             processed += 1
-                        fetcher.mark_as_processed(email.message_id)
+                        fetcher.mark_as_processed(email.imap_id)
                     except Exception as e:
                         logger.exception(f"Error processing email: {e}")
                 
