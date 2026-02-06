@@ -1,0 +1,19 @@
+{
+  "run_datetime": "2026-02-06T09:57:17.078321",
+  "input_folder": "/Users/joe/.openclaw/workspace/projects/autowork/test_plans/Siplin Road Pond Retrofit Plans.pdf",
+  "output_folder": "/Users/joe/.openclaw/workspace/projects/autowork/code/test_output/accuracy_test/siplin_road/Siplin Road Pond Retrofit Plans",
+  "statistics": {
+    "total_files": 1,
+    "successful_files": 1,
+    "failed_files": 0,
+    "total_pages_analyzed": 14,
+    "total_pay_items": 24,
+    "total_matched_items": 11,
+    "grand_total_estimate": 476808.0,
+    "processing_time_seconds": 15.42
+  },
+  "files_completed": [
+    "/Users/joe/.openclaw/workspace/projects/autowork/test_plans/Siplin Road Pond Retrofit Plans.pdf"
+  ],
+  "files_failed": []
+}

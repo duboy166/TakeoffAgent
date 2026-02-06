@@ -1,0 +1,530 @@
+{
+  "project_info": {
+    "name": "research parking test",
+    "location": "",
+    "owner": "TIPE C NLET FBER OPTIC DATCO MURY 2% 2823 RT MITERED END SECTION  TC 29.00 BY DIRECTIONAL DRILL DEV2025-167 00ED S0P1. , 2005 (M (SEE ELECTRICAL PLANS) CITY APPROVAL STAMP STA 3+86.72, 34.60' LT + 2s= + 30.1 BELLEVUE AVENUE EXT(SION) A8 \u2192204 08.79 +2s OLD DELAND RO(DEED)(100' R/W) ORB 2153. PC 836 4 TC 32.50 GRAPHIC SCALE INV 26.00 N STRUCTURE INV 25.00 15 30 60 90 4 1+00 ROP 27.20 SCALE: 1\" - 30\u00b0 28.50",
+    "engineer": "C INLET  30.00  PEOROSED UTUTY EXSOVENT ROP 4\u00b0 HOPE CONDUIT FOR TIPE C NLET FBER OPTIC DATCO MURY 2% 2823 RT MITERED END SECTION  TC 29.00 BY DIRECTIONAL DRILL DEV2025-167 00ED S0P1. , 2005 (M (SEE ELECTRICAL PLANS) CITY APPROVAL STAMP STA 3+86.72, 34.60' LT + 2s= + 30.1 BELLEVUE AVENUE EXT(SION) A8 \u2192204 08.79 +2s OLD DELAND RO(DEED)(100' R/W) ORB 2153. PC 836 4 TC 32.50 GRAPHIC SCALE INV 26.00 N STRUCTURE INV 25.00 15 30 60 90 4 1+00 ROP 27.20 SCALE: 1\" - 30\u00b0 28.50"
+  },
+  "pay_items": [
+    {
+      "pay_item_no": "RCP-24",
+      "description": "24\" RCP PIPE (VERIFY QTY)",
+      "unit": "LF",
+      "quantity": 0,
+      "matched": true,
+      "unit_price": 62.0,
+      "line_cost": 0.0,
+      "source": "callout",
+      "confidence": "low",
+      "needs_verification": true,
+      "mentions": 1,
+      "source_location": {
+        "page": 1,
+        "bbox": [
+          [
+            1190,
+            617
+          ],
+          [
+            1261,
+            617
+          ],
+          [
+            1261,
+            627
+          ],
+          [
+            1190,
+            627
+          ]
+        ],
+        "text_context": "INV $ 14\"x23\" RCP 24.90",
+        "ocr_confidence": 0.8875813484191895
+      },
+      "matched_product": {
+        "product_type": "Round Reinforced Concrete Pipe",
+        "size": "24\"",
+        "configuration": "CL III",
+        "price": 62.0,
+        "unit": "LF",
+        "fdot_code": "ASTM C-76"
+      }
+    },
+    {
+      "pay_item_no": "RCP-30",
+      "description": "30\" RCP PIPE (VERIFY QTY)",
+      "unit": "LF",
+      "quantity": 0,
+      "matched": true,
+      "unit_price": 95.0,
+      "line_cost": 0.0,
+      "source": "callout",
+      "confidence": "low",
+      "needs_verification": true,
+      "mentions": 2,
+      "source_location": {
+        "page": 1,
+        "bbox": [
+          [
+            866,
+            858
+          ],
+          [
+            900,
+            858
+          ],
+          [
+            900,
+            868
+          ],
+          [
+            866,
+            868
+          ]
+        ],
+        "text_context": "RCP 30.00",
+        "ocr_confidence": 0.9932358264923096
+      },
+      "matched_product": {
+        "product_type": "Round Reinforced Concrete Pipe",
+        "size": "30\"",
+        "configuration": "CL III",
+        "price": 95.0,
+        "unit": "LF",
+        "fdot_code": "ASTM C-76"
+      }
+    },
+    {
+      "pay_item_no": "INLET",
+      "description": "INLET #30",
+      "unit": "EA",
+      "quantity": 1,
+      "matched": true,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "drainage_label",
+      "confidence": "high",
+      "source_location": {
+        "page": 1,
+        "bbox": [
+          [
+            258,
+            153
+          ],
+          [
+            308,
+            157
+          ],
+          [
+            308,
+            167
+          ],
+          [
+            258,
+            163
+          ]
+        ],
+        "text_context": "TIPE C INLET ",
+        "ocr_confidence": 0.8027164936065674
+      },
+      "match_source": "ai",
+      "matched_code": "425-1-030",
+      "ai_confidence": 0.85,
+      "ai_match_reason": "Inlet number directly maps to catalog inlet type"
+    },
+    {
+      "pay_item_no": "INLET",
+      "description": "INLET #11",
+      "unit": "EA",
+      "quantity": 1,
+      "matched": true,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "drainage_label",
+      "confidence": "high",
+      "source_location": {
+        "page": 1,
+        "bbox": [
+          [
+            258,
+            153
+          ],
+          [
+            308,
+            157
+          ],
+          [
+            308,
+            167
+          ],
+          [
+            258,
+            163
+          ]
+        ],
+        "text_context": "TIPE C INLET ",
+        "ocr_confidence": 0.8027164936065674
+      },
+      "match_source": "ai",
+      "matched_code": "425-1-011",
+      "ai_confidence": 0.85,
+      "ai_match_reason": "Inlet number directly maps to catalog inlet type"
+    },
+    {
+      "pay_item_no": "INLET",
+      "description": "INLET #622",
+      "unit": "EA",
+      "quantity": 1,
+      "matched": true,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "drainage_label",
+      "confidence": "high",
+      "source_location": {
+        "page": 1,
+        "bbox": [
+          [
+            258,
+            153
+          ],
+          [
+            308,
+            157
+          ],
+          [
+            308,
+            167
+          ],
+          [
+            258,
+            163
+          ]
+        ],
+        "text_context": "TIPE C INLET ",
+        "ocr_confidence": 0.8027164936065674
+      },
+      "match_source": "ai",
+      "matched_code": "425-1-622",
+      "ai_confidence": 0.75,
+      "ai_match_reason": "Inlet number maps to catalog inlet type"
+    },
+    {
+      "pay_item_no": "INLET",
+      "description": "INLET #21",
+      "unit": "EA",
+      "quantity": 1,
+      "matched": true,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "drainage_label",
+      "confidence": "high",
+      "source_location": {
+        "page": 1,
+        "bbox": [
+          [
+            258,
+            153
+          ],
+          [
+            308,
+            157
+          ],
+          [
+            308,
+            167
+          ],
+          [
+            258,
+            163
+          ]
+        ],
+        "text_context": "TIPE C INLET ",
+        "ocr_confidence": 0.8027164936065674
+      },
+      "match_source": "ai",
+      "matched_code": "425-1-021",
+      "ai_confidence": 0.85,
+      "ai_match_reason": "Inlet number directly maps to catalog inlet type"
+    },
+    {
+      "pay_item_no": "INLET",
+      "description": "INLET #918",
+      "unit": "EA",
+      "quantity": 1,
+      "matched": true,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "drainage_label",
+      "confidence": "high",
+      "source_location": {
+        "page": 1,
+        "bbox": [
+          [
+            258,
+            153
+          ],
+          [
+            308,
+            157
+          ],
+          [
+            308,
+            167
+          ],
+          [
+            258,
+            163
+          ]
+        ],
+        "text_context": "TIPE C INLET ",
+        "ocr_confidence": 0.8027164936065674
+      },
+      "match_source": "ai",
+      "matched_code": "425-1-918",
+      "ai_confidence": 0.75,
+      "ai_match_reason": "Inlet number maps to catalog inlet type"
+    },
+    {
+      "pay_item_no": "INLET",
+      "description": "INLET #17",
+      "unit": "EA",
+      "quantity": 1,
+      "matched": true,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "drainage_label",
+      "confidence": "high",
+      "source_location": {
+        "page": 1,
+        "bbox": [
+          [
+            753,
+            844
+          ],
+          [
+            801,
+            844
+          ],
+          [
+            801,
+            851
+          ],
+          [
+            753,
+            851
+          ]
+        ],
+        "text_context": "TYPE C INLET #17",
+        "ocr_confidence": 0.9341416358947754
+      },
+      "match_source": "ai",
+      "matched_code": "425-1-017",
+      "ai_confidence": 0.85,
+      "ai_match_reason": "Inlet number directly maps to catalog inlet type"
+    }
+  ],
+  "drainage_structures": [
+    {
+      "type": "Pipe",
+      "size": "24\"",
+      "description": "24\" RCP PIPE (VERIFY QTY)",
+      "station": "-",
+      "quantity": 0,
+      "unit": "LF",
+      "unit_price": 62.0,
+      "line_total": 0.0
+    },
+    {
+      "type": "Pipe",
+      "size": "30\"",
+      "description": "30\" RCP PIPE (VERIFY QTY)",
+      "station": "-",
+      "quantity": 0,
+      "unit": "LF",
+      "unit_price": 95.0,
+      "line_total": 0.0
+    },
+    {
+      "type": "Inlet",
+      "size": "Standard",
+      "description": "INLET #30",
+      "station": "-",
+      "quantity": 1,
+      "unit": "EA",
+      "unit_price": null,
+      "line_total": null
+    },
+    {
+      "type": "Inlet",
+      "size": "Standard",
+      "description": "INLET #11",
+      "station": "-",
+      "quantity": 1,
+      "unit": "EA",
+      "unit_price": null,
+      "line_total": null
+    },
+    {
+      "type": "Inlet",
+      "size": "Standard",
+      "description": "INLET #622",
+      "station": "-",
+      "quantity": 1,
+      "unit": "EA",
+      "unit_price": null,
+      "line_total": null
+    },
+    {
+      "type": "Inlet",
+      "size": "Standard",
+      "description": "INLET #21",
+      "station": "-",
+      "quantity": 1,
+      "unit": "EA",
+      "unit_price": null,
+      "line_total": null
+    },
+    {
+      "type": "Inlet",
+      "size": "Standard",
+      "description": "INLET #918",
+      "station": "-",
+      "quantity": 1,
+      "unit": "EA",
+      "unit_price": null,
+      "line_total": null
+    },
+    {
+      "type": "Inlet",
+      "size": "Standard",
+      "description": "INLET #17",
+      "station": "-",
+      "quantity": 1,
+      "unit": "EA",
+      "unit_price": null,
+      "line_total": null
+    }
+  ],
+  "material_summary": {
+    "pipe_summary": {
+      "24\"_RCP": {
+        "total_lf": 0,
+        "count": 1,
+        "size": "24",
+        "material": "RCP"
+      },
+      "30\"_RCP": {
+        "total_lf": 0,
+        "count": 1,
+        "size": "30",
+        "material": "RCP"
+      }
+    },
+    "structure_summary": {
+      "INLET": {
+        "count": 6
+      }
+    },
+    "totals": {
+      "total_pipe_lf": 0,
+      "total_pipe_sizes": 2,
+      "total_structures": 6,
+      "total_structure_types": 1
+    }
+  },
+  "ai_matched_items": [
+    {
+      "original_description": "INLET #30",
+      "matched_code": "425-1-030",
+      "matched_description": "Type D Inlet",
+      "confidence": 0.85,
+      "reason": "Inlet number directly maps to catalog inlet type"
+    },
+    {
+      "original_description": "INLET #11",
+      "matched_code": "425-1-011",
+      "matched_description": "Type D Inlet",
+      "confidence": 0.85,
+      "reason": "Inlet number directly maps to catalog inlet type"
+    },
+    {
+      "original_description": "INLET #622",
+      "matched_code": "425-1-622",
+      "matched_description": "Type E Inlet",
+      "confidence": 0.75,
+      "reason": "Inlet number maps to catalog inlet type"
+    },
+    {
+      "original_description": "INLET #21",
+      "matched_code": "425-1-021",
+      "matched_description": "Type P Inlet",
+      "confidence": 0.85,
+      "reason": "Inlet number directly maps to catalog inlet type"
+    },
+    {
+      "original_description": "INLET #918",
+      "matched_code": "425-1-918",
+      "matched_description": "Ditch Bottom Inlet",
+      "confidence": 0.75,
+      "reason": "Inlet number maps to catalog inlet type"
+    },
+    {
+      "original_description": "INLET #17",
+      "matched_code": "425-1-017",
+      "matched_description": "Type D Inlet",
+      "confidence": 0.85,
+      "reason": "Inlet number directly maps to catalog inlet type"
+    }
+  ],
+  "validation_issues": [],
+  "needs_review": [
+    {
+      "description": "24\" RCP PIPE",
+      "quantity": 24.9,
+      "unit": "LF",
+      "confidence": 0.6,
+      "reason": "Text context suggests quantity of 24.90 LF might be correct. Original extraction showed 0 quantity. Description seems correct for drainage pipe.",
+      "page": 1,
+      "region_hint": "Middle-right region",
+      "needs_human_review": true
+    },
+    {
+      "description": "30\" RCP PIPE",
+      "quantity": 30.0,
+      "unit": "LF",
+      "confidence": 0.6,
+      "reason": "Text context shows 30.00, which likely represents pipe length. Original extraction showed 0 quantity. Description appears correct for drainage pipe.",
+      "page": 1,
+      "region_hint": "Bottom-right region",
+      "needs_human_review": true
+    }
+  ],
+  "pages_product_analysis": [],
+  "summary": {
+    "pages_analyzed": 1,
+    "total_items": 8,
+    "matched_items": 8,
+    "rule_matched_items": 2,
+    "ai_matched_items": 6,
+    "items_corrected": 0,
+    "items_for_review": 2,
+    "validation_confidence": 1.0,
+    "total_cost": 0,
+    "total_pipe_lf": 0,
+    "total_structures": 6
+  },
+  "extraction_info": {
+    "method": "paddleocr",
+    "recommended_method": "",
+    "analysis_notes": []
+  },
+  "extracted_text": "[Page 1]\n+  +30 +21 TIPE C INLET  30.00  PEOROSED UTUTY EXSOVENT ROP 4\u00b0 HOPE CONDUIT FOR TIPE C NLET FBER OPTIC DATCO MURY 2% 2823 RT MITERED END SECTION  TC 29.00 BY DIRECTIONAL DRILL DEV2025-167 00ED S0P1. , 2005 (M (SEE ELECTRICAL PLANS) CITY APPROVAL STAMP STA 3+86.72, 34.60' LT + 2s= + 30.1 BELLEVUE AVENUE EXT(SION) A8 \u2192204 08.79 +2s OLD DELAND RO(DEED)(100' R/W) ORB 2153. PC 836 4 TC 32.50 GRAPHIC SCALE INV 26.00 N STRUCTURE INV 25.00 15 30 60 90 4 1+00 ROP 27.20 SCALE: 1\" - 30\u00b0 28.50\n488 MITURED ENO SECTIONF LEGEND INV 27.00 40.09\" LT STA 6+15.34, EXISTING GRADE - 24.5 3 to 30.30 RCP 27.20 EXISTING CONTOUR RCP 27.20 BCP 27.20 50.55 PROPOSED GRADE STA 5+26,50 39.95'LT 1. PROPOSED CONTOUR 28 PROPOSED DRAINAGE 18.40 FLOW PATTERN CRSSATICN CONTRIOLLERA RAUN STNSC PROPOSED 4 ==5 6 EAST R/W LINE IRRIGATION SLEEVE O\nCLYDE MORRIS BOULEVARD 79270 (R/W VARIES) MAP SECTION KSS +00 552 3 (tYP.) TYPE E INLET FIO TC 32.50 RCP 27.25 IV N 24* TC 32.50 PERS 27.25 4 PERS HP 24\u00b0 PERF HP wV 27.25 27.23 TURY NV 25.50 HP 27.25 8\" HOPE (DR=11) REUSE MAN RCP 32\nTIPE C INLET 11 1C 27.50 INV $ 14\"x23\" RCP 24.90 2'N SLOTTED MER Te 32.50 1303 CREST EL 27.00 19255 NV S 24* PERT HP 27.25 INV NE 24* PERF HP 27.25 3083 38 U INV N 24\" ROP 27.40 (TYP. 1689-2\u22209 (99c) 30.20 TYPE C INLET M/APRON 12 TC27.00 ROP 24.80 0 124 UF24 PERI OOX IRENCH FT WOE MEDAN DRY RETENTION 3-TR BOTTOM DL 27.00 et -25.20 OVERFLOW EL 30.20 MEAN YR/24HR DHW 28.9 4R CHW 30.50 W/APRON 3 TYPE C INLET to TYPE \u00a3 INLET 622 TYPE C NLET F99 RCP NV N 24 PERF HO 27.25 T32.50 INV E 24\" PERF H0 27.25 NV E 24\" PERF HO 27.25 TRUCTURE INV 25.50 MEET EXOSTING STRUCTURE INV 25.50 TYPE E INLET F5 NG RAC SAM TARY MN WV N 24\" PERF HP 27.25 10P=29.60\" + 27 s HP27.25 INLET 21 RCP INLET 918 TYPE E NLET 120 TYPE C INLET #17 TYPE C NLET T6 29. MES 914 TAN TARY UN 27.25 PERF HP 27.25 RCP 30.00 10P-27.62 RCP27.25 (=20.12 8\" R URE INV 25.50 331 ADD RSER TO BRING TC - 28.50 = = = 3 2227 6 \u03c9 SHEET 2228 28.88 20'86 66'67 60'13 File No. 2419 35 35 Drown By: MRB 5.52% Date: 02/10/25 30 30 2.34% O SCALE: 1*=30\u2032 25 25 120 150 60 70 80 90 130 40 50 30 0 6\u2220\u00b060+1 8000+0 HORIZONTAL 1\"- 10\u00b0 00'S0+0 SECTION A-A VERTICAL 1\" = 10",
+  "notes": [
+    "Extracted via paddleocr",
+    "Source: research_parking_test.pdf",
+    "Pages: 1",
+    "AI matched: 6 items",
+    "Needs review: 2 items",
+    "Material: 0 LF pipe, 6 structures"
+  ]
+}

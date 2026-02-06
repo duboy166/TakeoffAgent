@@ -1,0 +1,617 @@
+{
+  "project_info": {
+    "name": "DESIGN.  THE COUNTY'S REPRESENTATIVE WILL ADDRESS CHANGES AND",
+    "location": "LOCATION MAP",
+    "owner": "OR THEIR REPRESENTATIVES.  CONTRACTOR",
+    "engineer": "REVISIONS"
+  },
+  "pay_items": [
+    {
+      "pay_item_no": "110-1-1",
+      "description": "CLEARING & GRUBBING",
+      "unit": "LS",
+      "quantity": 1.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "425-1-549",
+      "description": "INLET, TYPE D (MODIFIED) STRUCTURE",
+      "unit": "EA",
+      "quantity": 1.0,
+      "matched": true,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high",
+      "match_source": "ai",
+      "matched_code": "425-1-549",
+      "ai_confidence": 0.95,
+      "ai_match_reason": "Direct match to inlet type in catalog"
+    },
+    {
+      "pay_item_no": "425-2-41",
+      "description": "MANHOLE, TYPE 7 STRUCTURE",
+      "unit": "EA",
+      "quantity": 2.0,
+      "matched": true,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high",
+      "match_source": "ai",
+      "matched_code": "425-2-41",
+      "ai_confidence": 0.95,
+      "ai_match_reason": "Direct match to manhole type in catalog"
+    },
+    {
+      "pay_item_no": "430-175-118",
+      "description": "PIPE CULVERT, SRCP-CLASS III, ROUND 18\"",
+      "unit": "LF",
+      "quantity": 98.0,
+      "matched": true,
+      "unit_price": 40.0,
+      "line_cost": 3920.0,
+      "source": "fdot",
+      "confidence": "high",
+      "matched_product": {
+        "product_type": "Round Reinforced Concrete Pipe",
+        "size": "18\"",
+        "configuration": "CL III",
+        "price": 40.0,
+        "unit": "LF",
+        "fdot_code": "ASTM C-76"
+      }
+    },
+    {
+      "pay_item_no": "430-518-120",
+      "description": "STRAIGHT CONCRETE ENDWALLS, 18\", SINGLE, ROUND",
+      "unit": "EA",
+      "quantity": 1.0,
+      "matched": true,
+      "unit_price": 1264.0,
+      "line_cost": 1264.0,
+      "source": "fdot",
+      "confidence": "high",
+      "matched_product": {
+        "product_type": "Straight Endwalls",
+        "size": "18\"",
+        "configuration": "Single",
+        "price": 1264.0,
+        "unit": "EA",
+        "fdot_code": "FDOT 430-030"
+      }
+    },
+    {
+      "pay_item_no": "430-982-125",
+      "description": "MITERED END SECTION, ROUND, 18\"",
+      "unit": "EA",
+      "quantity": 2.0,
+      "matched": true,
+      "unit_price": 2100.0,
+      "line_cost": 4200.0,
+      "source": "fdot",
+      "confidence": "high",
+      "matched_product": {
+        "product_type": "Round Reinforced Concrete Pipe",
+        "size": "18\"",
+        "configuration": "Flared End",
+        "price": 2100.0,
+        "unit": "EA",
+        "fdot_code": "ASTM C-76"
+      }
+    },
+    {
+      "pay_item_no": "440-1-50",
+      "description": "UNDERDRAINS, TYPE V",
+      "unit": "LF",
+      "quantity": 145.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "570-1-2",
+      "description": "PERFORMANCE TURF, SOD (BAHIA OR MATCH EXIST.)",
+      "unit": "SY",
+      "quantity": 1600.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "101-1",
+      "description": "MOBILIZATION",
+      "unit": "LS",
+      "quantity": 1.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "102-1",
+      "description": "MAINTENANCE OF TRAFFIC",
+      "unit": "LS",
+      "quantity": 1.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "104-14",
+      "description": "PREVENTION CONTROL AND ABATEMENT CONTROL OF EROSION AND WATER POLLUTION",
+      "unit": "LS",
+      "quantity": 1.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "120-9",
+      "description": "EXCAVATION EMBANKMENT AND GRADING",
+      "unit": "LS",
+      "quantity": 1.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "522-2",
+      "description": "CONCRETE DRIVEWAY, 6\" THICK",
+      "unit": "SY",
+      "quantity": 23.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "900-1",
+      "description": "AS-BUILT PLANS",
+      "unit": "LS",
+      "quantity": 1.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "900-2",
+      "description": "INDEMNIFICATION",
+      "unit": "LS",
+      "quantity": 1.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "900-3",
+      "description": "BIOSORPTION ACTIVATED MEDIA (BAM)",
+      "unit": "CY",
+      "quantity": 136.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "900-4",
+      "description": "30-MIL PVC FLEXIBLE GEOMEMBRANE (F&I)",
+      "unit": "SF",
+      "quantity": 2880.0,
+      "matched": true,
+      "unit_price": 162.0,
+      "line_cost": 466560.0,
+      "source": "fdot",
+      "confidence": "high",
+      "matched_product": {
+        "product_type": "Round Reinforced Concrete Pipe",
+        "size": "30\"",
+        "configuration": "CL V",
+        "price": 162.0,
+        "unit": "LF",
+        "fdot_code": "ASTM C-76"
+      }
+    },
+    {
+      "pay_item_no": "MES-18\"",
+      "description": "18\" MES",
+      "unit": "EA",
+      "quantity": 1,
+      "matched": true,
+      "unit_price": 864.0,
+      "line_cost": 864.0,
+      "source": "structure",
+      "confidence": "medium",
+      "structure_type": "MES",
+      "configuration": null,
+      "option": null,
+      "matched_product": {
+        "product_type": "Galvanized Steel 4:1 MES",
+        "size": "18\"",
+        "configuration": "Single Run No Frame",
+        "price": 864.0,
+        "unit": "EA",
+        "fdot_code": ""
+      }
+    },
+    {
+      "pay_item_no": "RCP-15",
+      "description": "15\" RCP PIPE (VERIFY QTY)",
+      "unit": "LF",
+      "quantity": 0,
+      "matched": true,
+      "unit_price": 30.0,
+      "line_cost": 0.0,
+      "source": "callout",
+      "confidence": "low",
+      "needs_verification": true,
+      "mentions": 10,
+      "matched_product": {
+        "product_type": "Round Reinforced Concrete Pipe",
+        "size": "15\"",
+        "configuration": "CL III",
+        "price": 30.0,
+        "unit": "LF",
+        "fdot_code": "ASTM C-76"
+      }
+    },
+    {
+      "pay_item_no": "INLET",
+      "description": "INLET #35",
+      "unit": "EA",
+      "quantity": 1,
+      "matched": true,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "drainage_label",
+      "confidence": "high",
+      "match_source": "ai",
+      "matched_code": "425-1-1",
+      "ai_confidence": 0.75,
+      "ai_match_reason": "Generic inlet mapped to standard Type D inlet"
+    },
+    {
+      "pay_item_no": "INLET",
+      "description": "INLET #6",
+      "unit": "EA",
+      "quantity": 1,
+      "matched": true,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "drainage_label",
+      "confidence": "high",
+      "match_source": "ai",
+      "matched_code": "425-1-1",
+      "ai_confidence": 0.75,
+      "ai_match_reason": "Generic inlet mapped to standard Type D inlet"
+    },
+    {
+      "pay_item_no": "INLET",
+      "description": "INLET #103",
+      "unit": "EA",
+      "quantity": 1,
+      "matched": true,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "drainage_label",
+      "confidence": "high",
+      "match_source": "ai",
+      "matched_code": "425-1-1",
+      "ai_confidence": 0.75,
+      "ai_match_reason": "Generic inlet mapped to standard Type D inlet"
+    },
+    {
+      "pay_item_no": "MANHOLE",
+      "description": "MANHOLE (VERIFY QTY)",
+      "unit": "EA",
+      "quantity": 0,
+      "matched": true,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "drainage_label",
+      "confidence": "low",
+      "needs_verification": true,
+      "mentions": 10,
+      "match_source": "ai",
+      "matched_code": "425-2-41",
+      "ai_confidence": 0.65,
+      "ai_match_reason": "Generic manhole mapped to standard Type 7 manhole"
+    },
+    {
+      "pay_item_no": "CATCH BASIN",
+      "description": "CATCH BASIN (VERIFY QTY)",
+      "unit": "EA",
+      "quantity": 0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "drainage_label",
+      "confidence": "low",
+      "needs_verification": true,
+      "mentions": 2
+    }
+  ],
+  "drainage_structures": [
+    {
+      "type": "Inlet",
+      "size": "Type D",
+      "description": "INLET, TYPE D (MODIFIED) STRUCTURE",
+      "station": "-",
+      "quantity": 1.0,
+      "unit": "EA",
+      "unit_price": null,
+      "line_total": null
+    },
+    {
+      "type": "Manhole",
+      "size": "Type 7",
+      "description": "MANHOLE, TYPE 7 STRUCTURE",
+      "station": "-",
+      "quantity": 2.0,
+      "unit": "EA",
+      "unit_price": null,
+      "line_total": null
+    },
+    {
+      "type": "Pipe",
+      "size": "18\"",
+      "description": "PIPE CULVERT, SRCP-CLASS III, ROUND 18\"",
+      "station": "-",
+      "quantity": 98.0,
+      "unit": "LF",
+      "unit_price": 40.0,
+      "line_total": 3920.0
+    },
+    {
+      "type": "Endwall",
+      "size": "18\"",
+      "description": "Straight - STRAIGHT CONCRETE ENDWALLS, 18\", SINGLE, ROUND",
+      "station": "-",
+      "quantity": 1.0,
+      "unit": "EA",
+      "unit_price": 1264.0,
+      "line_total": 1264.0
+    },
+    {
+      "type": "Endwall",
+      "size": "18\"",
+      "description": "MES - MITERED END SECTION, ROUND, 18\"",
+      "station": "-",
+      "quantity": 2.0,
+      "unit": "EA",
+      "unit_price": 2100.0,
+      "line_total": 4200.0
+    },
+    {
+      "type": "Pipe",
+      "size": "15\"",
+      "description": "15\" RCP PIPE (VERIFY QTY)",
+      "station": "-",
+      "quantity": 0,
+      "unit": "LF",
+      "unit_price": 30.0,
+      "line_total": 0.0
+    },
+    {
+      "type": "Inlet",
+      "size": "Standard",
+      "description": "INLET #35",
+      "station": "-",
+      "quantity": 1,
+      "unit": "EA",
+      "unit_price": null,
+      "line_total": null
+    },
+    {
+      "type": "Inlet",
+      "size": "Standard",
+      "description": "INLET #6",
+      "station": "-",
+      "quantity": 1,
+      "unit": "EA",
+      "unit_price": null,
+      "line_total": null
+    },
+    {
+      "type": "Inlet",
+      "size": "Standard",
+      "description": "INLET #103",
+      "station": "-",
+      "quantity": 1,
+      "unit": "EA",
+      "unit_price": null,
+      "line_total": null
+    },
+    {
+      "type": "Manhole",
+      "size": "Standard",
+      "description": "MANHOLE (VERIFY QTY)",
+      "station": "-",
+      "quantity": 0,
+      "unit": "EA",
+      "unit_price": null,
+      "line_total": null
+    }
+  ],
+  "material_summary": {
+    "pipe_summary": {
+      "18\"_SRCP": {
+        "total_lf": 98.0,
+        "count": 1,
+        "size": "18",
+        "material": "SRCP"
+      },
+      "15\"_RCP": {
+        "total_lf": 0,
+        "count": 1,
+        "size": "15",
+        "material": "RCP"
+      }
+    },
+    "structure_summary": {
+      "INLET": {
+        "count": 4
+      },
+      "MANHOLE": {
+        "count": 3
+      },
+      "ENDWALL": {
+        "count": 1
+      },
+      "OTHER": {
+        "count": 2
+      },
+      "MES": {
+        "count": 1
+      },
+      "CATCH BASIN": {
+        "count": 1
+      }
+    },
+    "totals": {
+      "total_pipe_lf": 98.0,
+      "total_pipe_sizes": 2,
+      "total_structures": 12,
+      "total_structure_types": 6
+    }
+  },
+  "ai_matched_items": [
+    {
+      "original_description": "INLET, TYPE D (MODIFIED) STRUCTURE",
+      "matched_code": "425-1-549",
+      "matched_description": "Type D Inlet",
+      "confidence": 0.95,
+      "reason": "Direct match to inlet type in catalog"
+    },
+    {
+      "original_description": "MANHOLE, TYPE 7 STRUCTURE",
+      "matched_code": "425-2-41",
+      "matched_description": "Type 7 Manhole",
+      "confidence": 0.95,
+      "reason": "Direct match to manhole type in catalog"
+    },
+    {
+      "original_description": "INLET #35",
+      "matched_code": "425-1-1",
+      "matched_description": "Type D Inlet",
+      "confidence": 0.75,
+      "reason": "Generic inlet mapped to standard Type D inlet"
+    },
+    {
+      "original_description": "INLET #6",
+      "matched_code": "425-1-1",
+      "matched_description": "Type D Inlet",
+      "confidence": 0.75,
+      "reason": "Generic inlet mapped to standard Type D inlet"
+    },
+    {
+      "original_description": "INLET #103",
+      "matched_code": "425-1-1",
+      "matched_description": "Type D Inlet",
+      "confidence": 0.75,
+      "reason": "Generic inlet mapped to standard Type D inlet"
+    },
+    {
+      "original_description": "MANHOLE (VERIFY QTY)",
+      "matched_code": "425-2-41",
+      "matched_description": "Type 7 Manhole",
+      "confidence": 0.65,
+      "reason": "Generic manhole mapped to standard Type 7 manhole"
+    }
+  ],
+  "validation_issues": [
+    {
+      "index": 12,
+      "severity": "medium",
+      "issue": "Non-standard pipe size: 6\"",
+      "auto_corrected": false
+    },
+    {
+      "index": 12,
+      "issue": "Incorrect item type - this appears to be a concrete driveway, not a pipe item",
+      "severity": "medium",
+      "suggested_correction": "Verify if this is a drainage-related construction plan or a different type of project"
+    }
+  ],
+  "needs_review": [
+    {
+      "description": "15\" RCP PIPE",
+      "quantity": 0,
+      "unit": "LF",
+      "confidence": 0.3,
+      "reason": "Zero quantity is suspicious. Item appears to be a standard drainage pipe, but needs quantity verification from plan details. Description seems standard for reinforced concrete pipe (RCP) drainage item.",
+      "page": 0,
+      "region_hint": "Unknown location",
+      "needs_human_review": true
+    },
+    {
+      "description": "MANHOLE",
+      "quantity": 0,
+      "unit": "EA",
+      "confidence": 0.4,
+      "reason": "Manhole is a typical drainage structure item. Zero quantity suggests potential extraction error. Manual verification of plan details required to confirm actual quantity.",
+      "page": 0,
+      "region_hint": "Unknown location",
+      "needs_human_review": true
+    },
+    {
+      "description": "CATCH BASIN",
+      "quantity": 0,
+      "unit": "EA",
+      "confidence": 0.4,
+      "reason": "Catch basin is a standard drainage collection structure. Zero quantity indicates likely extraction issue. Recommend cross-referencing plan details to determine correct quantity.",
+      "page": 0,
+      "region_hint": "Unknown location",
+      "needs_human_review": true
+    }
+  ],
+  "pages_product_analysis": [],
+  "summary": {
+    "pages_analyzed": 14,
+    "total_items": 24,
+    "matched_items": 12,
+    "rule_matched_items": 6,
+    "ai_matched_items": 6,
+    "items_corrected": 0,
+    "items_for_review": 3,
+    "validation_confidence": 0.9166666666666666,
+    "total_cost": 476808.0,
+    "total_pipe_lf": 98.0,
+    "total_structures": 12
+  },
+  "extraction_info": {
+    "method": "native",
+    "recommended_method": "",
+    "analysis_notes": []
+  },
+  "extracted_text": "[Page 1]\nT-22-S\nT-23-S\nADDRESS CONDITIONS AS THEY EXISTED AT THE TIME OF PLANS PREPARATION.\nNEEDS WITH THE PROPERTY OWNER OR THEIR REPRESENTATIVES.  CONTRACTOR\nNEEDS, CONDITIONS AND OWNERSHIP OF PROPERTIES MAY HAVE CHANGED SINCE\nPROJECT DESIGN.  THE COUNTY'S REPRESENTATIVE WILL ADDRESS CHANGES AND\nSHALL WORK WITH THE COUNTY'S REPRESENTATIVE IN ADDRESSING AND MEETING\nNEEDS AND CONDITIONS THAT MAY CHANGE SINCE PLANS PREPARATION.\nPLANS WERE PREPARED ACCORDING TO AVAILABLE INFORMATION TO ADEQUATELY\nDATE:\nN.T.S.\nVICINITY MAP\nCHECKED BY:\nAPPROVED BY:\nDESIGNED BY:\nCERTIFICATION TO PLANS\nENGINEER:\nREVISIONS\nSHEET\nOF\nDATE\nBY\nUTILITIES ENCOUNTERED\nBREVARD COUNTY\nLOCATION MAP\nINDEX OF SHEETS\nSHEET\nDESCRIPTION\n436\nORLANDO\nAIRPORT\nINTERNATIONAL\nOSCEOLA COUNTY\nE-W   EXPY.\nFLORIDA\n535\nI-4\nLAKE COUNTY\n545\n441\nTPK.\nLAKE COUNTY\nGARDEN\nWINTER\nAPOPKA\nLAKE\n500\nAPOPKA\nORLANDO\n50\n435\nI-4\n50\n15\n528\nCHRISTMAS\n520\nJOHNS\nRIVER\nSEMINOLE COUNTY\n420\n50\n419\nST.\nLENGTH  OF  PROJECT\nMILES\nLINEAR FEET\n____________\nUNDERGROUND CABLE TELEVISION\nCLEAN OUT\nBURIED TELEPHONE CABLE\nSWALE FLOW LINE\nPALM TREE & SIZE\nTELEPHONE PEDESTAL\nBENCHMARK\nSOIL BORING\nBURIED TELEPHONE CABLE\nOAK\nCEDER\nELM\nCA\nP\nEA\n=\n=\n=\nCAMPHOR\nPINE\nEAR\nCHAIN LINK FENCE\nBARBED WIRE FENCE\nMANHOLE\nTREE TYPE & SIZE\nWOOD FENCE\nFARM FENCE, WOVEN WIRE\nO =\nCE\n=\n=\nE\nCHERRYM = MAPLE\nC =\nBS\nPVC PIP FENCE\nGATE\nCENTER LINE\nPROPERTY LINE\nDELTA ANGLE\nAPPROXIMATE\nCURB & GUTTER\nBASE LINE\nCURB\nROUND\nWATER METER\nWATER MAIN\nPOWER POLE\nCOMBINATION POLE\nVALVE\nGUY WIRE\nOVERHEAD POWER POLE\nFIRE HYDRANT\nSANITARY SEWER\nLIGHT POLE \nGAS MAIN\nTELEPHONE DUCT\nIRON PIPE\nCONCRETE MONUMENT\nIRON ROD\nOVERHEAD CABLE TELEVISION\nBURIED POWER CABLE\nTRAFFIC SIGN\nMAIL BOX\nGATE POST\nSTORM SEWER, SIZE & TYPE\nBUSH\nCATCH BASIN\n+/-\nL\nP\nL\nC\nL\nB\nDE\nBT\nPROPOSED PAVEMENT\nRIGHT OF WAY LINE\nSEWER STORM INLET\nSURVEY REFERENCE POINT\nPOINT OF INTERSECTION\nTELEPHONE POLE\nRATE OF SUPERELEVATION\nOVERHEAD TELEPHONE POLE\nX\n12\"\nCE\nBT 6MTD\nOH(CATV)\nUG(CATV)\n16\" RCP\nGM\nSAN\nBE \ne\nOT 100 PER\nHEDGE\nEDGE OF WOODED AREA\nCONCRETE\nW\n72355\nNOTE :\nLEGEND\nSECT 27  TWP. 22  S  RNG 27  E.    \nORANGE COUNTY BENCH MARKS USED\n1\nEXIST. EDGE OF PAVT.\nTELEPHONE NO.\nCOMPANY NAME\nPE NO.:\nOF TRANSPORTATION PURSUANT TO SUBSECTION 336.045(1) OF THE FLORIDA STATUTES.\nHIGHWAYS\" IN EFFECT ON THIS DATE AS ADOPTED BY THE FLORIDA DEPARTMENT \nSTANDARDS FOR DESIGN, CONSTRUCTION AND MAINTENANCE FOR STREETS AND\nSTANDARDS CONTAINED IN THE EDITION OF THE \"MANUAL OF UNIFORM MINIMUM \nOF THE FLORIDA STATUTES AND ARE IN SUBSTANTIAL CONFORMANCE WITH THE \nCONSTRUCTION PLANS COMPLY WITH THE REQUIREMENTS OF SECTION 336.045\nI HEREBY CERTIFY THAT THE DESIGN FOR THIS PROJECT AND THE ATTACHED\n482\n14\nDATE:   03 2023\nDATE:   03 2023\n526\nGOVERNING STANDARDS AND STANDARD SPECIFICATIONS :\nFLORIDA DEPARTMENT OF TRANSPORTATION DESIGN STANDARDS FOR \nDESIGN, CONSTRUCTION, MAINTENANCE AND UTILITY OPERATIONS ON \nAND\nDATE:   04 2023\nNAME\nCOMMISSIONERS\nPUBLIC WORKS DIRECTOR\nJOSEPH C. KUNKEL, P.E.\nDISTRICT 1\nDISTRICT 2\nDISTRICT 3\nDISTRICT 4\nDISTRICT 5\nDISTRICT 6\nCHRISTINE MO0RE\nMAYRA URIBE\nMARIBEL GOMEZ CORDERO\nEMILY BONILLA\nJERRY L. DEMINGS, COUNTY MAYOR\nBOARD OF COUNTY\nN\nBTG\nBRENT T. GILLETTE, P.E.\nPROJECT LOCATION\nNICOLE WILSON\nSITE BENCHMARKS\nTHE STATE HIGHWAY SYSTEM, DATED 2021-22\nSPECIFICATIONS FOR ROAD AND BRIDGE CONSTRUCTION, DATED\nPROJECT LOCATION\nR-28-E\nR-27-E\nPOND 6749\nNA\nNA\nPUBLISHED ELEVATION = 104.074' (NAVD88)\nSIPLIN ROAD AT THE SOUTHEAST CORNER OF POND NUMBER 6749.\nSIPLIN ROAD 14 FEET MORE OR LESS NORTHEAST OF THE CENTERLINE OF \nSQUARE CUT IN CURB INLET, NORTH SIDE OF CUL-DE-SAC AT EAST END OF \nSPECIFIC PURPOSE SURVEY SIPLIN ROAD POND #6749:\nPUBLISHED ELEVATION = 105.141' (NAVD88)\nSIPLIN ROAD.\nOF PAVEMENT OF COUNTY ROAD NUMBER 545 AND 15.7 FEET NORTH OF \nEDGE OF CURB INLET 35.8 FEET MORE OR LESS EAST OF THE EAST EDGE \n2 1/2 INCH BRASS ORANGE COUNTY PUBLIC WORKS DISK IN THE SOUTH \nC-1278-035:\nBENCHMARKS:\nAS ESTABLISHED FROM THE FOLLOWING ORANGE COUNTY      \nNORTH AMERICAN VERTICAL DATUM OF 1988 (NAVD88)\nELEVATIONS SHOWN HEREON ARE RELATIVE TO THE \nORANGE COUNTY, FLORIDA\nDISTRICT NO. 1\nSIPLIN ROAD POND 6749 RETROFIT\nCONSTRUCTION PLANS FOR\nCHARTER COMMUNICATIONS\n407-532-8593\nCITY OF WINTER GARDEN\n407-656-4111\n805-889-9658\n407-901-3688\n407-395-2965\nDUKE ENERGY\nCENTURYLINK\nLAKE APOPKA NATURAL GAS DISTRICT\nJULY 2021 AS AMENDED BY CONTRACT DOCUMENTS. \nTLP ENGINEERING CONSULTANTS, INC.\nPREPARED BY:\nPHONE: 407-901-5060\nORLANDO, FL. 32801\n450 S. ORANGE AVE., SUITE 600\nDIVISION MANAGER\nDAVID D. JONES, P.E. ENVIRONMENTAL PROTECTION \nKEY SHEET\n2\nGENERAL NOTES & STANDARD DETAILS\n8\n10\n6\nDRAINAGE MAP\n5\n4\n3\nSUMMARY OF PAY ITEMS\nSUMMARY OF QUANTITIES\nSUMMARY OF DRAINAGE STRUCTURES\nPOND DETAILS AND GRADING\n7\nPOND DETAIL SHEET\nEROSION CONTROL PLAN\n9\nAB-1\nAB-2\nREPORT OF TESTS\nREPORT OF AUGER BORINGS\nSC-2\nSC-1\nSURVEY CONTROL SHEETS\nSURVE CONTROL DETAIL SHEET\n1\nBIOSORPTION ACTIVIATED MEDIA (BAM) AND UNDERDRAIN DETAIL\nMICHAEL SCOTT\nJune 2023\nSSJ\nJEM\n8\n18\n2\n17\n16\n15\n19\n20\n21\n21\n22\n29\n28\n27\n26\n25\n29\n28\n27\n31\n32\n33\n36\n31\n32\n33\n34\n6\n5\n4\n3\n2\n1\n6\n5\n4\n3\n8\n9\n10\n11\n12\n7\n9\n10\n34\n35\n18\n17\n18\n30\n20\n23\n26\n35\n11\n16\n15\n14\n13\n15\n16\n17\n14\n19\n15\n23\n24\n438\n545\nL.\nC\n91\nd\nr\na\ny\ne\nni\nV \na\nk\np\no\np\nA\nHULL\nIS.\nDEER  IS.\nGOTHA\nPop. 1,897\nPop.  936\nPop. 24,391\nPop. 14,351\nTildenville\nGUS\nIsleworth\nOAKLAND\nWINTER\nOCOEE\nGARDEN\nBeulah\n.\nR\n.\nR \nL\nA\nR\nT\nN\nE\nC\n \n.\nL\nF\nBch.\nSummerport\nWINDERMERE\nHills\nCain\nLake\nL.\nTilden\nL.\nBlack\nStarke\nJohns\nSpeer\nLake\nL.\nL.\nL.\nLake\nLake\nWhitney\nL.\nL.\nLake\nDown\nFischer\nL.\nL.\nL.\nL.\nFischer\nL.\nLake\nL.\nL.\nBlanche\nCypress L.\nLake\nButler\nL.\nL.\nAvalon\nL.\nL.\nBeulah\nOlympia\nFlorence\nL.\nL. Sherwood\nRose\nSteer\nRoberts\nLuntz\nCrescent\nOlivia\nBessie\nLouise\nHiawassa\nRoberson Rd.\nRd.\nLake\nService Plaza\nTurkey Lake\nFlorida ,s\nInt. 80\nOcoee-Orlando West\nRd.\nMalcolm \nMann     \nRd.\nTilden   \nRd.\nWestern Exp.\n50\n536\nB\n439\n435\n535\n439\n50\nFLORIDA'S\nTURNPIKE\nP\nHarlem\nHarlem\nHeights\nTOLL\n429\n535\n438\nTOLL\n429\nT-22-S\nT-23-S\nADDRESS CONDITIONS AS THEY EXISTED AT THE TIME OF PLANS PREPARATION.\nNEEDS WITH THE PROPERTY OWNER OR THEIR REPRESENTATIVES.  CONTRACTOR\nNEEDS, CONDITIONS AND OWNERSHIP OF PROPERTIES MAY HAVE CHANGED SINCE\nPROJECT DESIGN.  THE COUNTY'S REPRESENTATIVE WILL ADDRESS CHANGES AND\nSHALL WORK WITH THE COUNTY'S REPRESENTATIVE IN ADDRESSING AND MEETING\nNEEDS AND CONDITIONS THAT MAY CHANGE SINCE PLANS PREPARATION.\nPLANS WERE PREPARED ACCORDING TO AVAILABLE INFORMATION TO ADEQUATELY\nDATE:\nN.T.S.\nVICINITY MAP\nCHECKED BY:\nAPPROVED BY:\nDESIGNED BY:\nCERTIFICATION TO PLANS\nENGINEER:\nREVISIONS\nSHEET\nOF\nDATE\nBY\nUTILITIES ENCOUNTERED\nBREVARD COUNTY\nLOCATION MAP\nINDEX OF SHEETS\nSHEET\nDESCRIPTION\n436\nORLANDO\nAIRPORT\nINTERNATIONAL\nOSCEOLA COUNTY\nE-W   EXPY.\nFLORIDA\n535\nI-4\nLAKE COUNTY\n545\n441\nTPK.\nLAKE COUNTY\nGARDEN\nWINTER\nAPOPKA\nLAKE\n500\nAPOPKA\nORLANDO\n50\n435\nI-4\n50\n15\n528\nCHRISTMAS\n520\nJOHNS\nRIVER\nSEMINOLE COUNTY\n420\n50\n419\nST.\nLENGTH  OF  PROJECT\nMILES\nLINEAR FEET\n____________\nUNDERGROUND CABLE TELEVISION\nCLEAN OUT\nBURIED TELEPHONE CABLE\nSWALE FLOW LINE\nPALM TREE & SIZE\nTELEPHONE PEDESTAL\nBENCHMARK\nSOIL BORING\nBURIED TELEPHONE CABLE\nOAK\nCEDER\nELM\nCA\nP\nEA\n=\n=\n=\nCAMPHOR\nPINE\nEAR\nCHAIN LINK FENCE\nBARBED WIRE FENCE\nMANHOLE\nTREE TYPE & SIZE\nWOOD FENCE\nFARM FENCE, WOVEN WIRE\nO =\nCE\n=\n=\nE\nCHERRYM = MAPLE\nC =\nBS\nPVC PIP FENCE\nGATE\nCENTER LINE\nPROPERTY LINE\nDELTA ANGLE\nAPPROXIMATE\nCURB & GUTTER\nBASE LINE\nCURB\nROUND\nWATER METER\nWATER MAIN\nPOWER POLE\nCOMBINATION POLE\nVALVE\nGUY WIRE\nOVERHEAD POWER POLE\nFIRE HYDRANT\nSANITARY SEWER\nLIGHT POLE \nGAS MAIN\nTELEPHONE DUCT\nIRON PIPE\nCONCRETE MONUMENT\nIRON ROD\nOVERHEAD CABLE TELEVISION\nBURIED POWER CABLE\nTRAFFIC SIGN\nMAIL BOX\nGATE POST\nSTORM SEWER, SIZE & TYPE\nBUSH\nCATCH BASIN\n+/-\nL\nP\nL\nC\nL\nB\nDE\nBT\nPROPOSED PAVEMENT\nRIGHT OF WAY LINE\nSEWER STORM INLET\nSURVEY REFERENCE POINT\nPOINT OF INTERSECTION\nTELEPHONE POLE\nRATE OF SUPERELEVATION\nOVERHEAD TELEPHONE POLE\nX\n12\"\nCE\nBT 6MTD\nOH(CATV)\nUG(CATV)\n16\" RCP\nGM\nSAN\nBE \ne\nOT 100 PER\nHEDGE\nEDGE OF WOODED AREA\nCONCRETE\nW\n72355\nNOTE :\nLEGEND\nSECT 27  TWP. 22  S  RNG 27  E.    \nORANGE COUNTY BENCH MARKS USED\n1\nEXIST. EDGE OF PAVT.\nTELEPHONE NO.\nCOMPANY NAME\nPE NO.:\nOF TRANSPORTATION PURSUANT TO SUBSECTION 336.045(1) OF THE FLORIDA STATUTES.\nHIGHWAYS\" IN EFFECT ON THIS DATE AS ADOPTED BY THE FLORIDA DEPARTMENT \nSTANDARDS FOR DESIGN, CONSTRUCTION AND MAINTENANCE FOR STREETS AND\nSTANDARDS CONTAINED IN THE EDITION OF THE \"MANUAL OF UNIFORM MINIMUM \nOF THE FLORIDA STATUTES AND ARE IN SUBSTANTIAL CONFORMANCE WITH THE \nCONSTRUCTION PLANS COMPLY WITH THE REQUIREMENTS OF SECTION 336.045\nI HEREBY CERTIFY THAT THE DESIGN FOR THIS PROJECT AND THE ATTACHED\n482\n14\nDATE:   03 2023\nDATE:   03 2023\n526\nGOVERNING STANDARDS AND STANDARD SPECIFICATIONS :\nFLORIDA DEPARTMENT OF TRANSPORTATION DESIGN STANDARDS FOR \nDESIGN, CONSTRUCTION, MAINTENANCE AND UTILITY OPERATIONS ON \nAND\nDATE:   04 2023\nNAME\nCOMMISSIONERS\nPUBLIC WORKS DIRECTOR\nJOSEPH C. KUNKEL, P.E.\nDISTRICT 1\nDISTRICT 2\nDISTRICT 3\nDISTRICT 4\nDISTRICT 5\nDISTRICT 6\nCHRISTINE MO0RE\nMAYRA URIBE\nMARIBEL GOMEZ CORDERO\nEMILY BONILLA\nJERRY L. DEMINGS, COUNTY MAYOR\nBOARD OF COUNTY\nN\nBTG\nBRENT T. GILLETTE, P.E.\nPROJECT LOCATION\nNICOLE WILSON\nSITE BENCHMARKS\nTHE STATE HIGHWAY SYSTEM, DATED 2021-22\nSPECIFICATIONS FOR ROAD AND BRIDGE CONSTRUCTION, DATED\nPROJECT LOCATION\nR-28-E\nR-27-E\nPOND 6749\nNA\nNA\nPUBLISHED ELEVATION = 104.074' (NAVD88)\nSIPLIN ROAD AT THE SOUTHEAST CORNER OF POND NUMBER 6749.\nSIPLIN ROAD 14 FEET MORE OR LESS NORTHEAST OF THE CENTERLINE OF \nSQUARE CUT IN CURB INLET, NORTH SIDE OF CUL-DE-SAC AT EAST END OF \nSPECIFIC PURPOSE SURVEY SIPLIN ROAD POND #6749:\nPUBLISHED ELEVATION = 105.141' (NAVD88)\nSIPLIN ROAD.\nOF PAVEMENT OF COUNTY ROAD NUMBER 545 AND 15.7 FEET NORTH OF \nEDGE OF CURB INLET 35.8 FEET MORE OR LESS EAST OF THE EAST EDGE \n2 1/2 INCH BRASS ORANGE COUNTY PUBLIC WORKS DISK IN THE SOUTH \nC-1278-035:\nBENCHMARKS:\nAS ESTABLISHED FROM THE FOLLOWING ORANGE COUNTY      \nNORTH AMERICAN VERTICAL DATUM OF 1988 (NAVD88)\nELEVATIONS SHOWN HEREON ARE RELATIVE TO THE \nORANGE COUNTY, FLORIDA\nDISTRICT NO. 1\nSIPLIN ROAD POND 6749 RETROFIT\nCONSTRUCTION PLANS FOR\nCHARTER COMMUNICATIONS\n407-532-8593\nCITY OF WINTER GARDEN\n407-656-4111\n805-889-9658\n407-901-3688\n407-395-2965\nDUKE ENERGY\nCENTURYLINK\nLAKE APOPKA NATURAL GAS DISTRICT\nJULY 2021 AS AMENDED BY CONTRACT DOCUMENTS. \nTLP ENGINEERING CONSULTANTS, INC.\nPREPARED BY:\nPHONE: 407-901-5060\nORLANDO, FL. 32801\n450 S. ORANGE AVE., SUITE 600\nDIVISION MANAGER\nDAVID D. JONES, P.E. ENVIRONMENTAL PROTECTION \nKEY SHEET\n2\nGENERAL NOTES & STANDARD DETAILS\n8\n10\n6\nDRAINAGE MAP\n5\n4\n3\nSUMMARY OF PAY ITEMS\nSUMMARY OF QUANTITIES\nSUMMARY OF DRAINAGE STRUCTURES\nPOND DETAILS AND GRADING\n7\nPOND DETAIL SHEET\nEROSION CONTROL PLAN\n9\nAB-1\nAB-2\nREPORT OF TESTS\nREPORT OF AUGER BORINGS\nSC-2\nSC-1\nSURVEY CONTROL SHEETS\nSURVE CONTROL DETAIL SHEET\n1\nBIOSORPTION ACTIVIATED MEDIA (BAM) AND UNDERDRAIN DETAIL\nMICHAEL SCOTT\nJune 2023\nSSJ\nJEM\n\n\n--- Page Break ---\n\n[Page 2]\nDESIGN PLANS FOR:\nBY\nDESCRIPTION\nDATE\nSHEET\nNO.\nPROJECT NO.\nBY\nDESCRIPTION\nDATE\nREVISIONS\nPROJECT NAME\nJ:\\PROJECTS\\T201507 - Orange County Cont SvcsY16-900 B\\_TWO36_POND6749\\_POND6749\\roadway\\GNNTRD01.dgn\nbrent\n6/29/2023 12:32:40 PM\nDefault\nPOND 6749 RETROFIT\n                        \nSIPLIN ROAD POND 6749 RETROFIT\nBRENT GILLETTE, P.E. 72355\nPH. 407-901-5060\nORLANDO, FL. 32801\n450 S. ORANGE AVENUE, SUITE 600\nTLP ENGINEERING CONSULTANTS, INC.\n      \n2\n2' (TYP.)\n6' (TYP.)\nVARIES\n5' (TYP.)\n(TYP.)\nBEYOND EDGE OF DRIVE\nEXTEND SUBGRADE 12\"\nDRIVEWAY\n6\" THICK CONCRETE\n12' (MIN.)\n.\nN. T. S\nTYP. DRIVEWAY APRONS\nO\nB\nO\nD\nI\nS.W.\nU\nO\nC\nE\nN\nA\nG\nR\nY\nT\nN\nR\nL\nF\nO\nA\nI\nS\nM\nM\nO\nN\nU\nO\nR\nA\nC\nO\nD\nF\nI\nS\nT\nY\nC\nN\nS\nR\nE\nO\nO\nB\nO\nD\nI\nS.W.\nU\nO\nC\nE\nN\nA\nG\nR\nY\nT\nN\nR\nL\nF\nO\nA\nI\nS\nM\nM\nO\nN\nU\nO\n2023\nR\nA\nC\nD\nI\nS\nT\nY\nC\nN\nS\nR\nE\nO\nSTRUCTURE COVER\nSTANDARD DRAINAGE\nN. T. S.\n& STANDARD DETAILS\n     GENERAL NOTES      \nEXIST. FENCE LINE\nEXIST. FENCE LINE\nGATE OPENING\nCENTER ON \nMATCH EXIST. GRADE\nEDGE OF EXIST. PAVEMENT\nEXIST. MIAMI CURB (TO REMAIN)\n6'\nREF LOC.\n850-245-2606\nTALLAHASSEE, FL\n3900 COMMONWEALTH BOULEVARD, SUITE 309,\nSTATE GEODETIC ADVISOR\nSHALL NOTIFY: \nNOTIFY THE PROJECT ENGINEER, ORANGE COUNTY SURVEY SECTION 407-836-7881 AND BOTH \nCONSTRUCTION SHALL BE PROTECTED.  IF IN DANGER OF DAMAGE, THE CONTRACTOR SHALL \n14. ANY UNITED STATES COAST AND GEODETIC SURVEY MONUMENTS WITHIN THE LIMITS OF \nIN THE PLANS OR DIRECTED BY THE ENGINEER.\nALL EXISTING DRAINAGE STRUCTURES AND PIPES TO REMAIN, UNLESS OTHERWISE SHOWN \n13.\nUTILITIES ARE TO BE ADJUSTED BY OTHERS OR AS DIRECTED BY THE ENGINEER.\n12.\nFLORIDA PHONE NUMBER IS 1-800-432-4770.\nRELOCATIONS AND/OR PERFORMING ANY SUBSURFACE WORK. SUNSHINE STATE ONE CALL OF \nOF FLORIDA 48 HOURS IN ADVANCE OF PERFORMING ANY UTILITY ADJUSTMENTS OR \nPRIOR TO COMMENCEMENT OF WORK CONTRACTOR SHALL CALL SUNSHINE STATE ONE CALL \n11.\nSUBMITTED TO THE ENGINEER AS SOON AS POSSIBLE AFTER DISCOVERY FOR RESOLUTION.\nDETERMINE IF DRAINAGE/UTILITY CONFLICTS EXIST. INFORMATION ON CONFLICTS IS TO BE \nPROJECT CONSTRUCTION. PRIOR TO ORDERING DRAINAGE STRUCTURES, THE CONTRACTOR SHALL \nAVOID DAMAGE THERETO AND IS RESPONSIBLE FOR COORDINATING UTILITY RELOCATION WITH \nDETERMINATION AS TO THE TYPE AND LOCATION OF UTILITIES AS MAY BE NECESSARY TO \nNOT GUARANTEED TO BE ACCURATE OR ALL INCLUSIVE. THE CONTRACTOR SHALL MAKE HIS OWN \nUNDERGROUND AND OTHER UTILITIES IS BASED ON AVAILABLE RECORDS AND SURVEYS BUT IS \nTHE INFORMATION SHOWN ON THESE DRAWINGS CONCERNING TYPE AND LOCATION OF \n10.\nPLANS AND/OR DESIGNATED BY THE ENGINEER.  \nELSEWHERE. ENVIRONMENTAL CONTROLS SHALL BE USED AT LOCATIONS DESIGNATED IN THE \nUNIT PRICES STATED ON THE SUMMARY OF PAY ITEMS; EXCLUDING ITEMS SPECIFIED \nTHE VARIOUS PERMITS INCLUDED IN THE BID SPECIFICATIONS. PAYMENT IS INCLUDED IN THE \nTHE CONTRACTOR SHALL PERFORM HIS WORK IN ACCORDANCE WITH REQUIREMENTS OF \n9.\nALL OFFSETS SHOWN ARE TO PROPOSED BASELINE OF SURVEY.\n8.\nSOD ALL DISTURBED AREAS. PEG ALL SLOPES 3:1 OR STEEPER. \n7.\nCOST TO BE INCLUDED IN CONTRACT UNIT PRICE FOR SOD.\nINSTALL A 4\" MUCK BLANKET OR TOPSOIL TREATMENT ON ALL PERMANENT GRASS AREAS. \n6.\nDIRECTED BY THE ENGINEER. \nSOD IN DISTURBED AREAS SHALL MATCH EXISTING TYPE SOD, UNLESS OTHERWISE \n5.\nPRIOR TO DISPOSAL. ALL EXCESS MATERIAL IS THE PROPERTY OF THE CONTRACTOR.\nCONTRACTOR. APPROVALS OF DISPOSAL SITES SHALL BE OBTAINED FROM ORANGE COUNTY \nTHE DISPOSAL OF EXCESS EARTHWORK MATERIALS SHALL BE THE RESPONSIBILITY OF THE \n4.\nSUBSURFACE CONDITIONS. \nREVIEW SAME PRIOR TO BIDDING, AND TO MAKE HIS OWN DETERMINATION AS TO ALL \nOF THE ENGINEER IF ADDITIONAL INFORMATION IS AVAILABLE, TO MAKE ARRANGEMENTS TO \nCONSTRUCTION OF THE PROJECT. IT IS THE RESPONSIBILITY OF THE CONTRACTOR TO INQUIRE \nNOT GUARANTEED AND IS NOT TO BE CONSTRUED AS PART OF THE PLANS GOVERNING \nESTABLISHING DESIGN CRITERIA FOR THE PROJECT. THE ACCURACY OF THIS INFORMATION IS \nSUBSURFACE INFORMATION SHOWN ON THESE DRAWINGS WAS OBTAINED FOR USE IN \n3.\nALL MEASUREMENTS ARE IN ENGLISH UNITS UNLESS OTHERWISE SPECIFIED.\n2.\nCONSTRUCTION SPECIFICATIONS.\nCONSTRUCTION (FDOT), AND SUPPLEMENTS THERETO, AND ORANGE COUNTY ROAD \nFLORIDA DEPARTMENT OF TRANSPORTATION STANDARD SPECIFICATIONS FOR ROAD AND BRIDGE \nSTRINGENT REQUIREMENT OF THE PROJECT SPECIFICATION, THE JULY 2021 EDITION OF THE \nALL CONSTRUCTION SHALL BE IN ACCORDANCE WITH AND CONFORM TO THE MOST \n1.\nBE NECESSARY BASED ON THE CONTRACTORS METHOD OF DEWATERING.\n\"NO- NOTICE DEWATERING /PERMIT BY RULE\" AND APPLY FOR A WATER USE PERMIT SHOULD IT \nDEWATERING IS ANTICIPATED FOR THIS PROJECT. THE CONTRACTOR SHALL REVIEW THE \n25.\nALONG SIPLIN ROAD. COORDINATE WITH ORANGE COUNTY STORMWATER DIVISION FOR ACCESS.\nTHE CONTRACTOR IS TO ACCESS THE PROJECT SITE ONLY THROUGH THE LOCKED GATE \n24.\nADDITIONAL EXPENSE TO ORANGE COUNTY.\nCONSTRUCTION ASSOCIATED WITH THIS PROJECT SHALL BE REPAIRED BY CONTRACTOR AT NO \nANY DAMAGE CAUSED TO ORANGE COUNTY RIGHT-OF-WAY OR FACILITIES DUE TO \n23.\nSHALL BE IN ACCORDANCE WITH THE F.D.O.T. STANDARD PLANS 102-600 SERIES.\nMAINTENANCE OF TRAFFIC WHILE WORKING WITHIN THE ORANGE COUNTY RIGHT-OF-WAY \n22.\nALL CONCRETE SHALL BE MIN. OF 3,000 PSI.\n21.\nOTHER CONSTRUCTION AND NO EXTRA COMPENSATION WILL BE ALLOWED.\nCONDITION EQUAL TO OR BETTER THAN THE CONDITION EXISTING. COST TO BE INCIDENTAL TO \nALL PRIVATE AND PUBLIC PROPERTY AFFECTED BY THIS WORK SHALL BE RESTORED TO A \n20.\nDRIVEWAYS AND SIDEWALKS TO MATCH THE PROPOSED PAVEMENT TO THE EXISTING.\nTHE CONTRACTOR SHALL FIELD VERIFY THE EXISTING PAVEMENT ELEVATIONS OF ALL \n19.\nCONSTRUCTION.\nSTREETS AT ALL TIMES AND IS TO NOTIFY PROPERTY OWNERS FIVE DAYS PRIOR TO STARTED \nCONTRACTOR IS TO MAINTAIN UNINTERRUPTED ACCESS TO ALL DRIVEWAYS AND SIDE \n18.\nCONSTRUCTION OF THE PROJECT.\nPAVEMENT, STRUCTURES, FOUNDATIONS, AND CONSTRUCTION PERSONNEL DURING \nCHAPTER 553.60, F.S., ALSO KNOWN AS THE \"TRENCH SAFETY ACT\". TO PROTECT EXISTING \nALL EXCAVATIONS SHALL BE REQUIRED TO CONFORM TO THE PROVISION OF PART IV OF \n17.\nIN THE STATE OF FLORIDA.\nSUBMITTALS SHALL BE SIGNED AND SEALED BY A PROFESSIONAL LAND SURVEYOR REGISTERED \nTHEIR LOCATION, DESCRIPTION AND ELEVATION, BASED ON ORANGE COUNTY DATUM. ALL \nAND REFERENCE POINT TIES PROPOSED TO BE USED IN CONSTRUCTING THE PROJECT WITH \nPLAN AND PROFILE SHEETS, AND/OR A SET OF FIELD NOTES FOR ALL ADDITIONAL BENCHMARK \nBENCHMARK ELEVATIONS AND THE REFERENCE POINT TIES SHOWN ON THE TITLE SHEET AND \nCOUNTY HIGHWAY CONSTRUCTION DEPARTMENT A SET OF FIELD NOTES VERIFYING THE \nPRIOR TO BEGINNING ANY CONSTRUCTION, THE CONTRACTOR SHALL SUBMIT TO ORANGE \n16.\nCONFIRMATION WITHIN 48 HOURS OF TELEPHONE NOTIFICATION.\nTELEPHONE 407-836-7881). THE CONTRACTOR SHALL PROVIDE WRITTEN FOLLOW UP \nSHALL NOTIFY THE PROJECT ENGINEER AND THE COUNTY SURVEYOR, WITHOUT DELAY, BY \nCORNER MONUMENT IS IN DANGER OF BEING DESTROYED OR DISTURBED, THE CONTRACTOR \n15.  PUBLIC LAND CORNERS WITHIN THE LIMITS OF CONSTRUCTION SHALL BE PROTECTED. IF A \n\n\n--- Page Break ---\n\n[Page 3]\nDESIGN PLANS FOR:\nBY\nDESCRIPTION\nDATE\nSHEET\nNO.\nPROJECT NO.\nBY\nDESCRIPTION\nDATE\nREVISIONS\nPROJECT NAME\nJ:\\PROJECTS\\T201507 - Orange County Cont SvcsY16-900 B\\_TWO36_POND6749\\_POND6749\\roadway\\CESSRD01.dgn\nbrent\n6/29/2023 12:32:41 PM\nDefault\nPOND 6749 RETROFIT\n                        \nSIPLIN ROAD POND 6749 RETROFIT\nBRENT GILLETTE, P.E. 72355\nPH. 407-901-5060\nORLANDO, FL. 32801\n450 S. ORANGE AVENUE, SUITE 600\nTLP ENGINEERING CONSULTANTS, INC.\nPAY ITEM NOTES:\n  SUMMARY OF PAY ITEMS  \n3\nSUMMARY OF PAY ITEMS\nNO.\nPAY ITEM\nPAY ITEM DESCRIPTION\nUNIT\nQUANTITY\nP\nF\nROADWAY\n101-1\nMOBILIZATION\nLS\n1\n102-1\nMAINTENANCE OF TRAFFIC\nLS\n1\n104-14\nPREVENTION CONTROL AND ABATEMENT CONTROL OF EROSION AND WATER POLLUTION\nLS\n1\n110-1-1\nCLEARING & GRUBBING\nLS\n1\n120-9\nEXCAVATION EMBANKMENT AND GRADING\nLS\n1\n425-1-549\nINLET, TYPE D (MODIFIED) STRUCTURE\nEA\n1\n425-2-41\nMANHOLE, TYPE 7 STRUCTURE\nEA\n2\n430-175-118\nPIPE CULVERT, SRCP-CLASS III, ROUND 18\"\nLF\n98\n430-518-120\nSTRAIGHT CONCRETE ENDWALLS, 18\", SINGLE, ROUND\nEA\n1\n430-982-125\nMITERED END SECTION, ROUND, 18\"\nEA\n2\n440-1-50\nUNDERDRAINS, TYPE V\nLF\n145\n522-2\nCONCRETE DRIVEWAY, 6\" THICK\nSY\n23\n570-1-2\nPERFORMANCE TURF, SOD (BAHIA OR MATCH EXIST.)\nSY\n1600\n900-1\nAS-BUILT PLANS\nLS\n1\n900-2\nINDEMNIFICATION\nLS\n1\n900-3\nBIOSORPTION ACTIVATED MEDIA (BAM)\nCY\n136\n900-4\n30-MIL PVC FLEXIBLE GEOMEMBRANE (F&I)\nSF\n2880\nFABRIC, CLEAN OUTS, AND CONCRETE APRONS.\nINCLUDES COST OF PIPE, FITTINGS, AGGREAGATE, SOCK, FILTER \n440-1-50\nCONSTRUCTION OF MODIFIED STRUCTURE.\nINCLUDES COST OF CONCRETE APRON, WEIR, SKIMMER AND \n425-1-549\nPIPE AND MES.\nUNDERDRAIN PIPE, REMOVAL OF EXISTING CONTROL STRUCTURE, 15\" \nPARTIAL EXIST. 18\" PIPE AND MES, REMOVAL OF EXISTING \nINCLUDES COST TO REMOVE PARTIAL EXIST.15\" PIPE AND MES, AND \n110-1-1\nSHALL BE INCORPORATED IN THIS PAY ITEM. \nRESTORATION SHALL BE THE RESPONSIBILITY OF THE CONTRACTOR AND \nCOSTS ASSOCIATED WITH SITE FLOODING AND RECOVERY / \nWET SEASON RAINFALL EVENTS OCCURRING DURING CONSTRUCTION. ANY \nPUMPS, AND ANY OTHER EQUIPMENT NEEDED TO ACCOMMODATE TYPICAL \nDISMANTLE TEMPORARY COFFER DAMS, TEMPORARY BYPASS PIPES, \nNOTES SHEET. INCLUDES ALL EFFORTS NECESSARY TO CONSTRUCT AND \nOF A DEWATERING PLAN, REFER TO GENERAL NOTE 25 ON THE GENERAL \nPLANS OR AS DIRECTED BY THE COUNTY. INCLUDES THE DEVELOPMENT \nBARRIERS, SILT FENCES AND TEMPORARY GRASSING AS SHOWN IN THE \nINCLUDING, BUT NOT LIMITED TO, SYNTHETIC BALES, TURBIDITY \nINCLUDES THE COST OF ALL ITEMS REQUIRED FOR EROSION CONTROL \n104-14\n\n\n--- Page Break ---\n\n[Page 4]\nDESIGN PLANS FOR:\nBY\nDESCRIPTION\nDATE\nSHEET\nNO.\nPROJECT NO.\nBY\nDESCRIPTION\nDATE\nREVISIONS\nPROJECT NAME\nJ:\\PROJECTS\\T201507 - Orange County Cont SvcsY16-900 B\\_TWO36_POND6749\\_POND6749\\roadway\\SUMQRD01.dgn\nbrent\n6/29/2023 12:32:41 PM\nDefault\nPOND 6749 RETROFIT\n                        \nSIPLIN ROAD POND 6749 RETROFIT\nBRENT GILLETTE, P.E. 72355\nPH. 407-901-5060\nORLANDO, FL. 32801\n450 S. ORANGE AVENUE, SUITE 600\nTLP ENGINEERING CONSULTANTS, INC.\n SUMMARY OF QUANTITIES  \n4\nSUMMARY OF PERMANENT DRIVEWAYS\nLOCATION\nSIDE\nMATERIAL\nNOTES\nDESIGN\nREMARKS\nCONSTRUCTION\nCONCRETE (SY)\nSTA. @ \u00a1 OF DRIVEWAY\n0522  2\nP\nF\n10+59.48\nLT\n23.0\nSUB-TOTAL:\n23.0\nSUMMARY OF PERFORMANCE TURF\nLOCATION\nSIDE\nTURF (SOD)\nPERFORMANCE\nNOTES\nDESIGN\nREMARKS\nCONSTRUCTION\n0570  1  2\nSTA. TO STA.\nSY\nP\nF\n10+19.16 TO 11+43.62\nLT\n1600.0\nPOND 6749\nSUB-TOTAL:\n1600.0\nTOTAL:\n1600\nSUMMARY OF LUMP SUM ITEMS\nNO.\nPAY ITEM\nPAY ITEM DESCRIPTION\nQUANTITY\nNOTES\nDESIGN\nREMARKS\nCONSTRUCTION\nP\nF\n101-1\nMOBILIZATION\n1\n102-1\nMAINTENANCE OF TRAFFIC\n1\n104-14\nPREVENTION, CONTROL AND ABATEMENT OF EROSION AND WATER POLLUTION\n1\n110-1-1\nCLEARING & GRUBBING\n1\n120-9\nEXCAVATION EMBANKMENT AND GRADING\n1\n900-1\nAS-BUILT PLANS\n1\n900-2\nINDEMNIFICATION\n1\nSUMMARY OF EARTHWORK\nPAY ITEM DESCRIPTION\nCY\nNOTES\nDESIGN\nREMARKS\nCONSTRUCTION\nP\nF\nREGULAR EXCAVATION\n2646\nEMBANKMENT\n211\nSUMMARY OF MISCELLANEOUS DRAINAGE ITEMS\nNO.\nPAY ITEM\nPAY ITEM DESCRIPTION\nLOCATION\nSIDE\nUNIT\nQUANTITY\nTOTAL\nNOTES\nDESIGN\nREMARKS\nCONSTRUCTION\nSTA. TO STA.\nP\nF\nP\nF\n440-1-2\nUNDERDRAINS\n11+20.41 TO 11+82.85\nLT\nLF\n145.0\n145\n900-3\nBISORPTION ACTIVATED MEDIA (BAM)\n11+20.41 TO 11+82.85\nLT\nCY\n136.0\n136\n900-4\n30-MIL PVC FLEXIBLE GEOMEMBRANE (F&I)\n11+20.41 TO 11+82.85\nLT\nSF\n2880.0\n2880\n\n\n--- Page Break ---\n\n[Page 5]\nDESIGN PLANS FOR:\nBY\nDESCRIPTION\nDATE\nSHEET\nNO.\nPROJECT NO.\nBY\nDESCRIPTION\nDATE\nREVISIONS\nPROJECT NAME\nJ:\\PROJECTS\\T201507 - Orange County Cont SvcsY16-900 B\\_TWO36_POND6749\\_POND6749\\drainage\\SUMDRD01.dgn\nbrent\n6/29/2023 12:32:41 PM\nDefault\nPOND 6749 RETROFIT\n                        \nSIPLIN ROAD POND 6749 RETROFIT\nBRENT GILLETTE, P.E. 72355\nPH. 407-901-5060\nORLANDO, FL. 32801\n450 S. ORANGE AVENUE, SUITE 600\nTLP ENGINEERING CONSULTANTS, INC.\n  SUMMARY OF DRAINAGE   \n       STRUCTURES       \n5\nQUANTITY\nSTR. NO.\nSTATION\nSIDE\nDESCRIPTION\nBARRELS\nMODIFIED\nSTRUCTURE\nCONTROL\n DBI\nMANHOLE\nPIPE\nCONCRETE\nREINFORCED\nSTEEL\nSTORM DRAIN\nENDWALL\nCONCRETE\nSTRAIGHT\nSLOPE\nSECTION 1:4\nMITERED END\nREMARKS\nTYPE D\nTYPE 7\nROUND\nCD\n425-1-549\n425-2-41\n430-175-118\n430-518-120\n430-982-125\n<10'\n<10'\n18\"\n18\"\n18\"\nP\nCS-1\n11+06.17\nLT\nSTRUCTURE, PIPE, STR. CONC. ENDWALL\n1\n1\n45\n1\nORIFICE, SKIMMER\nINCULDES CONC. PAVEMENT, WEIR,\nF\nP\nS-101\n10+74.30\nLT\nMANHOLE, PIPE, MES\n1\n1\n15\n1\nF\nP\nS-102\n11+89.74\nLT\nMANHOLE, PIPE, MES\n1\n1\n38\n1\nF\nFINAL SUMMARY\nP TOTAL\n1\n2\n98\n1\n2\nF TOTAL\n\n\n--- Page Break ---\n\n[Page 6]\nDESIGN PLANS FOR:\nBY\nDESCRIPTION\nDATE\nSHEET\nNO.\nPROJECT NO.\nBY\nDESCRIPTION\nDATE\nREVISIONS\nPROJECT NAME\nJ:\\PROJECTS\\T201507 - Orange County Cont SvcsY16-900 B\\_TWO36_POND6749\\_POND6749\\drainage\\DRMPRD01.dgn\nbrent\n6/29/2023 12:32:43 PM\nDefault\nPOND 6749 RETROFIT\n                        \nSIPLIN ROAD POND 6749 RETROFIT\nBRENT GILLETTE, P.E. 72355\nPH. 407-901-5060\nORLANDO, FL. 32801\n450 S. ORANGE AVENUE, SUITE 600\nTLP ENGINEERING CONSULTANTS, INC.\nSD\nSD\nSD\nSD\n      DRAINAGE MAP      \nN\nFeet\n100\n20\n0\nCONTRIBUTING AREA = 7.45 AC.\n6749\nPOND\nR/W LINE\nSIPLIN ROAD\nSUNRIDGE MIDDLE SCHOOL\nS-101\nS-102\nEX-CS-1\nEX-1\nEX-2\nEX-3\nEX-4\nEX-CS-1\nEX-1\nEX-2\nBOTTOM EL= 100.25'\nNE INV EL= 99.72'\nW INV EL= 100.71'\nRIM EL=104.64'\nEXIST. STORM MH\nIN. EL. 98.97\nEXIST. MES\nEX-4\nIN. EL. 99.03\nEXIST. MES\nEX-3\nEXIST. 18\" RCP\nEXIST. 15\" RCP\nBOTTOM EL= 99.77'\nN INV EL= 99.42'\nSW INV EL= 100.21'\nRIM EL= 104.13'\nW/ STORM MH\nEXIST. CURB INLET\n6\nCS-1\nPER ORB 7436, PG 3616\nACCESS EASEMENT\nORANGE COUNTY\nWETLAND 1\nWETLAND 1\nBOTTOM EL= 96.11'\nINV 6\" DIP EL= 99.10'\n(15\" RCP) NE INV EL= 99.34'\n(8\" PVC) SW INV EL= 100.47'\nGRATE EL= 103.06'\nW/ 1' HIGH METAL SKIMMER\nEXIST. CONTROL STRUCTURE\n\n\n--- Page Break ---\n\n[Page 7]\nDESIGN PLANS FOR:\nBY\nDESCRIPTION\nDATE\nSHEET\nNO.\nPROJECT NO.\nBY\nDESCRIPTION\nDATE\nREVISIONS\nPROJECT NAME\nJ:\\PROJECTS\\T201507 - Orange County Cont SvcsY16-900 B\\_TWO36_POND6749\\_POND6749\\drainage\\DRDTRD01.dgn\nbrent\n6/29/2023 12:33:08 PM\nDefault\nPOND 6749 RETROFIT\n                        \nSIPLIN ROAD POND 6749 RETROFIT\nBRENT GILLETTE, P.E. 72355\nPH. 407-901-5060\nORLANDO, FL. 32801\n450 S. ORANGE AVENUE, SUITE 600\nTLP ENGINEERING CONSULTANTS, INC.\nGDCOR2\n FND N&D \"LS 3993\"\n0.0000\nGBNG80\n97.3346\nGBNG86\n97.4474\nGBNG79\n97.4971\nGBB16\n97.5097\nGBNG81\n97.5545\nGBNG84\n97.5822\nGBB15\n97.6111\nGBB1\n97.6195\nGBNG83\n97.6260\nGBNG85\n97.6535\nGBB14\n97.6540\nGBB4\n97.6770\nGBB3\n97.7452\nGBB8\n97.7948\nGBB17\n97.8063\nGBNG87\n97.8160\nGBB6\n97.8556\nGBNG72\n97.8586\nGBINV3\n PIPE ONLY 15\" RCP\n97.8778\nGBB7\n97.9126\nGBB5\n97.9205\nGBNG82\n97.9213\nGBB2\n97.9686\nGBNG78\n97.9888\nGBB13\n98.0260\nGBB10\n98.0299\nGBNG75\n98.0720\nGCWP6\n W1-6\n98.0819\nGBB12\n98.1108\nGBB11\n98.1155\nGBB9\n98.1801\nGBNG71\n98.2515\nGBNG77\n98.2926\nGBNG69\n98.3822\nGBCOR4\n FND 1\" IP NO ID\n98.6340\nGBNG70\n98.7078\nGBEW21\n98.8004\nGBEW9\n98.8020\nX10\n98.8100\nX11\n98.8600\nGBEW8\n98.8872\nGBEW25\n98.9287\nGBINV2\n 18\" RCP PIPE ONLY\n98.9683\nGBCOR3\n FND 4\"X4\" CM \"PRM 1542\"\n98.9947\nGBEW5\n98.9961\nGBEW19\n99.0015\nGBEW1\n99.0020\nGBEW24\n99.0109\nGBEW18\n99.0130\nGBEW13\n99.0156\nGBEW7\n99.0172\nGBEW23\n99.0219\nGBINV1\n PIPE ONLY 15\" RCP\n99.0314\nGCWP3\n W1-3\n99.0362\nGBEW17\n99.0461\nGBEW6\n99.0477\nGBEW4\n99.0564\nGBEW26\n99.0588\nGBEW10\n99.0646\nGBEW20\n99.0868\nGBEW12\n99.0876\nX9\n99.0969\nX14\n99.1000\nGBEW14\n99.1037\nGBEW11\n99.1137\nGBEW2\n99.1198\nGBEW15\n99.1223\nGBEW22\n99.1282\nGBEW3\n99.1298\nGBEW16\n99.1792\nGBWDL3\n99.3115\nX8\n99.3400\nX6\n99.4200\nGBNG61\n99.4878\nGBNG6\n99.5081\nGBNG74\n99.5198\nGBNG73\n99.5283\nGBNG2\n99.5718\nX3\n99.7200\nGBNG14\n99.7283\nGBNG5\n99.7503\nGBNG4\n99.7643\nGBNG12\n99.7672\nGBNG15\n99.7979\nGBNG24\n99.8176\nGBNG22\n99.8807\nGBNG13\n99.8860\nGBNG1\n99.9197\nGCWP5\n W1-5\n99.9251\nGBNG9\n99.9513\nGBWDL1\n100.0149\nGBT8\n100.1003\nGBNG18\n100.1111\nGBNG68\n100.1414\nGBNG67\n100.2032\nX5\n100.2100\nGBNG17\n100.2334\nGBNG3\n100.2444\nGBNG21\n100.2611\nGCWP2\n W1-2\n100.3204\nGBNG25\n100.3378\nGBNG23\n100.3410\nGCWP1\n W1-1\n100.3753\nGCWP4\n W1-4\n100.4126\nX13\n100.4300\nX12\n100.4400\nGBNG19\n100.4424\nGBNG8\n100.4464\nGBNG16\n100.4684\nX7\n100.4700\nGBNG20\n100.6036\nX4\n100.6900\nX2\n100.7100\nGBNG11\n100.7309\nGBNG10\n100.7979\nGBPST1\n WETLAND PROTECTION AREA\n100.8089\nGBNG7\n100.8767\nGBFNC11\n100.9646\nGBT7\n100.9836\nGBNG76\n101.0515\nGBNG64\n101.4008\nGBWDL2\n101.4939\nGBNG66\n101.5707\nGBNG38\n101.8640\nGBNG65\n102.1191\nGBT4\n102.1425\nGBT6\n102.1864\nGBNG35\n102.2191\nGBWDL4\n102.4009\nGBNG42\n102.5690\nGBT5\n102.7202\nGBFNCA1\n 6' CHAINLINK\n102.7258\nGBNG50\n102.7680\nGBGRT1\n GRATE\n103.0042\nGBDI1\n DROP INLET\n103.0281\nGBGRT2\n103.0511\nGBNG31\n103.0749\nGBNG39\n103.0756\nGBGRT4\n103.0787\nGBDI2\n103.0965\nGBNG49\n103.1072\nGBGRT3\n103.1131\nGBDI4\n103.1423\nGBT3\n103.1699\nGBDI3\n103.1743\nGBTR1\n 24\"\n103.1885\nGBFL12\n103.2726\nGBFL11\n103.3094\nGBFL13\n103.3898\nGBMISC3\n103.4593\nGBT17\n103.4953\nGBFNC1\n 6' CHAIN LINK\n103.4980\nGBFL10\n103.5285\nGBNG33\n103.5343\nGBFL15\n103.5408\nGBEP10\n103.5613\nGBFL9\n103.5695\nGBEP11\n103.5830\nGBEP9\n103.5939\nGBFL16\n103.6242\nGBMISC4\n103.6322\nGBFL8\n103.6401\nGBEP8\n103.6458\nGBBC16\n103.6480\nGBFL14\n103.6485\nGBT15\n103.6551\nGBT13\n103.6588\nGBFL17\n103.6909\nGBT14\n103.6969\nGBEP7\n103.7027\nGBFL7\n103.7030\nGBNG37\n103.7047\nGBEP12\n103.7115\nGBEP13\n103.7143\nGBFL18\n103.7205\nGBMISC2\n103.7260\nGBMISC1\n METAL SKIMMER\n103.7365\nGBT22\n103.7588\nGBFL19\n103.7672\nGBEP14\n103.7742\nGBNG59\n103.7814\nGBNG40\n103.7966\nGBBC15\n103.8041\nGBBC10\n103.8165\nGBFL6\n103.8212\nGBNG48\n103.8236\nGBBC9\n103.8265\nGBNG60\n103.8303\nGBBC17\n103.8520\nGBEP6\n103.8523\nGBFL20\n103.8553\nGBEP15\n103.8587\nGBT23\n103.8619\nGBEP16\n103.8623\nGBT2\n103.8702\nGBNG57\n103.8762\nGBBC8\n103.8857\nGBBC18\n103.9049\nGBNG58\n103.9119\nGBNG29\n103.9210\nGBGYA7\n103.9297\nGBBC19\n103.9378\nGBBC7\n103.9408\nGBNG41\n103.9560\nGBT18\n103.9579\nGBFL21\n103.9760\nGBAC4\n103.9763\nGBAC3\n103.9769\nGBEP5\n103.9893\nGBFL5\n103.9900\nGBBC20\n104.0039\nGBNG34\n104.0102\nGBEP17\n104.0299\nGBT1\n104.0301\nGBCI9\n104.0361\nGBT16\n104.0436\nGBNG36\n104.0539\nGBEP4\n104.0540\nGBBC6\n104.0564\nGBFL4\n104.0576\nGBBC21\n104.0594\nGBNG63\n104.0715\nGBCI8\n104.0721\nGBAC2\n104.0951\nGBCI7\n104.1198\nSD\nGBMHD1\n104.1254\nGBBC12\n104.1284\nGBBC14\n104.1287\nGBCI10\n104.1314\nGBNG28\n104.1315\nGBBC13\n104.1321\nGBGYA1\n104.1400\nGBCI5\n104.1403\nGBCI6\n104.1417\nGBNG62\n104.1424\nGBT24\n104.1605\nGBGYA3\n104.1610\nGBBC11\n104.1621\nGBCI4\n104.1742\nGBAC5\n104.1752\nGBFL3\n104.1851\nGBBC22\n104.1871\nGBNG56\n104.1874\nGBCI2\n104.1875\nGBNG43\n104.1896\nGBCI1\n104.1931\nGBCI3\n104.1987\nGBT21\n104.2065\nGBFL22\n104.2086\nGBEP3\n104.2109\nGBNG27\n104.2219\nGBBC5\n104.2246\nGBFNC3\n104.2337\nSD\nGBMHD2\n104.2464\nGBFL2\n104.2499\nGBBC4\n104.2658\nGBEP18\n104.2794\nGBGYA6\n104.2822\nGBEP2\n104.2869\nGBT12\n104.2940\nGBT25\n104.3036\nGBCOR2\n FND 4\"X4\" CM BROKEN NO ID\n104.3072\nGA2\n SET N&D \"TRAV PT LB 6556\"\n104.3280\nGBT11\n104.3314\nGBT20\n104.3336\nGBFNC8\n104.3344\nGBT10\n104.3560\nGBFL1\n104.3702\nGBOHP5\n104.3851\nGBSHP2\n W/ LIGHT\n104.3855\nGBGYA2\n104.3915\nGBCSH1\n PB-2\n104.3967\nGBNG26\n104.3999\nGBAC6\n104.4140\nGBEP1\n104.4167\nGBFW5\n104.4261\nGBNG47\n104.4261\nGBBC3\n104.4280\nGBNG52\n104.4286\nGBT9\n104.4343\nGBBC23\n104.4396\nGBBW6\n104.4452\nGA3\n SET 5/8\" IRC \"TRAV PT LB 6556\"\n104.4550\nGBWP1\n104.4686\nGBWP4\n104.4804\nGBBC2\n104.4870\nGBOHP3\n104.5024\nGBAC7\n104.5264\nGBTR2\n 30\"\n104.5293\nGBNG32\n104.5300\nGBNG54\n104.5394\nGBGYA5\n104.5433\nGBT19\n104.5466\nGBCSH2\n PB-1\n104.5580\nGBNG30\n104.5712\nGBNG55\n104.5721\nGBWP3\n104.5764\nGBFNC2\n104.5833\nGBBC1\n104.5904\nGBWP2\n104.6117\nGBFW4\n104.6257\nGBVC1\n BM1 SET N&D \"GEODATA LB 6556 BENCHMARK\"\n104.6370\nSD\nGBMHD3\n104.6440\nGBGYA4\n104.6469\nGBNG53\n104.6504\nGBSHP1\n W/ LIGHT\n104.6554\nGBCOR1\n FND 4\"X4\" CM BROKEN NO ID\n104.6560\nGBOHP2\n104.6608\nGBBW5\n104.6851\nGBAC8\n104.6968\nGBFW3\n104.6972\nGBFW2\n104.7075\nGBFNCA2\n104.7154\nGBNG44\n104.7173\nGBSHRB1\n104.7204\nGBBW4\n104.7215\nGA4\n SET 5/8\" IRC \"TRAV PT LB 6556\"\n104.7310\nGBBW3\n104.7479\nGBBW2\n104.7587\nGBFNC10\n104.7819\nGBAC9\n104.7844\nGBNG51\n104.7850\nGBFW1\n104.8198\nGBBW1\n104.8801\nGA1\n SET N&D \"TRAV PT LB 6556\"\n104.9320\nGBOHP1\n104.9788\nGBNG46\n105.0181\nGBFNC9\n105.1184\nGBNG45\n105.1583\nGBOHP4\n105.3177\nGBFNC4\n105.7620\nGBFNC5\n106.4587\nGBFNC7\n END GATE\n106.6824\nGBFNC6\n BEGIN GATE\n106.7916\n10\n11\n12\nSET N&D \"TRAV PT LB 6556\"\nPOT STA 10+30.00\nEL= 104.93' (NAVD88)\nE: 463311.58\nN: 1529485.41\nSITE BENCHMARK #3\nE: 463285.89\nN: 1529500.90\nNO POINT FND OR SET\nSTA 10+00.00\nBEGIN \u00a3 SURVEY\nSET N&D \"TRAV PT LB 6556\"\nEL= 104.33' (NAVD88)\nE: 463517.40\nN: 1529361.39\nSITE BENCHMARK #2\nSTA 12+70.29\nEND \u00a3 SURVEY\n10\n40\nFeet\n0\nN\nPOND DETAILS AND GRADING\n1:3\n1:50\n1:2\n86.60\nNWL = 98.60\n96.60\n104.00\n104.20\nPOND 6749\n10' MAINTENANCE BERM\n1:3\n1:3\n1:4\nPOND 6749\n UNDERDRAIN PIPE\nREMOVE EXISTING\n UNDERDRAIN PIPE\nREMOVE EXISTING\n1:2\n1:2\n1:3\n86.60\n1\"=40'H,1\"=10'V\nSECTION A - A\nSHGWT\n98.60\n1:50\n104.00\n1:50\nA\nA\n1:4\n7\n (10YR-24HR)\nDHW EL. 102.15\n (25YR-24HR)\nDHW EL. 102.45\n (MEAN ANNUAL-24HR)\nDHW EL. 100.31\nWETLAND 1\nPER ORB 7436, PG 3616\nACCESS EASEMENT\nORANGE COUNTY\nWETLAND 1\nWETLAND 1\nD\nC\nA\nC1\nB1\nB\nPOND RADIUS POINT LOCATION DATA\nPOINT\nCENTER\nCURVE\nSTATION\nOFFSET\nRADIUS AT CONTOUR ELEV.\n86.60\n96.60\n104.00\n104.20\nA\n10+91.45\n78.04 'LT.\n5.00 '\n25.00 '\n47.20 '\n57.20 '\nB\n11+32.71\n76.65 'LT.\n5.00 '\n25.00 '\n--\n--\nC\n10+89.76\n140.67 'LT.\n5.00 '\n25.00 '\n--\n--\nD\n10+73.22\n130.76 'LT.\n5.00 '\n25.00 '\n47.20 '\n57.20 '\nB1\n11+34.52\n80.39 'LT.\n--\n--\n51.00 '\n61.00 '\nC1\n10+94.81\n138.63 'LT.\n--\n--\n51.54 '\n61.54 '\nVARIES\nSODDING LIMITS\nVARIES\nSODDING LIMITS\nSEE DETAIL\nBIOSORPTION ACTIVIATED MEDIA (BAM)\n\n\n--- Page Break ---\n\n[Page 8]\nDESIGN PLANS FOR:\nBY\nDESCRIPTION\nDATE\nSHEET\nNO.\nPROJECT NO.\nBY\nDESCRIPTION\nDATE\nREVISIONS\nPROJECT NAME\nJ:\\PROJECTS\\T201507 - Orange County Cont SvcsY16-900 B\\_TWO36_POND6749\\_POND6749\\drainage\\PDPLRD01_ALT2.dgn\nbrent\n6/29/2023 12:33:09 PM\nDefault\nPOND 6749 RETROFIT\n                        \nSIPLIN ROAD POND 6749 RETROFIT\nBRENT GILLETTE, P.E. 72355\nPH. 407-901-5060\nORLANDO, FL. 32801\n450 S. ORANGE AVENUE, SUITE 600\nTLP ENGINEERING CONSULTANTS, INC.\nGDCOR2\n FND N&D \"LS 3993\"\n0.0000\nGBNG80\n97.3346\nGBNG86\n97.4474\nGBNG79\n97.4971\nGBB16\n97.5097\nGBNG81\n97.5545\nGBNG84\n97.5822\nGBB15\n97.6111\nGBB1\n97.6195\nGBNG83\n97.6260\nGBNG85\n97.6535\nGBB14\n97.6540\nGBB4\n97.6770\nGBB3\n97.7452\nGBB8\n97.7948\nGBB17\n97.8063\nGBNG87\n97.8160\nGBB6\n97.8556\nGBNG72\n97.8586\nGBINV3\n PIPE ONLY 15\" RCP\n97.8778\nGBB7\n97.9126\nGBB5\n97.9205\nGBNG82\n97.9213\nGBB2\n97.9686\nGBNG78\n97.9888\nGBB13\n98.0260\nGBB10\n98.0299\nGBNG75\n98.0720\nGCWP6\n W1-6\n98.0819\nGBB12\n98.1108\nGBB11\n98.1155\nGBB9\n98.1801\nGBNG71\n98.2515\nGBNG77\n98.2926\nGBNG69\n98.3822\nGBCOR4\n FND 1\" IP NO ID\n98.6340\nGBNG70\n98.7078\nGBEW21\n98.8004\nGBEW9\n98.8020\nX10\n98.8100\nX11\n98.8600\nGBEW8\n98.8872\nGBEW25\n98.9287\nGBINV2\n 18\" RCP PIPE ONLY\n98.9683\nGBCOR3\n FND 4\"X4\" CM \"PRM 1542\"\n98.9947\nGBEW5\n98.9961\nGBEW19\n99.0015\nGBEW1\n99.0020\nGBEW24\n99.0109\nGBEW18\n99.0130\nGBEW13\n99.0156\nGBEW7\n99.0172\nGBEW23\n99.0219\nGBINV1\n PIPE ONLY 15\" RCP\n99.0314\nGCWP3\n W1-3\n99.0362\nGBEW17\n99.0461\nGBEW6\n99.0477\nGBEW4\n99.0564\nGBEW26\n99.0588\nGBEW10\n99.0646\nGBEW20\n99.0868\nGBEW12\n99.0876\nX9\n99.0969\nX14\n99.1000\nGBEW14\n99.1037\nGBEW11\n99.1137\nGBEW2\n99.1198\nGBEW15\n99.1223\nGBEW22\n99.1282\nGBEW3\n99.1298\nGBEW16\n99.1792\nGBWDL3\n99.3115\nX8\n99.3400\nX6\n99.4200\nGBNG61\n99.4878\nGBNG6\n99.5081\nGBNG74\n99.5198\nGBNG73\n99.5283\nGBNG2\n99.5718\nX3\n99.7200\nGBNG14\n99.7283\nGBNG5\n99.7503\nGBNG4\n99.7643\nGBNG12\n99.7672\nGBNG15\n99.7979\nGBNG24\n99.8176\nGBNG22\n99.8807\nGBNG13\n99.8860\nGBNG1\n99.9197\nGCWP5\n W1-5\n99.9251\nGBNG9\n99.9513\nGBWDL1\n100.0149\nGBT8\n100.1003\nGBNG18\n100.1111\nGBNG68\n100.1414\nGBNG67\n100.2032\nX5\n100.2100\nGBNG17\n100.2334\nGBNG3\n100.2444\nGBNG21\n100.2611\nGCWP2\n W1-2\n100.3204\nGBNG25\n100.3378\nGBNG23\n100.3410\nGCWP1\n W1-1\n100.3753\nGCWP4\n W1-4\n100.4126\nX13\n100.4300\nX12\n100.4400\nGBNG19\n100.4424\nGBNG8\n100.4464\nGBNG16\n100.4684\nX7\n100.4700\nGBNG20\n100.6036\nX4\n100.6900\nX2\n100.7100\nGBNG11\n100.7309\nGBNG10\n100.7979\nGBPST1\n WETLAND PROTECTION AREA\n100.8089\nGBNG7\n100.8767\nGBFNC11\n100.9646\nGBT7\n100.9836\nGBNG76\n101.0515\nGBNG64\n101.4008\nGBWDL2\n101.4939\nGBNG66\n101.5707\nGBNG38\n101.8640\nGBNG65\n102.1191\nGBT4\n102.1425\nGBT6\n102.1864\nGBNG35\n102.2191\nGBWDL4\n102.4009\nGBNG42\n102.5690\nGBT5\n102.7202\nGBFNCA1\n 6' CHAINLINK\n102.7258\nGBNG50\n102.7680\nGBGRT1\n GRATE\n103.0042\nGBDI1\n DROP INLET\n103.0281\nGBGRT2\n103.0511\nGBNG31\n103.0749\nGBNG39\n103.0756\nGBGRT4\n103.0787\nGBDI2\n103.0965\nGBNG49\n103.1072\nGBGRT3\n103.1131\nGBDI4\n103.1423\nGBT3\n103.1699\nGBDI3\n103.1743\nGBTR1\n 24\"\n103.1885\nGBFL12\n103.2726\nGBFL11\n103.3094\nGBFL13\n103.3898\nGBMISC3\n103.4593\nGBT17\n103.4953\nGBFNC1\n 6' CHAIN LINK\n103.4980\nGBFL10\n103.5285\nGBNG33\n103.5343\nGBFL15\n103.5408\nGBEP10\n103.5613\nGBFL9\n103.5695\nGBEP11\n103.5830\nGBEP9\n103.5939\nGBFL16\n103.6242\nGBMISC4\n103.6322\nGBFL8\n103.6401\nGBEP8\n103.6458\nGBBC16\n103.6480\nGBFL14\n103.6485\nGBT15\n103.6551\nGBT13\n103.6588\nGBFL17\n103.6909\nGBT14\n103.6969\nGBEP7\n103.7027\nGBFL7\n103.7030\nGBNG37\n103.7047\nGBEP12\n103.7115\nGBEP13\n103.7143\nGBFL18\n103.7205\nGBMISC2\n103.7260\nGBMISC1\n METAL SKIMMER\n103.7365\nGBT22\n103.7588\nGBFL19\n103.7672\nGBEP14\n103.7742\nGBNG59\n103.7814\nGBNG40\n103.7966\nGBBC15\n103.8041\nGBBC10\n103.8165\nGBFL6\n103.8212\nGBNG48\n103.8236\nGBBC9\n103.8265\nGBNG60\n103.8303\nGBBC17\n103.8520\nGBEP6\n103.8523\nGBFL20\n103.8553\nGBEP15\n103.8587\nGBT23\n103.8619\nGBEP16\n103.8623\nGBT2\n103.8702\nGBNG57\n103.8762\nGBBC8\n103.8857\nGBBC18\n103.9049\nGBNG58\n103.9119\nGBNG29\n103.9210\nGBGYA7\n103.9297\nGBBC19\n103.9378\nGBBC7\n103.9408\nGBNG41\n103.9560\nGBT18\n103.9579\nGBFL21\n103.9760\nGBAC4\n103.9763\nGBAC3\n103.9769\nGBEP5\n103.9893\nGBFL5\n103.9900\nGBBC20\n104.0039\nGBNG34\n104.0102\nGBEP17\n104.0299\nGBT1\n104.0301\nGBCI9\n104.0361\nGBT16\n104.0436\nGBNG36\n104.0539\nGBEP4\n104.0540\nGBBC6\n104.0564\nGBFL4\n104.0576\nGBBC21\n104.0594\nGBNG63\n104.0715\nGBCI8\n104.0721\nGBAC2\n104.0951\nGBCI7\n104.1198\nSD\nGBMHD1\n104.1254\nGBBC12\n104.1284\nGBBC14\n104.1287\nGBCI10\n104.1314\nGBNG28\n104.1315\nGBBC13\n104.1321\nGBGYA1\n104.1400\nGBCI5\n104.1403\nGBCI6\n104.1417\nGBNG62\n104.1424\nGBT24\n104.1605\nGBGYA3\n104.1610\nGBBC11\n104.1621\nGBCI4\n104.1742\nGBAC5\n104.1752\nGBFL3\n104.1851\nGBBC22\n104.1871\nGBNG56\n104.1874\nGBCI2\n104.1875\nGBNG43\n104.1896\nGBCI1\n104.1931\nGBCI3\n104.1987\nGBT21\n104.2065\nGBFL22\n104.2086\nGBEP3\n104.2109\nGBNG27\n104.2219\nGBBC5\n104.2246\nGBFNC3\n104.2337\nSD\nGBMHD2\n104.2464\nGBFL2\n104.2499\nGBBC4\n104.2658\nGBEP18\n104.2794\nGBGYA6\n104.2822\nGBEP2\n104.2869\nGBT12\n104.2940\nGBT25\n104.3036\nGBCOR2\n FND 4\"X4\" CM BROKEN NO ID\n104.3072\nGA2\n SET N&D \"TRAV PT LB 6556\"\n104.3280\nGBT11\n104.3314\nGBT20\n104.3336\nGBFNC8\n104.3344\nGBT10\n104.3560\nGBFL1\n104.3702\nGBOHP5\n104.3851\nGBSHP2\n W/ LIGHT\n104.3855\nGBGYA2\n104.3915\nGBCSH1\n PB-2\n104.3967\nGBNG26\n104.3999\nGBAC6\n104.4140\nGBEP1\n104.4167\nGBFW5\n104.4261\nGBNG47\n104.4261\nGBBC3\n104.4280\nGBNG52\n104.4286\nGBT9\n104.4343\nGBBC23\n104.4396\nGBBW6\n104.4452\nGA3\n SET 5/8\" IRC \"TRAV PT LB 6556\"\n104.4550\nGBWP1\n104.4686\nGBWP4\n104.4804\nGBBC2\n104.4870\nGBOHP3\n104.5024\nGBAC7\n104.5264\nGBTR2\n 30\"\n104.5293\nGBNG32\n104.5300\nGBNG54\n104.5394\nGBGYA5\n104.5433\nGBT19\n104.5466\nGBCSH2\n PB-1\n104.5580\nGBNG30\n104.5712\nGBNG55\n104.5721\nGBWP3\n104.5764\nGBFNC2\n104.5833\nGBBC1\n104.5904\nGBWP2\n104.6117\nGBFW4\n104.6257\nGBVC1\n BM1 SET N&D \"GEODATA LB 6556 BENCHMARK\"\n104.6370\nSD\nGBMHD3\n104.6440\nGBGYA4\n104.6469\nGBNG53\n104.6504\nGBSHP1\n W/ LIGHT\n104.6554\nGBCOR1\n FND 4\"X4\" CM BROKEN NO ID\n104.6560\nGBOHP2\n104.6608\nGBBW5\n104.6851\nGBAC8\n104.6968\nGBFW3\n104.6972\nGBFW2\n104.7075\nGBFNCA2\n104.7154\nGBNG44\n104.7173\nGBSHRB1\n104.7204\nGBBW4\n104.7215\nGA4\n SET 5/8\" IRC \"TRAV PT LB 6556\"\n104.7310\nGBBW3\n104.7479\nGBBW2\n104.7587\nGBFNC10\n104.7819\nGBAC9\n104.7844\nGBNG51\n104.7850\nGBFW1\n104.8198\nGBBW1\n104.8801\nGA1\n SET N&D \"TRAV PT LB 6556\"\n104.9320\nGBOHP1\n104.9788\nGBNG46\n105.0181\nGBFNC9\n105.1184\nGBNG45\n105.1583\nGBOHP4\n105.3177\nGBFNC4\n105.7620\nGBFNC5\n106.4587\nGBFNC7\n END GATE\n106.6824\nGBFNC6\n BEGIN GATE\n106.7916\nPROPERTY BOUNDARY\n10\n11\n12\nSET N&D \"TRAV PT LB 6556\"\nPOT STA 10+30.00\nEL= 104.93' (NAVD88)\nE: 463311.58\nN: 1529485.41\nSITE BENCHMARK #3\nE: 463285.89\nN: 1529500.90\nNO POINT FND OR SET\nSTA 10+00.00\nBEGIN \u00a3 SURVEY\nSET N&D \"TRAV PT LB 6556\"\nEL= 104.33' (NAVD88)\nE: 463517.40\nN: 1529361.39\nSITE BENCHMARK #2\nSTA 12+70.29\nEND \u00a3 SURVEY\n10\n40\nFeet\n0\nN\nPOND 6749\n   POND DETAIL SHEET    \nB\nB\nSIPLIN ROAD\nC\nC\n8\n1:3.5\n1:3.5\nR/W LINE\nTOE ALL SIDES\n3\" APRON W/ 24\" \n4'\nN.T.S.\nSECTION C - C\nN.T.S.\nDBI TYPE D (MODIFIED) SECTION B - B\nCONTROL STRUCTURE CS-1\nTOE ALL SIDES\n3\" APRON W/ 24\" \n8'\n5'\n6\" MIN.\n4\"\nELEV. 100.50\nELEV. 101.75\nINV. ELEV. 98.10\nCONST. 18\" RCP\nBOTTOM ELEV. 101.50\nTOP ELEV. 103.00\nCONST. SKIMMER 28\"L X 18\"H X 61\"W\nINV. ELEV. 98.10 \nCONST. 18\" RCP\n INV. ELEV. 101.65\nCENTERED IN WALL\nCONST 8\" WIDE WEIR \nTOP ELEV. 98.60\n6\" PVC CAPPED W/ 2.5\" DIA. OPENING\nINV. ELEV. 97.15\n6\" PVC UNDERDRAIN CONNECTION\nGRATE ELEV. 103.00\nINV. ELEV. 98.00\nCONST. ENDWALL\n(TO BE REMOVED)\nEXIST. 15\" RCP & MES\n1:2\nFENCE TO REMAIN\nEXIST. CHAIN LINK \n86.60\n96.60\n104.00\nPIPE AND MES\nREMOVE 19 LF OF EXIST. 15\"\nCONST. 38 LF OF 18\" PIPE\n1:3\n104.20\n1:50\nNWL = 98.60\nOF 18\" PIPE\nCONST. 15 LF \nAND MES\nEXIST. 18\" PIPE\nREMOVE 19 LF OF\nS-101\nS-102\n1:3\n1:4\n1:4\n1:3\nSTA. 11+56.30, 58.07' LT\nFDOT INDEX 430-021\nINV. ELV. 96.60\nCONST. 18\" MES (1:4)\nCONTROL STRUCTURE\nINV. ELV. 98.60 AT \nOF 18\" RCP.\nCONST. 45 LF\nTO BE REMOVED\nEXIST. CONTROL STRUCTURE\nCS-1\nPROPOSED FL EL. 98.00\nEXIST. FL CONNECTION EL. 99.44\nTOP EL. 104.00\nSTA. 10+74.30, 30.92' LT\nFDOT INDEX 425-001\nCONST. MANHOLE TYPE 7 (3.5' DIA.)\n20' WIDE\nEXIST. GATE ACCESS LOCATION\nPROPOSED FL EL. 98.00\nEXIST. FL CONNECTION EL. 99.14\nTOP EL. 104.00\nSTA. 11+89.74, 31.74' LT\nFDOT INDEX 425-001\nCONST. MANHOLE TYPE 7 (3.5' DIA.)\nSTA. 10+81.18, 49.82' LT\nFDOT INDEX 430-021\nINV. ELV. 96.60\nCONST. 18\" MES (1:4)\nINV. ELV. 98.00\nSTA. 11+24.15, 217.20' LT\nFDOT INDEX: 430-030\n ENDWALL\nCONST. STRAIGHT CONC.\nORB 7436, PG 3616\nACCESS EASEMENT\nORANGE COUNTY\nTO BE REMOVED\nEXIST. 6\" UNDERDRAIN \nWETLAND 1\nWETLAND 1\nCONC. ENDWALL\nTO CONSTRUCT STRAIGHT\nEXIST. 6' CHAIN LINK FENCE\nREMOVE AND REPLACE 20LF OF\nSEE SECTIONS THIS SHEET\nSTA. 11+06.17, 180.62' LT\nFDOT INDEX 425-052\nCONST. DBI TYPE D (MODIFIED)\nFENCE TO REMAIN\nEXIST. CHAIN LINK \nINV ELEV. = 97.26\nSTA. 11+20.42, 180.52' LT\nW/ CLEANOUT \nSTA. 11+82.67, 71.69 LT.\nCONST. CLEANOUT\nSTA. 10+59.48, 20.16 LT.\n CONCRETE DRIVEWAY\nCONST. 6\" THICK\nSEE DETAIL\n(BAM) AND UNDERDRAIN\nACTIVIATED MEDIA \nCONST. BIOSORPTION \nPIPE INV. ELV. = 97.30\nSTA. 11+24.50, 177.21 LT.\nBEGIN 27 LF OF 6\" SOLID PVC PIPE\nEND 120 LF OF 6\" UNDERDRAIN PIPE\nEND BIOSORPTION ACTIVIATED MEDIA (BAM) \nPIPE INV. ELV. = 98.10\nSTA. 11+82.85, 74.69 LT.\nCONNECT TO CLEANOUT\nBEGIN 120 LF OF 6\" UNDERDRAIN PIPE\nBEGIN BIOSORPTION ACTIVIATED MEDIA (BAM) \nTO BE REMOVED.\nEXIST. 15\" RCP & MES\n\n\n--- Page Break ---\n\n[Page 9]\nDESIGN PLANS FOR:\nBY\nDESCRIPTION\nDATE\nSHEET\nNO.\nPROJECT NO.\nBY\nDESCRIPTION\nDATE\nREVISIONS\nPROJECT NAME\nJ:\\PROJECTS\\T201507 - Orange County Cont SvcsY16-900 B\\_TWO36_POND6749\\_POND6749\\drainage\\DRDTRD02.dgn\nbrent\n6/29/2023 12:33:10 PM\nDefault\nPOND 6749 RETROFIT\n                        \nSIPLIN ROAD POND 6749 RETROFIT\nBRENT GILLETTE, P.E. 72355\nPH. 407-901-5060\nORLANDO, FL. 32801\n450 S. ORANGE AVENUE, SUITE 600\nTLP ENGINEERING CONSULTANTS, INC.\n4\n1\nTOP OF TREATMENT VOLUME, ELEV. = 101.75\nELEV. = 98.60\nNORMAL WATER LEVEL\nPERMANENT POOL\nTREATMENT VOLUME\nGEOMEMBRANE\n30-MIL PVC FLEXIBLE \nSEE GENERAL NOTE 4\nINTERNAL FILTER FABRIC\nSEE GENERAL NOTE 4\nINTERNAL FILTER FABRIC\nWASHED STONE\n#57 DOUBLE \nGEOMEMBRANE\n30-MIL PVC FLEXIBLE \n#57 DOUBLE WASHED STONE\n6\" FREE DRAINING COVER\n0.50'\n18.50'\n16.75'\nINV. ELEV. = SEE PLANS\n6\" CORRIGATED PE UNDERDRAIN PIPE\n0.25' TYP.\n0.50' MIN.\n \n24\" OF BIOSORPTION ACTIVIATED MEDIA (BAM)\nNTS\nBIOSORPTION ACTIVIATED MEDIA (BAM) AND UNDERDRAIN DETAIL\nELEV. = 103.23\nTOP OF BIOSORPTION ACTIVIATED MEDIA (BAM)\nSECTION A-A\n3\"\nA\nA\nENVELOPE (TYP.)\nFILTER FABRIC\nWRAP APRON SURFACE\nCONCRETE APRON\nUNDERDRAIN PIPE\n(NONPERFORATED)\nCLEANOUT RISER\nWrap (Typ.)\nFilter Fabric\nTHREADED CAP\nCONCRETE APRON\n(NONPERFORATED)\nCLEANOUT RISER\nNTS\nUNDERDRAIN CLEANOUT DETAIL\n9\nCLEANOUTS.\nUSE NONPERFORATED PIPES FOR UNDERDRAIN OUTLET AND \n5.\nMINIMUM OF 1'.\nINSTALL THE INTERNAL FILTER FABRIC JOINTS WITH AN OVERLAP \n4.\nPERMITTIVITY OF 0.7 /SEC. AND AN AOS OF #40 SIEVE.\nSPECIFICATIONS 985. THE INTERNAL FILTER FABRIC HAS A \nINSTALL INTERNAL FILTER FABRIC TYPE D-3 IN ACCORDANCE WITH \n3.\nINSTALL UNDERDRAIN IN ACCORDANCE WITH SPECIFICATION 440.\n2.\nWALL.\nWILL BE BASED ON THE NOMINAL DIAMETER OF THE INTERIOR \nOTHERWISE SHOWN IN THE PLANS. THE SIZE TO BE FURNISHED \nINSTALL UNDERDRAIN PIPE WITH THAT IS 6\" SMOOTH WALL UNLESS \n1.\nGENERAL NOTES:\n \n(MIN.)\n6\"\n(MIN.)\n6\"\n \n \n(MAX.)\n2\"\n \n2'-6\"\n \n2'-6\"\n8\n1\n8\n1\nUNDERDRAIN DETAIL\nMEDIA (BAM) AND\nBIOSORPTION ACTIVIATED\n\n\n--- Page Break ---\n\n[Page 10]\nDESIGN PLANS FOR:\nBY\nDESCRIPTION\nDATE\nSHEET\nNO.\nPROJECT NO.\nBY\nDESCRIPTION\nDATE\nREVISIONS\nPROJECT NAME\nJ:\\PROJECTS\\T201507 - Orange County Cont SvcsY16-900 B\\_TWO36_POND6749\\_POND6749\\drainage\\EROSIONCONTROL_1.dgn\nbrent\n6/29/2023 12:33:10 PM\nDefault\nPOND 6749 RETROFIT\n                        \nSIPLIN ROAD POND 6749 RETROFIT\nBRENT GILLETTE, P.E. 72355\nPH. 407-901-5060\nORLANDO, FL. 32801\n450 S. ORANGE AVENUE, SUITE 600\nTLP ENGINEERING CONSULTANTS, INC.\nGD1\n SET 5/8\" IRC \"TRAV PT LB 6556\"\n0.0000\nGDCOR1\n FND 5/8\" IRC \"BSM LB 7274\"\n0.0000\nGDCOR2\n FND N&D \"LS 3993\"\n0.0000\nGDCOR3\n FND N&D \"LS 3993\"\n0.0000\nGBNG80\n97.3346\nGBNG86\n97.4474\nGBNG79\n97.4971\nGBB16\n97.5097\nGBNG81\n97.5545\nGBNG84\n97.5822\nGBB15\n97.6111\nGBB1\n97.6195\nGBNG83\n97.6260\nGBNG85\n97.6535\nGBB14\n97.6540\nGBB4\n97.6770\nGBB3\n97.7452\nGBB8\n97.7948\nGBB17\n97.8063\nGBNG87\n97.8160\nGBB6\n97.8556\nGBNG72\n97.8586\nGBINV3\n PIPE ONLY 15\" RCP\n97.8778\nGBB7\n97.9126\nGBB5\n97.9205\nGBNG82\n97.9213\nGBB2\n97.9686\nGBNG78\n97.9888\nGBB13\n98.0260\nGBB10\n98.0299\nGBNG75\n98.0720\nGCWP6\n W1-6\n98.0819\nGBB12\n98.1108\nGBB11\n98.1155\nGBB9\n98.1801\nGBNG71\n98.2515\nGBNG77\n98.2926\nGBNG69\n98.3822\nGBCOR4\n FND 1\" IP NO ID\n98.6340\nGBNG70\n98.7078\nGBEW21\n98.8004\nGBEW9\n98.8020\nX10\n98.8100\nX11\n98.8600\nGBEW8\n98.8872\nGBEW25\n98.9287\nGBINV2\n 18\" RCP PIPE ONLY\n98.9683\nGBCOR3\n FND 4\"X4\" CM \"PRM 1542\"\n98.9947\nGBEW5\n98.9961\nGBEW19\n99.0015\nGBEW1\n99.0020\nGBEW24\n99.0109\nGBEW18\n99.0130\nGBEW13\n99.0156\nGBEW7\n99.0172\nGBEW23\n99.0219\nGBINV1\n PIPE ONLY 15\" RCP\n99.0314\nGCWP3\n W1-3\n99.0362\nGBEW17\n99.0461\nGBEW6\n99.0477\nGBEW4\n99.0564\nGBEW26\n99.0588\nGBEW10\n99.0646\nGBEW20\n99.0868\nGBEW12\n99.0876\nX9\n99.0969\nX14\n99.1000\nGBEW14\n99.1037\nGBEW11\n99.1137\nGBEW2\n99.1198\nGBEW15\n99.1223\nGBEW22\n99.1282\nGBEW3\n99.1298\nGBEW16\n99.1792\nGBWDL3\n99.3115\nX8\n99.3400\nX6\n99.4200\nGBNG61\n99.4878\nGBNG6\n99.5081\nGBNG74\n99.5198\nGBNG73\n99.5283\nGBNG2\n99.5718\nX3\n99.7200\nGBNG14\n99.7283\nGBNG5\n99.7503\nGBNG4\n99.7643\nGBNG12\n99.7672\nGBNG15\n99.7979\nGBNG24\n99.8176\nGBNG22\n99.8807\nGBNG13\n99.8860\nGBNG1\n99.9197\nGCWP5\n W1-5\n99.9251\nGBNG9\n99.9513\nGBWDL1\n100.0149\nGBT8\n100.1003\nGBNG18\n100.1111\nGBNG68\n100.1414\nGBNG67\n100.2032\nX5\n100.2100\nGBNG17\n100.2334\nGBNG3\n100.2444\nGBNG21\n100.2611\nGCWP2\n W1-2\n100.3204\nGBNG25\n100.3378\nGBNG23\n100.3410\nGCWP1\n W1-1\n100.3753\nGCWP4\n W1-4\n100.4126\nX13\n100.4300\nX12\n100.4400\nGBNG19\n100.4424\nGBNG8\n100.4464\nGBNG16\n100.4684\nX7\n100.4700\nGBNG20\n100.6036\nX4\n100.6900\nX2\n100.7100\nGBNG11\n100.7309\nGBNG10\n100.7979\nGBPST1\n WETLAND PROTECTION AREA\n100.8089\nGBNG7\n100.8767\nGBFNC11\n100.9646\nGBT7\n100.9836\nGBNG76\n101.0515\nGBNG64\n101.4008\nGBWDL2\n101.4939\nGBNG66\n101.5707\nGBNG38\n101.8640\nGBNG65\n102.1191\nGBT4\n102.1425\nGBT6\n102.1864\nGBNG35\n102.2191\nGBWDL4\n102.4009\nGBNG42\n102.5690\nGBT5\n102.7202\nGBFNCA1\n 6' CHAINLINK\n102.7258\nGBNG50\n102.7680\nGBGRT1\n GRATE\n103.0042\nGBDI1\n DROP INLET\n103.0281\nGBGRT2\n103.0511\nGBNG31\n103.0749\nGBNG39\n103.0756\nGBGRT4\n103.0787\nGBDI2\n103.0965\nGBNG49\n103.1072\nGBGRT3\n103.1131\nGBDI4\n103.1423\nGBT3\n103.1699\nGBDI3\n103.1743\nGBTR1\n 24\"\n103.1885\nGBFL12\n103.2726\nGBFL11\n103.3094\nGBFL13\n103.3898\nGBMISC3\n103.4593\nGBT17\n103.4953\nGBFNC1\n 6' CHAIN LINK\n103.4980\nGBFL10\n103.5285\nGBNG33\n103.5343\nGBFL15\n103.5408\nGBEP10\n103.5613\nGBFL9\n103.5695\nGBEP11\n103.5830\nGBEP9\n103.5939\nGBFL16\n103.6242\nGBMISC4\n103.6322\nGBFL8\n103.6401\nGBEP8\n103.6458\nGBBC16\n103.6480\nGBFL14\n103.6485\nGBT15\n103.6551\nGBT13\n103.6588\nGBFL17\n103.6909\nGBT14\n103.6969\nGBEP7\n103.7027\nGBFL7\n103.7030\nGBNG37\n103.7047\nGBEP12\n103.7115\nGBEP13\n103.7143\nGBFL18\n103.7205\nGBMISC2\n103.7260\nGBMISC1\n METAL SKIMMER\n103.7365\nGBT22\n103.7588\nGBFL19\n103.7672\nGBEP14\n103.7742\nGBNG59\n103.7814\nGBNG40\n103.7966\nGBBC15\n103.8041\nGBBC10\n103.8165\nGBFL6\n103.8212\nGBNG48\n103.8236\nGBBC9\n103.8265\nGBNG60\n103.8303\nGBBC17\n103.8520\nGBEP6\n103.8523\nGBFL20\n103.8553\nGBEP15\n103.8587\nX1\n103.8600\nGBT23\n103.8619\nGBEP16\n103.8623\nGBT2\n103.8702\nGBNG57\n103.8762\nGBBC8\n103.8857\nGBBC18\n103.9049\nGBNG58\n103.9119\nGBNG29\n103.9210\nGBGYA7\n103.9297\nGBBC19\n103.9378\nGBBC7\n103.9408\nGBNG41\n103.9560\nGBT18\n103.9579\nGBFL21\n103.9760\nGBAC4\n103.9763\nGBAC3\n103.9769\nGBEP5\n103.9893\nGBFL5\n103.9900\nGBBC20\n104.0039\nGBNG34\n104.0102\nGBEP17\n104.0299\nGBT1\n104.0301\nGBCI9\n104.0361\nGBT16\n104.0436\nGBNG36\n104.0539\nGBEP4\n104.0540\nGBBC6\n104.0564\nGBFL4\n104.0576\nGBBC21\n104.0594\nGBNG63\n104.0715\nGBCI8\n104.0721\nGBAC2\n104.0951\nGBCI7\n104.1198\nSD\nGBMHD1\n104.1254\nGBBC12\n104.1284\nGBBC14\n104.1287\nGBCI10\n104.1314\nGBNG28\n104.1315\nGBBC13\n104.1321\nGBGYA1\n104.1400\nGBCI5\n104.1403\nGBCI6\n104.1417\nGBNG62\n104.1424\nGBT24\n104.1605\nGBGYA3\n104.1610\nGBBC11\n104.1621\nGBCI4\n104.1742\nGBAC5\n104.1752\nGBFL3\n104.1851\nGBBC22\n104.1871\nGBNG56\n104.1874\nGBCI2\n104.1875\nGBNG43\n104.1896\nGBCI1\n104.1931\nGBCI3\n104.1987\nGBT21\n104.2065\nGBFL22\n104.2086\nGBEP3\n104.2109\nGBNG27\n104.2219\nGBBC5\n104.2246\nGBFNC3\n104.2337\nSD\nGBMHD2\n104.2464\nGBFL2\n104.2499\nGBBC4\n104.2658\nGBEP18\n104.2794\nGBGYA6\n104.2822\nGBEP2\n104.2869\nGBT12\n104.2940\nGBT25\n104.3036\nGBCOR2\n FND 4\"X4\" CM BROKEN NO ID\n104.3072\nGA2\n SET N&D \"TRAV PT LB 6556\"\n104.3280\nGBT11\n104.3314\nGBT20\n104.3336\nGBFNC8\n104.3344\nGBT10\n104.3560\nGBFL1\n104.3702\nGBOHP5\n104.3851\nGBSHP2\n W/ LIGHT\n104.3855\nGBGYA2\n104.3915\nGBCSH1\n PB-2\n104.3967\nGBNG26\n104.3999\nGBAC6\n104.4140\nGBEP1\n104.4167\nGBFW5\n104.4261\nGBNG47\n104.4261\nGBBC3\n104.4280\nGBNG52\n104.4286\nGBT9\n104.4343\nGBBC23\n104.4396\nGBBW6\n104.4452\nGA3\n SET 5/8\" IRC \"TRAV PT LB 6556\"\n104.4550\nGBWP1\n104.4686\nGBWP4\n104.4804\nGBBC2\n104.4870\nGBOHP3\n104.5024\nGBAC7\n104.5264\nGBTR2\n 30\"\n104.5293\nGBNG32\n104.5300\nGBNG54\n104.5394\nGBGYA5\n104.5433\nGBT19\n104.5466\nGBCSH2\n PB-1\n104.5580\nGBNG30\n104.5712\nGBNG55\n104.5721\nGBWP3\n104.5764\nGBFNC2\n104.5833\nGBBC1\n104.5904\nGBWP2\n104.6117\nGBFW4\n104.6257\nGBVC1\n BM1 SET N&D \"GEODATA LB 6556 BENCHMARK\"\n104.6370\nSD\nGBMHD3\n104.6440\nGBGYA4\n104.6469\nGBNG53\n104.6504\nGBSHP1\n W/ LIGHT\n104.6554\nGBCOR1\n FND 4\"X4\" CM BROKEN NO ID\n104.6560\nGBOHP2\n104.6608\nGBBW5\n104.6851\nGBAC8\n104.6968\nGBFW3\n104.6972\nGBFW2\n104.7075\nGBFNCA2\n104.7154\nGBNG44\n104.7173\nGBSHRB1\n104.7204\nGBBW4\n104.7215\nGA4\n SET 5/8\" IRC \"TRAV PT LB 6556\"\n104.7310\nGBBW3\n104.7479\nGBBW2\n104.7587\nGBFNC10\n104.7819\nGBAC9\n104.7844\nGBNG51\n104.7850\nGBFW1\n104.8198\nGBBW1\n104.8801\nGA1\n SET N&D \"TRAV PT LB 6556\"\n104.9320\nGBOHP1\n104.9788\nGBNG46\n105.0181\nGBFNC9\n105.1184\nGBNG45\n105.1583\nGBOHP4\n105.3177\nGBFNC4\n105.7620\nGBFNC5\n106.4587\nGBFNC7\n END GATE\n106.6824\nGBFNC6\n BEGIN GATE\n106.7916\nSD\nGBMHD4\n108.6515\n10\n11\n12\nSET N&D \"TRAV PT LB 6556\"\nPOT STA 10+30.00\nEL= 104.93' (NAVD88)\nE: 463311.58\nN: 1529485.41\nSITE BENCHMARK #3\nE: 463285.89\nN: 1529500.90\nNO POINT FND OR SET\nSTA 10+00.00\nBEGIN \u00a3 SURVEY\nSET N&D \"TRAV PT LB 6556\"\nEL= 104.33' (NAVD88)\nE: 463517.40\nN: 1529361.39\nSITE BENCHMARK #2\nSTA 12+70.29\nEND \u00a3 SURVEY\n10\n40\nFeet\n0\nN\nPOND 6749\n  EROSION CONTROL PLAN  \nSIPLIN ROAD\nLEGEND\nSEDIMENT BARRIER - STAKED SILT FENCE\nSTAKED SILT FENCE (TYP.)\nINSTALL 670 LF OF SEDIMENT BARRIER\nINLET PROTECTION SYSTEM\nINSTALL INLET PROTECTION \nBARRIER STAKED SILT FENCE\nINSTALL 22 LF OF SEDIMENT\n218.84' LT\n11+31.97\n228.26' LT\n11+33.24\n231.17' LT\n11+28.29\n229.87' LT\n11+21.84\n229.59' LT\n11+18.35\n48.23' LT\n12+30.51\n16.80' LT\n12+09.98\n21.70' LT\n10+69.71\n21.95' LT\n10+50.26\n156.35' LT\n10+03.85\n10\nORB 7436, PG 3616\nACCESS EASEMENT\nORANGE COUNTY\nWETLAND 1\nWETLAND 1\n\n\n--- Page Break ---\n\n[Page 11]\nAB-1\n\n\n--- Page Break ---\n\n[Page 12]\nAB-2\n\n\n--- Page Break ---\n\n[Page 13]\n\n\n--- Page Break ---\n\n[Page 14]\n",
+  "notes": [
+    "Extracted via native",
+    "Source: Siplin Road Pond Retrofit Plans.pdf",
+    "Pages: 14",
+    "AI matched: 6 items",
+    "Needs review: 3 items",
+    "Material: 98.0 LF pipe, 12 structures"
+  ]
+}

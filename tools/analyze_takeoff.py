@@ -442,6 +442,9 @@ class TakeoffAnalyzer:
         # Strategy 1: FDOT pay item codes (highest confidence)
         items.extend(self._extract_fdot_items(page_text, seen))
 
+        # Strategy 1b: Multi-line FDOT pay item tables (native PDF extraction format)
+        items.extend(self._extract_fdot_multiline_items(page_text, seen))
+
         # Strategy 2: Quantity-first format (federal/military style)
         items.extend(self._extract_quantity_first_items(page_text, seen))
 
@@ -599,6 +602,148 @@ class TakeoffAnalyzer:
                 # Attach source location if available
                 self._attach_source_location(item, match.group(0))
                 items.append(item)
+
+        return items
+
+    def _extract_fdot_multiline_items(self, text: str, seen: set) -> List[Dict]:
+        """
+        Extract FDOT pay items from multi-line table format (native PDF extraction).
+
+        Native PDF text extraction often produces each table cell on a separate line:
+            Line N:   430-175-118                              (FDOT code)
+            Line N+1: REINFORCED CONCRETE PIPE ... (18")       (description)
+            Line N+2: 160                                      (quantity)
+            Line N+3: LF                                       (unit)
+
+        This handles the following FDOT code patterns:
+        - Pipe culverts: 430-175-XXX
+        - Inlets: 425-1-XXX
+        - Manholes: 425-2-XXX
+        - Endwalls: 430-030-XXX, 430-040-XXX
+        - MES: 430-982-XXX
+
+        Args:
+            text: Page text to search
+            seen: Set of already-seen items
+
+        Returns:
+            List of extracted pay items
+        """
+        items = []
+        lines = text.split('\n')
+
+        # FDOT code patterns for drainage items
+        fdot_code_pattern = re.compile(
+            r'^(\d{3}-\d{1,3}-\d{1,3})\s*$'  # Just the code on a line by itself
+        )
+
+        # Valid units
+        valid_units = {'LS', 'EA', 'LF', 'SY', 'CY', 'SF', 'TON', 'GAL', 'AC', 'AS', 'GM'}
+
+        i = 0
+        while i < len(lines):
+            line = lines[i].strip()
+
+            # Check if this line is an FDOT code
+            code_match = fdot_code_pattern.match(line)
+            if code_match:
+                fdot_code = code_match.group(1)
+
+                # Only process drainage-related codes
+                # 430-175 = pipes, 425-1 = inlets, 425-2 = manholes, 430-030/040 = endwalls, 430-982 = MES
+                if not (fdot_code.startswith('430-') or fdot_code.startswith('425-')):
+                    i += 1
+                    continue
+
+                # Look ahead for description, quantity, unit
+                description = None
+                quantity = None
+                unit = None
+
+                # Check next 1-4 lines for the components
+                for j in range(1, 5):
+                    if i + j >= len(lines):
+                        break
+
+                    next_line = lines[i + j].strip()
+                    if not next_line:
+                        continue
+
+                    # Check if it's a unit
+                    if next_line.upper() in valid_units:
+                        unit = next_line.upper()
+                        continue
+
+                    # Check if it's a quantity (numeric, possibly with decimal)
+                    try:
+                        test_qty = float(next_line.replace(',', ''))
+                        # If we already have a quantity and this looks like a bid item number, skip
+                        if quantity is None and test_qty < 100000:
+                            quantity = test_qty
+                            continue
+                    except ValueError:
+                        pass
+
+                    # Check if this is a description (not a number, not a unit, not another FDOT code)
+                    if (description is None and
+                        not fdot_code_pattern.match(next_line) and
+                        not next_line.upper() in valid_units and
+                        len(next_line) > 5):
+                        # Skip if it looks like a bid item number (just digits)
+                        if not re.match(r'^\d{1,3}$', next_line):
+                            description = next_line
+
+                # Validate we found all required components
+                if description and quantity is not None and unit:
+                    # Validate using gates
+                    desc_result, desc_warnings = validate_description(
+                        description,
+                        pay_item_no=fdot_code
+                    )
+                    if desc_result is None:
+                        logger.debug(f"Rejected multiline FDOT item {fdot_code}: invalid description '{description}'")
+                        i += 1
+                        continue
+
+                    qty_result, qty_warnings = validate_quantity(
+                        quantity, unit,
+                        pay_item_no=fdot_code
+                    )
+                    if qty_result is None:
+                        logger.debug(f"Rejected multiline FDOT item {fdot_code}: invalid quantity {quantity} {unit}")
+                        i += 1
+                        continue
+
+                    item_key = f"fdot_ml_{fdot_code}_{quantity}"
+                    if item_key in seen:
+                        i += 1
+                        continue
+                    seen.add(item_key)
+
+                    item = {
+                        'pay_item_no': fdot_code,
+                        'description': description,
+                        'unit': unit,
+                        'quantity': quantity,
+                        'matched': False,
+                        'unit_price': None,
+                        'line_cost': None,
+                        'source': 'fdot_multiline',
+                        'confidence': 'high'
+                    }
+
+                    # Add validation warnings if any
+                    if desc_warnings or qty_warnings:
+                        item['validation_warnings'] = [
+                            w.to_dict() for w in (desc_warnings + qty_warnings)
+                            if w.severity.value == 'warning'
+                        ]
+
+                    # Attach source location if available
+                    self._attach_source_location(item, f"{fdot_code} {description}")
+                    items.append(item)
+
+            i += 1
 
         return items
 

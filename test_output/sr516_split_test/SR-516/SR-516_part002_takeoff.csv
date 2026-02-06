@@ -1,0 +1,27 @@
+Pay Item No,Description,Unit,Quantity,Unit Price,Line Cost,Page,Source,Confidence,Matched,Match Source,AI Match Reason
+HDPE-42,"42"" HDPE PIPE (VERIFY QTY)",LF,0,175.0,,,callout,low,Yes,rules,
+HDPE-18,"18"" HDPE PIPE (VERIFY QTY)",LF,0,40.0,,,callout,low,Yes,rules,
+
+DRAINAGE STRUCTURES
+Type,ID,Size,Description,Quantity,Page,Confidence
+Pipe,,"42""","42"" HDPE PIPE (VERIFY QTY)",0,,
+Pipe,,"18""","18"" HDPE PIPE (VERIFY QTY)",0,,
+
+ITEMS NEEDING REVIEW
+Description,Quantity,Unit,Page,Reason,Region Hint
+"42"" HDPE PIPE",0,LF,0,"Pipe description seems valid for drainage, but zero quantity is suspicious. Unable to verify actual quantity without additional context. Recommend manual review of plan sheets to confirm pipe length.",Unknown location
+"18"" HDPE PIPE",0,LF,0,"Pipe description seems valid for drainage, but zero quantity is suspicious. Unable to verify actual quantity without additional context. Recommend manual review of plan sheets to confirm pipe length.",Unknown location
+
+MATERIAL TAKEOFF SUMMARY
+
+PIPE SUMMARY
+Size/Material,Total LF,Count
+"18""_HDPE",0,1
+"42""_HDPE",0,1
+
+GRAND TOTALS
+Metric,Value
+Total Pipe LF,0
+Total Pipe Sizes,2
+Total Structures,0
+Total Structure Types,0

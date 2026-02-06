@@ -1,0 +1,1169 @@
+{
+  "project_info": {
+    "name": "LOCATION",
+    "location": "N",
+    "owner": "ROAD AND BRIDGE CONSTRUCTION AVAILABLE AT THE FOLLOWING WEBSITE:",
+    "engineer": "P.E. NO. 94069"
+  },
+  "pay_items": [
+    {
+      "pay_item_no": "104-10-3",
+      "description": "SEDIMENT BARRIER",
+      "unit": "LF",
+      "quantity": 735.0,
+      "matched": true,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high",
+      "match_source": "ai",
+      "matched_code": "104-10-3",
+      "ai_confidence": 1.0,
+      "ai_match_reason": "Exact match from FDOT catalog"
+    },
+    {
+      "pay_item_no": "110-1-1",
+      "description": "CLEARING & GRUBBING",
+      "unit": "AC",
+      "quantity": 0.46,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "110-4-10",
+      "description": "REMOVAL OF EXISTING CONCRETE PAVEMENT/REMOVAL IF EXISTING CONCRETE",
+      "unit": "SY",
+      "quantity": 43.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "327-70-1",
+      "description": "MILLING EXISTING ASPHALT PAVEMENT, 1\" AVG DEPTH",
+      "unit": "SY",
+      "quantity": 1551.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "425-1-345",
+      "description": "INLETS, CURB, TYPE P-4, PARTIAL",
+      "unit": "EA",
+      "quantity": 1.0,
+      "matched": true,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high",
+      "match_source": "ai",
+      "matched_code": "425-1-345",
+      "ai_confidence": 1.0,
+      "ai_match_reason": "Exact match from FDOT inlet catalog"
+    },
+    {
+      "pay_item_no": "425-1-521",
+      "description": "INLETS, DT BOT, TYPE C, <10'",
+      "unit": "EA",
+      "quantity": 2.0,
+      "matched": true,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high",
+      "match_source": "ai",
+      "matched_code": "425-1-521",
+      "ai_confidence": 1.0,
+      "ai_match_reason": "Exact match from FDOT inlet catalog"
+    },
+    {
+      "pay_item_no": "430-174-118",
+      "description": "PIPE CULVERT, OPTIONAL MATERIAL, ROUND, 18\"SD",
+      "unit": "LF",
+      "quantity": 20.0,
+      "matched": true,
+      "unit_price": 40.0,
+      "line_cost": 800.0,
+      "source": "fdot",
+      "confidence": "high",
+      "matched_product": {
+        "product_type": "Round Reinforced Concrete Pipe",
+        "size": "18\"",
+        "configuration": "CL III",
+        "price": 40.0,
+        "unit": "LF",
+        "fdot_code": "ASTM C-76"
+      }
+    },
+    {
+      "pay_item_no": "430-175-118",
+      "description": "PIPE CULVERT, OPTIONAL MATERIAL, ROUND, 18\"S/CD",
+      "unit": "LF",
+      "quantity": 391.0,
+      "matched": true,
+      "unit_price": 40.0,
+      "line_cost": 15640.0,
+      "source": "fdot",
+      "confidence": "high",
+      "matched_product": {
+        "product_type": "Round Reinforced Concrete Pipe",
+        "size": "18\"",
+        "configuration": "CL III",
+        "price": 40.0,
+        "unit": "LF",
+        "fdot_code": "ASTM C-76"
+      }
+    },
+    {
+      "pay_item_no": "430-984-125",
+      "description": "MITERED END SECTION, OPTIONAL ROUND, 18\" SD",
+      "unit": "EA",
+      "quantity": 1.0,
+      "matched": true,
+      "unit_price": 2100.0,
+      "line_cost": 2100.0,
+      "source": "fdot",
+      "confidence": "high",
+      "matched_product": {
+        "product_type": "Round Reinforced Concrete Pipe",
+        "size": "18\"",
+        "configuration": "Flared End",
+        "price": 2100.0,
+        "unit": "EA",
+        "fdot_code": "ASTM C-76"
+      }
+    },
+    {
+      "pay_item_no": "520-1-10",
+      "description": "CONCRETE CURB & GUTTER, TYPE F",
+      "unit": "LF",
+      "quantity": 155.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "570-1-2",
+      "description": "PERFORMANCE TURF, SOD",
+      "unit": "SY",
+      "quantity": 1397.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "630-2-11",
+      "description": "CONDUIT, F&I, OPEN TRENCH",
+      "unit": "LF",
+      "quantity": 1215.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "630-2-12",
+      "description": "CONDUIT, F&I, DIRECTIONAL BORE",
+      "unit": "LF",
+      "quantity": 282.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "630-2-14",
+      "description": "CONDUIT, F&I, ABOVEGROUND",
+      "unit": "LF",
+      "quantity": 85.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "633-1-111",
+      "description": "FIBER OPTIC CABLE, F&I, OVERHEAD,2-12 FIBERS",
+      "unit": "LF",
+      "quantity": 834.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "633-1-121",
+      "description": "FIBER OPTIC CABLE, F&I, UNDERGROUND,2-12 FIBERS",
+      "unit": "LF",
+      "quantity": 974.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "633-2-31",
+      "description": "FIBER OPTIC CONNECTION, INSTALL, SPLICE",
+      "unit": "EA",
+      "quantity": 96.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "633-3-11",
+      "description": "FIBER OPTIC CONNECTION HARDWARE, F&I, SPLICE ENCLOSURE",
+      "unit": "EA",
+      "quantity": 1.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "633-3-12",
+      "description": "FIBER OPTIC CONNECTION HARDWARE, F&I, SPLICE TRAY",
+      "unit": "EA",
+      "quantity": 1.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "633-3-15",
+      "description": "FIBER OPTIC CONNECTION HARDWARE, F&I, PRETERMINATED PATCH PANEL",
+      "unit": "EA",
+      "quantity": 1.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "635-2-12",
+      "description": "PULL & SPLICE BOX, F&I, 24\" X 36\" COVER SIZE",
+      "unit": "EA",
+      "quantity": 4.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "635-2-14",
+      "description": "PULL & SPLICE BOX, F&I, 17\" X 30\" COVER SIZE",
+      "unit": "EA",
+      "quantity": 27.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "639-2-1",
+      "description": "ELECTRICAL SERVICE WIRE, F&I",
+      "unit": "LF",
+      "quantity": 43.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "639-3-11",
+      "description": "ELECTRICAL SERVICE DISCONNECT, F&I, POLE MOUNT",
+      "unit": "EA",
+      "quantity": 1.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "641-2-12",
+      "description": "PRESTRESSED CONCRETE POLE, F&I TYPE P-II SERVICE POLE",
+      "unit": "EA",
+      "quantity": 1.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "641-2-80",
+      "description": "PRESTRESSED CONCRETE POLE, COMPLETE POLE REMOVAL- POLE 30' AND GREATER",
+      "unit": "EA",
+      "quantity": 4.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "646-1-11",
+      "description": "ALUMINUM SIGNALS POLE, PEDESTAL",
+      "unit": "EA",
+      "quantity": 2.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "649-21-3",
+      "description": "STEEL MAST ARM ASSEMBLY, FURNISH AND INSTALL, SINGLE ARM 40'",
+      "unit": "EA",
+      "quantity": 1.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "649-21-6",
+      "description": "STEEL MAST ARM ASSEMBLY, FURNISH AND INSTALL, SINGLE ARM 50'",
+      "unit": "EA",
+      "quantity": 1.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "649-21-19",
+      "description": "STEEL MAST ARM ASSEMBLY, FURNISH AND INSTALL, DOUBLE ARM 70'-60'",
+      "unit": "EA",
+      "quantity": 1.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "660-1-109",
+      "description": "LOOP DETECTOR INDUCTIVE, F&I, TYPE 5, 2CHANNEL, SOLID STATE, RACK MOUNTED",
+      "unit": "EA",
+      "quantity": 6.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "665-1-12",
+      "description": "PEDESTRIAN DETECTOR, FURNISH & INSTALL, ACCESSIBLE1",
+      "unit": "EA",
+      "quantity": 2.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "682-1-112",
+      "description": "ITS CCTV CAMERA, F&I, DOME ENCLOSURE - PRESSURIZED, IP, STANDARD DEFINITION",
+      "unit": "EA",
+      "quantity": 1.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "684-1-1",
+      "description": "MANAGED FIELD ETHERNET SWITCH, FURNISH & INSTALL",
+      "unit": "EA",
+      "quantity": 1.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "685-1-13",
+      "description": "UNINTERRUPTIBLE POWER SUPPLY, F&I, LINE INTERACTIVE WITH CABINET",
+      "unit": "EA",
+      "quantity": 1.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "685-2-1",
+      "description": "REMOTE POWER MANAGEMENT UNIT- RPMU, FURNISH AND INSTALL",
+      "unit": "EA",
+      "quantity": 1.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "700-5-22",
+      "description": "INTERNALLY ILLUMINATED SIGN, F&I, OVERHEAD MOUNT 12-18 SF",
+      "unit": "EA",
+      "quantity": 4.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "706-1-3",
+      "description": "RAISED PAVEMENT MARKER, TYPE B",
+      "unit": "EA",
+      "quantity": 38.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "711-11-123",
+      "description": "THERMOPLASTIC, STANDARD, WHITE, SOLID, 12\" FOR CROSSWALK AND ROUNDABOUT",
+      "unit": "LF",
+      "quantity": 140.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "711-11-125",
+      "description": "THERMOPLASTIC, STANDARD, WHITE, SOLID, 24\" FOR STOP LINE AND CROSSWALK",
+      "unit": "LF",
+      "quantity": 185.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "711-11-170",
+      "description": "THERMOPLASTIC, STANDARD, WHITE, ARROW",
+      "unit": "EA",
+      "quantity": 7.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "715-5-31",
+      "description": "LUMINAIRE & BRACKET ARM- ALUM., FURNISH & INSTALL NEW LUMINAIRE AND ARM ON NEW/EXISTING POLE",
+      "unit": "EA",
+      "quantity": 2.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "101-1",
+      "description": "MOBILIZATION",
+      "unit": "LS",
+      "quantity": 1.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "102-1",
+      "description": "MAINTENANCE OF TRAFFIC",
+      "unit": "LS",
+      "quantity": 1.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "104-11",
+      "description": "FLOATING TURBIDITY BARRIER",
+      "unit": "LF",
+      "quantity": 15.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "120-00",
+      "description": "EARTHWORK",
+      "unit": "LS",
+      "quantity": 1.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "160-4",
+      "description": "TYPE B STABILIZATION",
+      "unit": "SY",
+      "quantity": 1027.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "425-11",
+      "description": "MODIFY EXISTING DRAINAGE STRUCTURE",
+      "unit": "EA",
+      "quantity": 1.0,
+      "matched": true,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high",
+      "match_source": "ai",
+      "matched_code": "425-11",
+      "ai_confidence": 0.8,
+      "ai_match_reason": "Direct match for drainage structure modification"
+    },
+    {
+      "pay_item_no": "522-1",
+      "description": "CONCRETE SIDEWALK AND DRIVEWAYS, 4\" THICK",
+      "unit": "SY",
+      "quantity": 11.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "522-2",
+      "description": "CONCRETE SIDEWALK AND DRIVEWAYS, 6\" THICK",
+      "unit": "SY",
+      "quantity": 49.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "527-2",
+      "description": "DETECTABLE WARNINGS",
+      "unit": "SF",
+      "quantity": 20.0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "fdot",
+      "confidence": "high"
+    },
+    {
+      "pay_item_no": "HDPE-48",
+      "description": "48\" HDPE PIPE (VERIFY QTY)",
+      "unit": "LF",
+      "quantity": 0,
+      "matched": true,
+      "unit_price": 215.0,
+      "line_cost": 0.0,
+      "source": "callout",
+      "confidence": "low",
+      "needs_verification": true,
+      "mentions": 5,
+      "matched_product": {
+        "product_type": "Round Reinforced Concrete Pipe",
+        "size": "48\"",
+        "configuration": "CL III",
+        "price": 215.0,
+        "unit": "LF",
+        "fdot_code": "ASTM C-76"
+      }
+    },
+    {
+      "pay_item_no": "RCP-48",
+      "description": "48\" RCP PIPE (VERIFY QTY)",
+      "unit": "LF",
+      "quantity": 0,
+      "matched": true,
+      "unit_price": 215.0,
+      "line_cost": 0.0,
+      "source": "callout",
+      "confidence": "low",
+      "needs_verification": true,
+      "mentions": 16,
+      "matched_product": {
+        "product_type": "Round Reinforced Concrete Pipe",
+        "size": "48\"",
+        "configuration": "CL III",
+        "price": 215.0,
+        "unit": "LF",
+        "fdot_code": "ASTM C-76"
+      }
+    },
+    {
+      "pay_item_no": "RCP-24",
+      "description": "24\" RCP PIPE (VERIFY QTY)",
+      "unit": "LF",
+      "quantity": 0,
+      "matched": true,
+      "unit_price": 62.0,
+      "line_cost": 0.0,
+      "source": "callout",
+      "confidence": "low",
+      "needs_verification": true,
+      "mentions": 15,
+      "matched_product": {
+        "product_type": "Round Reinforced Concrete Pipe",
+        "size": "24\"",
+        "configuration": "CL III",
+        "price": 62.0,
+        "unit": "LF",
+        "fdot_code": "ASTM C-76"
+      }
+    },
+    {
+      "pay_item_no": "RCP-15",
+      "description": "15\" RCP PIPE (VERIFY QTY)",
+      "unit": "LF",
+      "quantity": 0,
+      "matched": true,
+      "unit_price": 30.0,
+      "line_cost": 0.0,
+      "source": "callout",
+      "confidence": "low",
+      "needs_verification": true,
+      "mentions": 5,
+      "matched_product": {
+        "product_type": "Round Reinforced Concrete Pipe",
+        "size": "15\"",
+        "configuration": "CL III",
+        "price": 30.0,
+        "unit": "LF",
+        "fdot_code": "ASTM C-76"
+      }
+    },
+    {
+      "pay_item_no": "PVC-24",
+      "description": "24\" PVC PIPE (VERIFY QTY)",
+      "unit": "LF",
+      "quantity": 0,
+      "matched": true,
+      "unit_price": 62.0,
+      "line_cost": 0.0,
+      "source": "callout",
+      "confidence": "low",
+      "needs_verification": true,
+      "mentions": 10,
+      "matched_product": {
+        "product_type": "Round Reinforced Concrete Pipe",
+        "size": "24\"",
+        "configuration": "CL III",
+        "price": 62.0,
+        "unit": "LF",
+        "fdot_code": "ASTM C-76"
+      }
+    },
+    {
+      "pay_item_no": "CMP-15",
+      "description": "15\" CMP PIPE (VERIFY QTY)",
+      "unit": "LF",
+      "quantity": 0,
+      "matched": true,
+      "unit_price": 30.0,
+      "line_cost": 0.0,
+      "source": "callout",
+      "confidence": "low",
+      "needs_verification": true,
+      "mentions": 5,
+      "matched_product": {
+        "product_type": "Round Reinforced Concrete Pipe",
+        "size": "15\"",
+        "configuration": "CL III",
+        "price": 30.0,
+        "unit": "LF",
+        "fdot_code": "ASTM C-76"
+      }
+    },
+    {
+      "pay_item_no": "MANHOLE",
+      "description": "MANHOLE (VERIFY QTY)",
+      "unit": "EA",
+      "quantity": 0,
+      "matched": true,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "drainage_label",
+      "confidence": "low",
+      "needs_verification": true,
+      "mentions": 2,
+      "match_source": "ai",
+      "matched_code": "425-2-7",
+      "ai_confidence": 0.7,
+      "ai_match_reason": "Generic manhole match from drainage catalog"
+    },
+    {
+      "pay_item_no": "INLET",
+      "description": "INLET (VERIFY QTY)",
+      "unit": "EA",
+      "quantity": 0,
+      "matched": false,
+      "unit_price": null,
+      "line_cost": null,
+      "source": "drainage_label",
+      "confidence": "low",
+      "needs_verification": true,
+      "mentions": 8
+    }
+  ],
+  "drainage_structures": [
+    {
+      "type": "Inlet",
+      "size": "Type P",
+      "description": "INLETS, CURB, TYPE P-4, PARTIAL",
+      "station": "-",
+      "quantity": 1.0,
+      "unit": "EA",
+      "unit_price": null,
+      "line_total": null
+    },
+    {
+      "type": "Inlet",
+      "size": "Standard",
+      "description": "INLETS, DT BOT, TYPE C, <10'",
+      "station": "-",
+      "quantity": 2.0,
+      "unit": "EA",
+      "unit_price": null,
+      "line_total": null
+    },
+    {
+      "type": "Pipe",
+      "size": "18\"",
+      "description": "PIPE CULVERT, OPTIONAL MATERIAL, ROUND, 18\"SD",
+      "station": "-",
+      "quantity": 20.0,
+      "unit": "LF",
+      "unit_price": 40.0,
+      "line_total": 800.0
+    },
+    {
+      "type": "Pipe",
+      "size": "18\"",
+      "description": "PIPE CULVERT, OPTIONAL MATERIAL, ROUND, 18\"S/CD",
+      "station": "-",
+      "quantity": 391.0,
+      "unit": "LF",
+      "unit_price": 40.0,
+      "line_total": 15640.0
+    },
+    {
+      "type": "Endwall",
+      "size": "18\"",
+      "description": "MES - MITERED END SECTION, OPTIONAL ROUND, 18\" SD",
+      "station": "-",
+      "quantity": 1.0,
+      "unit": "EA",
+      "unit_price": 2100.0,
+      "line_total": 2100.0
+    },
+    {
+      "type": "Inlet",
+      "size": "Standard",
+      "description": "MODIFY EXISTING DRAINAGE STRUCTURE",
+      "station": "-",
+      "quantity": 1.0,
+      "unit": "EA",
+      "unit_price": null,
+      "line_total": null
+    },
+    {
+      "type": "Pipe",
+      "size": "48\"",
+      "description": "48\" HDPE PIPE (VERIFY QTY)",
+      "station": "-",
+      "quantity": 0,
+      "unit": "LF",
+      "unit_price": 215.0,
+      "line_total": 0.0
+    },
+    {
+      "type": "Pipe",
+      "size": "48\"",
+      "description": "48\" RCP PIPE (VERIFY QTY)",
+      "station": "-",
+      "quantity": 0,
+      "unit": "LF",
+      "unit_price": 215.0,
+      "line_total": 0.0
+    },
+    {
+      "type": "Pipe",
+      "size": "24\"",
+      "description": "24\" RCP PIPE (VERIFY QTY)",
+      "station": "-",
+      "quantity": 0,
+      "unit": "LF",
+      "unit_price": 62.0,
+      "line_total": 0.0
+    },
+    {
+      "type": "Pipe",
+      "size": "15\"",
+      "description": "15\" RCP PIPE (VERIFY QTY)",
+      "station": "-",
+      "quantity": 0,
+      "unit": "LF",
+      "unit_price": 30.0,
+      "line_total": 0.0
+    },
+    {
+      "type": "Pipe",
+      "size": "24\"",
+      "description": "24\" PVC PIPE (VERIFY QTY)",
+      "station": "-",
+      "quantity": 0,
+      "unit": "LF",
+      "unit_price": 62.0,
+      "line_total": 0.0
+    },
+    {
+      "type": "Pipe",
+      "size": "15\"",
+      "description": "15\" CMP PIPE (VERIFY QTY)",
+      "station": "-",
+      "quantity": 0,
+      "unit": "LF",
+      "unit_price": 30.0,
+      "line_total": 0.0
+    },
+    {
+      "type": "Manhole",
+      "size": "Standard",
+      "description": "MANHOLE (VERIFY QTY)",
+      "station": "-",
+      "quantity": 0,
+      "unit": "EA",
+      "unit_price": null,
+      "line_total": null
+    },
+    {
+      "type": "Inlet",
+      "size": "Standard",
+      "description": "INLET (VERIFY QTY)",
+      "station": "-",
+      "quantity": 0,
+      "unit": "EA",
+      "unit_price": null,
+      "line_total": null
+    }
+  ],
+  "material_summary": {
+    "pipe_summary": {
+      "18\"_PIPE": {
+        "total_lf": 411.0,
+        "count": 2,
+        "size": "18",
+        "material": "PIPE"
+      },
+      "48\"_HDPE": {
+        "total_lf": 0,
+        "count": 1,
+        "size": "48",
+        "material": "HDPE"
+      },
+      "48\"_RCP": {
+        "total_lf": 0,
+        "count": 1,
+        "size": "48",
+        "material": "RCP"
+      },
+      "24\"_RCP": {
+        "total_lf": 0,
+        "count": 1,
+        "size": "24",
+        "material": "RCP"
+      },
+      "15\"_RCP": {
+        "total_lf": 0,
+        "count": 1,
+        "size": "15",
+        "material": "RCP"
+      },
+      "24\"_PVC": {
+        "total_lf": 0,
+        "count": 1,
+        "size": "24",
+        "material": "PVC"
+      },
+      "15\"_CMP": {
+        "total_lf": 0,
+        "count": 1,
+        "size": "15",
+        "material": "CMP"
+      }
+    },
+    "structure_summary": {
+      "INLET": {
+        "count": 4
+      },
+      "OTHER": {
+        "count": 206
+      },
+      "MANHOLE": {
+        "count": 1
+      }
+    },
+    "totals": {
+      "total_pipe_lf": 411.0,
+      "total_pipe_sizes": 7,
+      "total_structures": 211,
+      "total_structure_types": 3
+    }
+  },
+  "ai_matched_items": [
+    {
+      "original_description": "INLETS, CURB, TYPE P-4, PARTIAL",
+      "matched_code": "425-1-345",
+      "matched_description": "Type P Inlet",
+      "confidence": 1.0,
+      "reason": "Exact match from FDOT inlet catalog"
+    },
+    {
+      "original_description": "INLETS, DT BOT, TYPE C, <10'",
+      "matched_code": "425-1-521",
+      "matched_description": "Ditch Bottom Inlet",
+      "confidence": 1.0,
+      "reason": "Exact match from FDOT inlet catalog"
+    },
+    {
+      "original_description": "MODIFY EXISTING DRAINAGE STRUCTURE",
+      "matched_code": "425-11",
+      "matched_description": "Drainage Structure Modification",
+      "confidence": 0.8,
+      "reason": "Direct match for drainage structure modification"
+    },
+    {
+      "original_description": "MANHOLE (VERIFY QTY)",
+      "matched_code": "425-2-7",
+      "matched_description": "Type 7 Manhole",
+      "confidence": 0.7,
+      "reason": "Generic manhole match from drainage catalog"
+    },
+    {
+      "original_description": "SEDIMENT BARRIER",
+      "matched_code": "104-10-3",
+      "matched_description": "Sediment Barrier",
+      "confidence": 1.0,
+      "reason": "Exact match from FDOT catalog"
+    }
+  ],
+  "validation_issues": [
+    {
+      "index": 3,
+      "severity": "medium",
+      "issue": "Non-standard pipe size: 1\"",
+      "auto_corrected": false
+    },
+    {
+      "index": 21,
+      "severity": "medium",
+      "issue": "Non-standard pipe size: 17\"",
+      "auto_corrected": false
+    },
+    {
+      "index": 48,
+      "severity": "medium",
+      "issue": "Non-standard pipe size: 4\"",
+      "auto_corrected": false
+    },
+    {
+      "index": 49,
+      "severity": "medium",
+      "issue": "Non-standard pipe size: 6\"",
+      "auto_corrected": false
+    },
+    {
+      "index": 3,
+      "issue": "Milling depth seems unusual - 1\" is very thin for typical milling operations",
+      "severity": "medium",
+      "suggested_correction": "Consider verifying typical milling depths, which are often 1.5-2\""
+    },
+    {
+      "index": 21,
+      "issue": "Pull & splice box size of 17\" x 30\" is non-standard",
+      "severity": "high",
+      "suggested_correction": "Verify correct box size - standard sizes are typically 14\"x23\" or 19\"x30\""
+    },
+    {
+      "index": 48,
+      "issue": "4\" concrete sidewalk thickness is thin",
+      "severity": "medium",
+      "suggested_correction": "Typical sidewalk thickness is 4-6\", confirm design requirements"
+    },
+    {
+      "index": 49,
+      "issue": "6\" concrete sidewalk thickness is at lower end of acceptable range",
+      "severity": "low",
+      "suggested_correction": "Verify if 6\" thickness meets project specifications"
+    }
+  ],
+  "needs_review": [
+    {
+      "description": "48\" HDPE PIPE",
+      "quantity": 0,
+      "unit": "LF",
+      "confidence": 0.3,
+      "reason": "Zero quantity is suspicious. Description looks valid for drainage item, but needs quantity verification from plan",
+      "page": 0,
+      "region_hint": "Unknown location",
+      "needs_human_review": true
+    },
+    {
+      "description": "48\" RCP PIPE",
+      "quantity": 0,
+      "unit": "LF",
+      "confidence": 0.3,
+      "reason": "Zero quantity is suspicious. Description is standard for reinforced concrete pipe drainage item, but requires quantity confirmation",
+      "page": 0,
+      "region_hint": "Unknown location",
+      "needs_human_review": true
+    },
+    {
+      "description": "24\" RCP PIPE",
+      "quantity": 0,
+      "unit": "LF",
+      "confidence": 0.3,
+      "reason": "Zero quantity is suspicious. Description looks valid for drainage pipe, but needs quantity verification",
+      "page": 0,
+      "region_hint": "Unknown location",
+      "needs_human_review": true
+    },
+    {
+      "description": "15\" RCP PIPE",
+      "quantity": 0,
+      "unit": "LF",
+      "confidence": 0.3,
+      "reason": "Zero quantity is suspicious. Description is typical for drainage pipe, requires quantity confirmation",
+      "page": 0,
+      "region_hint": "Unknown location",
+      "needs_human_review": true
+    },
+    {
+      "description": "24\" PVC PIPE",
+      "quantity": 0,
+      "unit": "LF",
+      "confidence": 0.3,
+      "reason": "Zero quantity is suspicious. Description matches typical drainage pipe specification, but needs quantity verification",
+      "page": 0,
+      "region_hint": "Unknown location",
+      "needs_human_review": true
+    },
+    {
+      "description": "15\" CMP PIPE",
+      "quantity": 0,
+      "unit": "LF",
+      "confidence": 0.3,
+      "reason": "Zero quantity is suspicious. Description valid for corrugated metal pipe drainage item, requires quantity check",
+      "page": 0,
+      "region_hint": "Unknown location",
+      "needs_human_review": true
+    },
+    {
+      "description": "MANHOLE",
+      "quantity": 0,
+      "unit": "EA",
+      "confidence": 0.3,
+      "reason": "Zero quantity is suspicious. Description is standard drainage structure, but needs quantity verification",
+      "page": 0,
+      "region_hint": "Unknown location",
+      "needs_human_review": true
+    },
+    {
+      "description": "INLET",
+      "quantity": 0,
+      "unit": "EA",
+      "confidence": 0.3,
+      "reason": "Zero quantity is suspicious. Description matches drainage structure, requires quantity confirmation",
+      "page": 0,
+      "region_hint": "Unknown location",
+      "needs_human_review": true
+    }
+  ],
+  "pages_product_analysis": [],
+  "summary": {
+    "pages_analyzed": 20,
+    "total_items": 59,
+    "matched_items": 14,
+    "rule_matched_items": 9,
+    "ai_matched_items": 5,
+    "items_corrected": 0,
+    "items_for_review": 8,
+    "validation_confidence": 0.8813559322033898,
+    "total_cost": 18540.0,
+    "total_pipe_lf": 411.0,
+    "total_structures": 211
+  },
+  "extraction_info": {
+    "method": "native",
+    "recommended_method": "",
+    "analysis_notes": []
+  },
+  "extracted_text": "[Page 1]\n24\nT-1\n4/8/2025 8:41:34 AM\nX:\\jobs\\6400\\6478.00\\000_CADD\\64780000001\\Signalization\\KEYSSG01.dwg\nCad Users\nSHEET\nNO.\nFISCAL\nYEAR\nLTG JOB NO.\nTHE OFFICIAL RECORD OF THIS SHEET IS THE ELECTRONIC FILE DIGITALLY SIGNED AND SEALED UNDER RULE 61G15-23.004\u201a F.A.C.\n6109\n  \nCHIPLEY\nTALLAHASSEE\n  \n  \n   \n  \nJACKSONVILLE\nST AUGUSTINE\nGAINESVILLE\nOCALA\nDELAND\n4\nNEW PORT RICHEY\nTAMPA\n  \n4\nLAKELAND\nMELBOURNE -\nCOCOA\nORLANDO\nBARTOW\nST PETERSBURG\n   \n  \nFT PIERCE\nFT MYERS\nFT LAUDERDALE\nMIAMI\n  \n  \nNAPLES\nKEY WEST\n  \nFORT WALTON\nBEACH\nPENSACOLA\nWEST PALM\nBEACH\nFLORIDA\nTURNPIKE\nPANAMA\nCITY\nLAKE\nCITY\nDAYTONA\nBEACH\nSARASOTA -\nBRADENTON\nBEE LINE\nEXPRESSWAY\n75\n75\n95\n75\n275\n75\n295\n10\n95\n75\n10\nhttps://maps.app.goo.gl/S8Z31opX4pFbZNu28\nPROJECT LOCATION\nN\n PROJECT LOCATION\nPLANS PREPARED BY:\nLTG\nEngineering\n& Planning\nLTG\nEngineering\n& Planning\nJONATHAN M. BRASCH, P.E.\nP.E. NO. 94069\n1049 EBER BLVD., SUITE 104\nMELBOURNE, FLORIDA 32904\nPH: 321.499.4679 FAX: 386.257.6996\nEMAIL:INFO@LTG-INC.US\nVENDOR NO.: F030424608005\nSIGNALIZATION PLANS\nENGINEER OF RECORD:\nGOVERNING STANDARD PLANS:\nGOVERNING STANDARDS SPECIFICATIONS:\nFLORIDA DEPARTMENT OF TRANSPORTATION, FY 2024-25 STANDARD SPECIFICATIONS\nFOR ROAD AND BRIDGE CONSTRUCTION AVAILABLE AT THE FOLLOWING WEBSITE:\nHTTP://WWW.FDOT.GOV/PROGRAMMANAGEMENT/IMPLEMENTED/SPECBOOKS\nFLORIDA DEPARTMENT OF TRANSPORTATION, FY 2024-25 STANDARDS PLANS FOR ROAD\nAND BRIDGE CONSTRUCTION AND APPLICABLE INTERIM REVISIONS (IRS).\nSTANDARD PLANS FOR ROAD AND BRIDGE CONSTRUCTION AND ASSOCIATED IRS ARE\nAVAILABLE AT THE FOLLOWING WEBSITE:\nHTTP://WWW.FDOT.GOV/DESIGN/STANDARDPLANS\nINDEX OF SIGNALIZATION PLANS\nSHEET NO.\nT-1\nT-2\nT-3 - T-4\nT-5 - T-7\nT-8\nT-9\nT-10 - T-11\nT-12\nT-13 - T-14\nT-15\nT-16\nT-17\nT-18\nT-19\nT-20\nSHEET DESCRIPTION\nKEY SHEET\nSIGNATURE SHEET\nTABULATION OF QUANTITIES\nGENERAL NOTES\nTYPICAL SECTION\nROADWAY PLAN\nCROSS SECTIONS\nSIGNING AND PAVEMENT MARKING PLAN\nSIGNALIZATION PLAN\nMAST ARM TABULATION\nMAST ARM ASSEMBLIES\nSPLICE DIAGRAM\nGUIDE SIGN WORKSHEET\nREPORT OF SOIL BORINGS\nVOLUSIA COUNTY DRIVEWAY DETAIL\nSIGNALIZATION PLANS\nVOLUSIA COUNTY\nCITY OF PORT ORANGE\nCR 415 (TOMOKA FARMS ROAD) AT TAYLOR ROAD\nSIGNAL #275\nVOLUSIA COUNTY PROJECT # 5926\n\n\n--- Page Break ---\n\n[Page 2]\nSIGNATURE SHEET\nVOLUSIA COUNTY\nDESCRIPTION\nDATE\nDESCRIPTION\nDATE\nREVISIONS\nSHEET\nNO.\nX:\\jobs\\6400\\6478.00\\000_CADD\\64780000001\\Signalization\\SIGNSG01.dwg\nCad Users\n4/8/2025 8:41:39 AM\n----\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\nT-2\n----\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\nLTG\nEngineering\n& Planning\nVENDOR No.: F030424608005\nPH: 321.499.4679  FAX: 321.499.4680\nMELBOURNE, FL 32904\n1049 EBER BOULEVARD, SUITE 104\nJONATHAN M. BRASCH\nP.E.  No. 94069\nREVISIONS\nROAD NO.\nCOUNTY\nLTG PROJECT NO.\nVOLUSIA\n6478\n\u00a0CR 415\nON THE DATE ADJACENT TO THE SEAL\nPRINTED COPIES OF THIS DOCUMENT ARE\nNOT CONSIDERED SIGNED AND SEALED\nAND THE SIGNATURE MUST BE VERIFIED\nON ANY ELECTRONIC COPIES.\nTHIS ITEM HAS BEEN DIGITALLY\nSIGNED AND SEALED BY\nLTG, INC.\n1049 EBER BLVD., SUITE 104\nMELBOURNE, FLORIDA 32904\nVENDOR NO.: F030424608005\nJONATHAN M. BRASCH, P.E. NO. 94069\nSIGNALIZATION PLANS\nSHEET NO.\nSHEET DESCRIPTION\nT-1\nKEY SHEET\nT-2\nSIGNATURE SHEET\nT-3 - T-4\nTABULATION OF QUANTITIES\nT-5 - T-7\nGENERAL NOTES\nT-13 - T-14\nSIGNALIZATION PLAN\nT-15\nMAST ARM TABULATION\nT-16\nMAST ARM ASSEMBLIES\nT-17\nSPLICE DIAGRAM\nT-18\nGUIDE SIGN WORKSHEET\nTHE ABOVE NAMED PROFESSIONAL ENGINEER SHALL BE RESPONSIBLE FOR THE\nFOLLOWING SHEETS IN ACCORDANCE WITH RULE 61G15-23.004\u201a F.A.C.\nON THE DATE ADJACENT TO THE SEAL\nPRINTED COPIES OF THIS DOCUMENT ARE\nNOT CONSIDERED SIGNED AND SEALED\nAND THE SIGNATURE MUST BE VERIFIED\nON ANY ELECTRONIC COPIES.\nTHIS ITEM HAS BEEN DIGITALLY\nSIGNED AND SEALED BY\nLTG, INC.\n1049 EBER BLVD., SUITE 104\nMELBOURNE, FLORIDA 32904\nVENDOR NO.: F030424608005\nGIL A. RAMIREZ, P.E. NO. 62600\nSIGNALIZATION PLANS\nSHEET DESCRIPTION\nSHEET NO.\nT-2\nT-8\nT-9\nT-10 - T-11\nT-12\nSIGNATURE SHEET\nTYPICAL SECTION\nROADWAY PLAN\nCROSS SECTIONS\nSIGNING AND PAVEMENT MARKING PLAN\nSTATE OF\n\u2729\n\u2729\n\u2729\nNo.\nP\nR\nO\nF\nE\nS\nS\nI\nO\nN\nA\nL\nE\nN\nG\nI\nN\nE\nE\nR\nJ\nO\nN\nA\nT\nH\nA\nN\n  \nM\n.\n  \nB\nR\nA\nS\nC\nH\nF\nL\nO\nR\nI\n'\nA\n94069\nON THE DATE ADJACENT TO THE SEAL\nPRINTED COPIES OF THIS DOCUMENT ARE\nNOT CONSIDERED SIGNED AND SEALED\nAND THE SIGNATURE MUST BE VERIFIED\nON ANY ELECTRONIC COPIES.\nTHIS ITEM HAS BEEN DIGITALLY\nSIGNED AND SEALED BY\nGEOTECHINICAL AND ENVIRONMENTAL\nCONSULTANTS, INC.\n919 LAKE BALDWIN LANE\nORLANDO, FLORIDA 32814\nCHRISTOPHER P. MEYER, P.E. NO. 49328\nSIGNALIZATION PLANS\nSHEET DESCRIPTION\nSHEET NO.\nT-2\nT-19\nSIGNATURE SHEET\nREPORT OF SOIL BORINGS\nSTATE OF\n\u2729\n\u2729\n\u2729\nNo.\nP\nR\nO\nF\nE\nS\nS\nI\nO\nN\nA\nL\nE\nN\nG\nI\nN\nE\nE\nR\n \nF\nL\nO\nR\nI\n'\nA\n49328\nC\nH\nR\nI\nS\nT\nO\nP\nH\nE\nR\n \nP\n.\n \nM\nE\nY\nE\nR\nTHE ABOVE NAMED PROFESSIONAL ENGINEER SHALL BE RESPONSIBLE FOR THE\nFOLLOWING SHEETS IN ACCORDANCE WITH RULE 61G15-23.004\u201a F.A.C.\nTHE ABOVE NAMED PROFESSIONAL ENGINEER SHALL BE RESPONSIBLE FOR THE\nFOLLOWING SHEETS IN ACCORDANCE WITH RULE 61G15-23.004\u201a F.A.C.\nSTATE OF\n\u2729\n\u2729\n\u2729\nNo.\nP\nR\nO\nF\nE\nS\nS\nI\nO\nN\nA\nL\nE\nN\nG\nI\nN\nE\nE\nR\nG\nI\nL\n  \nA\n. \n \nR\nA\nM\nI\nR\nE\nZ\nF\nL\nO\nR\nI\n'\nA\n62600\n\n\n--- Page Break ---\n\n[Page 3]\nPAY ITEM NO.\nDESCRIPTION\nUNIT\nSHEET NUMBER\nSHEET NUMBER\nSHEET NUMBER\nSHEET NUMBER\nTOTAL THIS SHEET\nGRAND TOTAL\nT-9\nT-12\nT-13\nT-14\nPLAN\nFINAL\nPLAN\nFINAL\nPLAN\nFINAL\nPLAN\nFINAL\nPLAN\nFINAL\nPLAN\nFINAL\n101-1\nMOBILIZATION\nLS\n1\n1\n1\n102-1\nMAINTENANCE OF TRAFFIC\nLS\n1\n1\n1\n104-10-3\nSEDIMENT BARRIER\nLF\n735\n735\n735\n104-11\nFLOATING TURBIDITY BARRIER\nLF\n15\n15\n15\n110-1-1\nCLEARING & GRUBBING\nAC\n0.46\n0.46\n0.46\n110-4-10\nREMOVAL OF EXISTING CONCRETE PAVEMENT/REMOVAL IF EXISTING CONCRETE\nSY\n43\n43.33\n43.33\n120-00\nEARTHWORK\nLS\n1\n1\n1\n160-4\nTYPE B STABILIZATION\nSY\n1027\n1027\n1027\n285-709\nOPTIONAL BASE, BASE GROUP 09\nSY\n870\n870\n870\n327-70-1\nMILLING EXISTING ASPHALT PAVEMENT, 1\" AVG DEPTH\nSY\n1551\n1551\n1551\n334-1-53\nSUPERPAVE ASPHALTIC CONCRETE, TRAFFIC C, PG 76-22\nTN\n93.4\n93.4\n93.4\n337-7-82\nASPHALT CONCRETE FRICTION COURSE, TRAFFIC C, FC-9.5, PG 76-22\nTN\n132.6\n132.6\n132.6\n425-11\nMODIFY EXISTING DRAINAGE STRUCTURE\nEA\n1\n1\n1\n425-1-345\nINLETS, CURB, TYPE P-4, PARTIAL\nEA\n1\n1\n1\n425-1-521\nINLETS, DT BOT, TYPE C, <10'\nEA\n2\n2\n2\n430-174-118\nPIPE CULVERT, OPTIONAL MATERIAL, ROUND, 18\"SD\nLF\n20\n20\n20\n430-175-118\nPIPE CULVERT, OPTIONAL MATERIAL, ROUND, 18\"S/CD\nLF\n391\n391\n391\n430-984-125\nMITERED END SECTION, OPTIONAL ROUND, 18\" SD\nEA\n1\n1\n1\n520-1-10\nCONCRETE CURB & GUTTER, TYPE F\nLF\n155\n155\n155\n522-1\nCONCRETE SIDEWALK AND DRIVEWAYS, 4\" THICK\nSY\n11\n11\n11\n522-2\nCONCRETE SIDEWALK AND DRIVEWAYS, 6\" THICK\nSY\n49\n49\n49\n527-2\nDETECTABLE WARNINGS\nSF\n20\n20\n20\n570-1-2\nPERFORMANCE TURF, SOD\nSY\n1397\n1397\n1397\n630-2-11\nCONDUIT, F&I, OPEN TRENCH\nLF\n1215\n1215\n1215\n630-2-12\nCONDUIT, F&I, DIRECTIONAL BORE\nLF\n282\n282\n282\n630-2-14\nCONDUIT, F&I, ABOVEGROUND\nLF\n85\n85\n85\n632-7-1\nSIGNAL CABLE-NEW OR RECONSTRUCTED INTERSECTION, F&I\nPI\n1\n1\n1\n633-1-111\nFIBER OPTIC CABLE, F&I, OVERHEAD,2-12 FIBERS\nLF\n834\n834\n834\n633-1-121\nFIBER OPTIC CABLE, F&I, UNDERGROUND,2-12 FIBERS\nLF\n974\n974\n974\n633-2-31\nFIBER OPTIC CONNECTION, INSTALL, SPLICE\nEA\n96\n96\n96\n633-3-11\nFIBER OPTIC CONNECTION HARDWARE, F&I, SPLICE ENCLOSURE\nEA\n1\n1\n1\n633-3-12\nFIBER OPTIC CONNECTION HARDWARE, F&I, SPLICE TRAY\nEA\n1\n1\n1\n633-3-15\nFIBER OPTIC CONNECTION HARDWARE, F&I, PRETERMINATED PATCH PANEL\nEA\n1\n1\n1\n633-6\nFIBER OPTIC CABLE LOCATOR\nDA\n635-2-12\nPULL & SPLICE BOX, F&I, 24\" X 36\" COVER SIZE\nEA\n4\n4\n4\n635-2-14\nPULL & SPLICE BOX, F&I, 17\" X 30\" COVER SIZE\nEA\n27\n27\n27\n639-1-122\nELECTRICAL POWER SERVICE, F&I, UNDERGROUND, METER FURNISHED BY CONTRACTOR\nAS\n1\n1\n1\n639-2-1\nELECTRICAL SERVICE WIRE, F&I\nLF\n43\n43\n43\nTABULATION OF QUANTITIES (1)\nTHE OFFICIAL RECORD OF THIS SHEET IS THE ELECTRONIC FILE DIGITALLY SIGNED AND SEALED UNDER RULE 61G15-23.004\u201a F.A.C.\nVOLUSIA COUNTY\nDESCRIPTION\nDATE\nDESCRIPTION\nDATE\nREVISIONS\nSHEET\nNO.\nX:\\jobs\\6400\\6478.00\\000_CADD\\64780000001\\Signalization\\TABQSG01.dwg\nCad Users\n4/8/2025 8:42:04 AM\n----\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\nT-3\n----\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\nLTG\nEngineering\n& Planning\nVENDOR No.: F030424608005\nPH: 321.499.4679  FAX: 321.499.4680\nMELBOURNE, FL 32904\n1049 EBER BOULEVARD, SUITE 104\nJONATHAN M. BRASCH\nP.E.  No. 94069\nROAD NO.\nCOUNTY\nLTG PROJECT NO.\nVOLUSIA\n6478\n\u00a0CR 415\n\n\n--- Page Break ---\n\n[Page 4]\nPAY ITEM NO.\nDESCRIPTION\nUNIT\nSHEET NUMBER\nSHEET NUMBER\nSHEET NUMBER\nSHEET NUMBER\nTOTAL THIS SHEET\nGRAND TOTAL\nT-9\nT-12\nT-13\nT-14\nPLAN\nFINAL\nPLAN\nFINAL\nPLAN\nFINAL\nPLAN\nFINAL\nPLAN\nFINAL\nPLAN\nFINAL\n639-3-11\nELECTRICAL SERVICE DISCONNECT, F&I, POLE MOUNT\nEA\n1\n1\n1\n641-2-12\nPRESTRESSED CONCRETE POLE, F&I TYPE P-II SERVICE POLE\nEA\n1\n1\n1\n641-2-80\nPRESTRESSED CONCRETE POLE, COMPLETE POLE REMOVAL- POLE 30' AND GREATER\nEA\n4\n4\n4\n646-1-11\nALUMINUM SIGNALS POLE, PEDESTAL\nEA\n2\n2\n2\n649-21-3\nSTEEL MAST ARM ASSEMBLY, FURNISH AND INSTALL, SINGLE ARM 40'\nEA\n1\n1\n1\n649-21-6\nSTEEL MAST ARM ASSEMBLY, FURNISH AND INSTALL, SINGLE ARM 50'\nEA\n1\n1\n1\n649-21-19\nSTEEL MAST ARM ASSEMBLY, FURNISH AND INSTALL, DOUBLE ARM 70'-60'\nEA\n1\n1\n1\n650-1-34\nVEHICULAR TRAFFIC SIGNAL, FURNISH AND INSTALL POLYCARBONATE, 3 SECTION, 1 WAY\nAS\n8\n8\n8\n650-1-36\nVEHICULAR TRAFFIC SIGNAL, FURNISH & INSTALL POLYCARBONATE, 4 SECTION, 1 WAY\nAS\n2\n2\n2\n653-1-11\nPEDESTRIAN SIGNAL, F&I LED COUNTDOWN, 1 WAY\nAS\n2\n2\n2\n660-1-109\nLOOP DETECTOR INDUCTIVE, F&I, TYPE 5, 2CHANNEL, SOLID STATE, RACK MOUNTED\nEA\n6\n6\n6\n660-2-102\nLOOP ASSEMBLY, F&I. TYPE B\nAS\n4\n4\n4\n660-2-106\nLOOP ASSEMBLY, F&I. TYPE F\nAS\n8\n8\n8\n665-1-12\nPEDESTRIAN DETECTOR, FURNISH & INSTALL, ACCESSIBLE1\nEA\n2\n2\n2\n670-5-161\nTRAFFIC CONTROLLER ASSEMBLY, F&I, NEMA W/STANDARD LOCK, 1 PREEMPTION\nAS\n1\n1\n1\n670-5-600\nTRAFFIC CONTROLLER ASSEMBLY, REMOVE CONTROLLER WITH CABINET\nAS\n1\n1\n1\n682-1-112\nITS CCTV CAMERA, F&I, DOME ENCLOSURE - PRESSURIZED, IP, STANDARD DEFINITION\nEA\n1\n1\n1\n684-1-1\nMANAGED FIELD ETHERNET SWITCH, FURNISH & INSTALL\nEA\n1\n1\n1\n685-1-13\nUNINTERRUPTIBLE POWER SUPPLY, F&I, LINE INTERACTIVE WITH CABINET\nEA\n1\n1\n1\n685-2-1\nREMOTE POWER MANAGEMENT UNIT- RPMU, FURNISH AND INSTALL\nEA\n1\n1\n1\n700-5-22\nINTERNALLY ILLUMINATED SIGN, F&I, OVERHEAD MOUNT 12-18 SF\nEA\n4\n4\n4\n706-1-3\nRAISED PAVEMENT MARKER, TYPE B\nEA\n38\n38\n38\nYELLOW/YELLOW (Y/Y)\nEA\n16\n16\n16\nWHITE/RED (W/R)\nEA\n22\n22\n22\n711-11-123\nTHERMOPLASTIC, STANDARD, WHITE, SOLID, 12\" FOR CROSSWALK AND ROUNDABOUT\nLF\n140\n140\n140\n711-11-125\nTHERMOPLASTIC, STANDARD, WHITE, SOLID, 24\" FOR STOP LINE AND CROSSWALK\nLF\n185\n185\n185\n711-11-170\nTHERMOPLASTIC, STANDARD, WHITE, ARROW\nEA\n7\n7\n7\n711-11-241\nTHERMOPLASTIC, STANDARD, YELLOW, 2-4 DOTTED GUIDE LINE /6-10 DOTTED EXTENSION LINE, 6\"\nGM\n0.035\n0.035\n0.035\n711-16-101\nTHERMOPLASTIC, STANDARD-OTHER SURFACES, WHITE, SOLID, 6\"\nGM\n0.228\n0.228\n0.228\n711-16-201\nTHERMOPLASTIC, STANDARD-OTHER SURFACES, YELLOW, SOLID, 6\"\nGM\n0.049\n0.0493\n0.0493\n715-5-31\nLUMINAIRE & BRACKET ARM- ALUM., FURNISH & INSTALL NEW LUMINAIRE AND ARM ON NEW/EXISTING POLE\nEA\n2\n2\n2\nTABULATION OF QUANTITIES (2)\nTHE OFFICIAL RECORD OF THIS SHEET IS THE ELECTRONIC FILE DIGITALLY SIGNED AND SEALED UNDER RULE 61G15-23.004\u201a F.A.C.\nVOLUSIA COUNTY\nDESCRIPTION\nDATE\nDESCRIPTION\nDATE\nREVISIONS\nSHEET\nNO.\nX:\\jobs\\6400\\6478.00\\000_CADD\\64780000001\\Signalization\\TABQSG01.dwg\nCad Users\n4/8/2025 8:42:04 AM\n----\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\nT-4\n----\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\nLTG\nEngineering\n& Planning\nVENDOR No.: F030424608005\nPH: 321.499.4679  FAX: 321.499.4680\nMELBOURNE, FL 32904\n1049 EBER BOULEVARD, SUITE 104\nJONATHAN M. BRASCH\nP.E.  No. 94069\nROAD NO.\nCOUNTY\nLTG PROJECT NO.\nVOLUSIA\n6478\n\u00a0CR 415\n\n\n--- Page Break ---\n\n[Page 5]\nVOLUSIA COUNTY'S GENERAL NOTES:\nSIGNALS:\n1.\nBLACK POLYCARBONATE HOUSINGS ARE REQUIRED FOR VEHICULAR SIGNAL HEAD ASSEMBLIES IN VOLUSIA COUNTY. ALL\nVEHICLE SIGNAL DISPLAYS SHALL BE LED. ALL SIGNAL HEADS SHALL INCLUDE TUNNEL VISORS, BACKPLATES WITH\nREFLECTIVE BORDERS. SPANWIRE SHALL BE LIGHTWEIGHTS TOP SECTION (RED) ALUMINUM, MAST ARMS SHALL BE\n(YELLOW/GREEN) POLYCARBONATE SECTIONS.\n2.\nTHE CONTRACTOR SHALL NOTIFY THE SHERIFF'S DEPARTMENT TO HAVE THE EXISTING TAG READER REMOVED PRIOR TO\nTHE REMOVAL OF THE EXISTING STRAIN POLES AND REINSTALLED AFTER THE COMPLETION OF THE PROJECT.\n1.\nTHE CONTRACTOR SHALL NOTIFY VOLUSIA COUNTY TRAFFIC ENGINEERING AT LEAST (2) TWO BUSINESS DAYS PRIOR\nTO BEGINNING WORK. NOTIFY ALLEN CATES AND TIM KARR (386) 736-5968.\n2.\nTHE CONTRACTOR SHALL COORDINATE WORK SCHEDULE, COORDINATE TIMING AND AUTHORIZATION OF POWER\nSERVICE WITH VOLUSIA COUNTY TRAFFIC ENGINEERING. NOTIFY ALLEN CATES, TIM KARR, AND KARL EWALD (386)\n736-5968.\n3.\nANY ITEM NOT SPECIFICALLY ADDRESSED IN THESE PLANS, USE F.D.O.T. F.Y. 2024-25 STANDARD PLANS AND\nJANUARY 2023 SPECIFICATIONS. ALL MATERIALS AND HARDWARE SHALL BE PRE-APPROVED BY VOLUSIA COUNTY\nTRAFFIC ENGINEERING.\n4.\nUNLESS OTHERWISE NOTED, ALL REMOVED EQUIPMENT SHALL BE DELIVERED TO VOLUSIA COUNTY TRAFFIC\nOPERATIONS, 3771 W. INTERNATIONAL SPEEDWAY, DAYTONA BEACH FL, 32124, EXCEPT CONCRETE POLES, WHICH\nSHALL BE DISPOSED OF BY THE CONTRACTOR IN AREAS PROVIDED BY HIM.\n5.\nTHE CONTRACTOR SHALL VERIFY COLOR CODES FOR SIGNAL CABLE WITH VOLUSIA COUNTY TRAFFIC ENGINEERING\nBEFORE ORDERING.\n6.\nEXISTING SIGNALIZATION SHALL REMAIN IN PLACE TO THE EXTENT POSSIBLE AND SHALL BE USED FOR\nMAINTENANCE OF TRAFFIC AS REQUIRED. THE MAINTENANCE OF EXISTING SIGNALS, UNTIL REMOVED, SHALL REMAIN\nTHE RESPONSIBILITY OF THE CONTRACTOR.\n7.\nIT SHOULD BE NOTED THAT NO TEST BORINGS WERE MADE WHERE CONDUIT RUNS ARE TO BE INSTALLED BY\nJACKING, DIRECTIONAL BORING, OR TRENCHING. IT SHALL BE THE CONTRACTOR'S RESPONSIBILITY TO EXAMINE\nTHE JOB SITE CONDITIONS BEFORE SUBMITTING A BID PROPOSAL.\n8.\nA SIGNAL INSPECTION IS TO BE SCHEDULED WITH ALLEN CATES AND TIM KARR (VOLUSIA COUNTY) 386-736-5968\nTRAFFIC ENGINEERING, (10) TEN DAYS PRIOR TO THE SIGNAL BEING PLACED IN TO OPERATION.\n9.\nAT THE TIME OF FINAL INSPECTION, THE CONTRACTOR SHALL PROVIDE (3) THREE SETS OF CONSTRUCTION\n\"AS-BUILT\" (1) ONE TO VOLUSIA COUNTY TRAFFIC ENGINEERING AND (1) ONE FOR THE TRAFFIC SIGNAL CONTROLLER\nCABINET.\n10.\nTHESE PLANS REFLECT CONDITIONS KNOWN DURING PLAN DEVELOPMENT. IN THE EVENT ACTUAL PHYSICAL\nCONDITIONS PREVENT THE APPLICATION OR THE PROGRESSION OF ANY WORK SPECIFIED IN THESE PLANS, THE\nCONTRACTOR SHALL NOTIFY THE ENGINEER IMMEDIATELY AND PRIOR TO ANY FURTHER WORK ACTIVITY.\n11.\nAT NO TIME IS THE CONTRACTOR TO CHANGE ANY SIGNAL TIMINGS. VOLUSIA COUNTY WILL MAINTAIN ALL SIGNAL\nTIMINGS BEFORE, DURING AND AFTER CONSTRUCTION, IF ANY TIMING CHANGES ARE MADE BY THE CONTRACTOR, A\nTIMING SHEET SHALL BE PLACED IN THE CONTROLLER CABINET WITH DATE AND TIME OF INSTALLING, ALONG WITH\nA CONTACT NUMBER.\n12.\nALL COMMUNICATIONS CABLE SHALL BE IN SEPARATE PULL BOXES AND CONDUITS.\n13.\nTHE USE OF JONES PLUGS IS NOT PERMITTED.\n14.\nIN THE EVENT THAT PERMANENT VEHICLE DETECTION IS DISTURBED, THE CONTRACTOR SHALL PROVIDE AN\nALTERNATE MEANS OF DETECTION (VIDEO OR RADAR) TO ALL LANES APPROACHING THE INTERSECTION, SEPERATING\nEACH MOVEMENT WHICH PREVIOUSLY HAD DETECTION. THE TYPE OF DETECTION SHALL BE APPROVED BY THE\nENGINEER AND THE COUNTY OF VOLUSIA TRAFFIC ENGINEERING (MAINTAINING AGENCY) PRIOR TO INSTALLATION. THE\nEQUIPMENT SHALL ONLY DETECT THE INTENDED MOVEMENT.\n15.\nTHE CONTRACTOR SHALL BE RESPONSIBLE FOR CONTACTING THE EXISTING POWER UTILITY TO DETERMINE IF A\nSERVICE PROCESSING FEE IS REQUIRED. IF REQUIRED, FEE SHALL BE INCLUDED AS PART OF PAYMENT ELECTRICAL\nPOWER SERVICE ASSEMBLY. \n16.\nTHE CONTRACTOR SHALL HAVE AN I.M.S.A. LEVEL II SIGNAL TECHNICIAN ON SITE THROUGH ALL PHASES OF\nCONSTRUCTION AND ON CALL WITH A (2) TWO HOUR MAX. RESPONSE TIME.\n17.\nBENCHMARK ELEVATIONS SHOWN ON THE PLANS ARE NORTH AMERICA VERTICAL DATUM OF 1988 (NAVD 88).\nHORIZONTAL DATUM IS NAD 83 (2011 ADJUSTMENT) FLORIDA STATE PLANE COORDINATE SYSTEM, EAST ZONE.\n18.\nALL SURVEY INFORMATION WAS OBTAINED FROM A LICENSED FLORIDA PROFESSIONAL SURVEYOR AND MAPPER AND\nUTILIZED AS SUPPORTING DATA IN THE PRODUCTION OF DESIGN PLANS AND FOR CONSTRUCTION ON SUBJECT \nPROJECT. THE PROFESSIONAL SURVEYOR AND MAPPER OF RECORD IS:\nKENNETH GLASS, PSM\nPSM #5713\n \nCIVILSURV DESIGN GROUP, INC, LB#7805\n2525 DRANE FIELD ROAD, SUITE 7\nLAKELAND, FLORIDA 33811\nPHONE # (863) 646-4771, EXT 241\nPOLES / CONTROLLER:\n1.\nALL UNDERGROUND CONDUIT ENTRY HOLES ON SIGNAL POLES SHALL BE STUBBED OUT.\n2.\nDUE TO THE CLOSE PROXIMITY OF UNDERGROUND UTILITIES, THE CONTRACTOR SHALL HAND DIG THE FIRST (4) FOUR FEET OF ANY POLE.\n3.\nTHE CABINET DOOR SHALL OPEN AWAY FROM THE INTERSECTION, WHERE POSSIBLE.\n4.\nUNDERGROUND POWER SERVICE SHALL BE PLACED ON A SEPARATE STEEL OR CONCRETE POLE NEAR THE CABINET. NO POWER SERVICE\nWILL BE ALLOWED ON THE CABINET.\n5.\nA MANUAL PUSH BUTTON CORD SHALL BE FURNISHED IN ALL CONTROLLER CABINETS.\n6.\nTWO SPARE CABINET CONDUIT SHALL BE STUBBED OUT AND CAPPED IN EACH CABINET ENTRY PULL BOX.\n7.\nTHE CONTROLLER BASE AND SERVICE PAD SHALL BE A MONOLITHIC POUR WITH A 4\" MINIMUM / 8\" MAXIMUM ABOVE FINISHED GRADE.\n8.\nTHE PROPOSED CONTROLLER ASSEMBLY SHALL BE NEMA TS2 R77 (TYPE VII) CABINET WITH A TS2 TYPE 2 ECONOLITE CONTROLLER (COBALT\n2100) AND SHALL INCLUDE BACKUP INTERNAL TIME BASED COORDINATION. THE CONTROLLER ASSEMBLY SHALL INCLUDE UPS BACKUP\nSYSTEM AND EXPRESS SUPPLY (8042 V3 PLUS) NETWORK SWITCH. INTERFACE PANEL, FIBER OPTIC TRANSCEIVER MODULE AND ALL\nNECESSARY EQUIPMENT FOR A COMPLETE OPERATIONAL, AND ACCEPTABLE INSTALLATION (670-5-111). ALSO, CONTROLLER CABINETS SHALL\nREQUIRE A GENERATOR HOOKUP BOX EXTERNAL TO THE CABINET. WIC OR FIBER ENCLOSURE AND A 4G WIRELESS ECONOLITE\nINTERCONNECT AND COMMUNICATION MODEM.\nMAST ARMS:\n1.\nALL MAST ARM AND ASSOCIATED HARDWARE SHALL BE HOT DIPPED AND GALVANIZED AT THE MANUFACTURER FACTORY AND NOT PAINTED.\n2.\nSIGNAL HEAD MOUNTED ON MAST ARMS SHALL HAVE INDIVIDUAL RUNS OF WIRES WITH 6 FEET OF SPARE WIRE COILED OVER THE 'J'\nHOOK.\n3.\nIF A CONTINUOUS RUN OF SIGNAL CABLE IS NOT POSSIBLE FROM THE CABINET TO THE SIGNAL HEAD, THEN A SPLICE WITH ORD WATER\nPROOF CONNECTORS SHALL BE USED AT THE HAND HOLE, NOT A TERMINAL STRIP - MARK PHASING ON WIRES.\n4.\nTHE PROPOSED SIGNAL CABLE SHALL INCLUDE SUFFICIENT CONDUCTORS FOR LEFT TURN PHASES.\n5.\nTHE CABLE GRIP SHALL BE SUFFICIENT SIZE TO NOT COMPROMISE THE INSULATION ON THE SIGNAL CABLE.\n6.\nTHE CONTRACTOR SHALL BE RESPONSIBLE FOR HIRING A CERTIFIED DRILLED SHAFT (CTQP) LEVEL I CONSTRUCTION ENGINEERING AND\nINSPECTION (CEI) FIRM, AND A CONCRETE TESTING LABORATORY FOR THE PURPOSE OF INSPECTING ALL DRILL SHAFT INSTALLATION PER\nF.D.O.T. STANDARDS. THE FIRM SHALL THEN SUBMIT A SIGNED AND SEALED REPORT BY THE P.E. RESPONSIBLE, TO VOLUSIA COUNTY FOR\nAPPROVAL. FAILURE TO OBTAIN THESE SERVICES PRIOR TO THE CONSTRUCTION OF THE DRILLED SHAFTS SHALL RESULT IN REJECTION OF\nTHE DRILLED SHAFT.\n7.\nTHE TOP OF TRAFFIC SIGNAL MAST ARM FOUNDATION SHOULD BE A LEAST 6 INCHES ABOVE GRADE TO PREVENT THE ANCHOR BOLTS FROM\nBEING SUBMERGED IN WATER AND / OR BURIED, UNLESS IT IS ADJACENT TO AN EXISTING, OR PROPOSED SIDEWALK, THEN TOP OF THE\nFOUNDATION SHOULD BE FLUSH WITH THE SIDEWALK.\n8.\nTHE CONTRACTOR SHALL BE RESPONSIBLE FOR SUPPLYING APPROVED SHOP DRAWINGS, SHOWING THE BOLT PATTERN AND ARM\nORIENTATION PRIOR TO THE PRE-DRILL SHAFT MEETING.\n9.\nALL MAST ARMS SHALL HAVE GROUT PADS.\n10. ALL SIGNAL ASSEMBLIES AND SIGNS SHALL HAVE A MINIMUM VERTICAL CLEARANCE OF 17.5' FROM BOTTOM OF THE ASSEMBLY AND SIGNS\nTO THE ROAD.\n11. THE CONTRACTOR SHALL PROVIDE AND MAINTAIN A BACK UP GENERATOR FOR ALL THE TIME THAT EXISTING TRAFFIC SIGNAL IS ON\nGENERATOR BACK UP TO POWER THE SIGNAL.\nSENIOR DETECTIVE CARL ECKBERG\nVOLUSIA SHERIFF'S OFFICE\nSPECIAL INVESTIGATIONS SECTION\nDOMESTIC SECURITY UNIT\nOFFICE 386-248-1753\nCELL 386-547-7260\nceckberg@volusiasheriff.gov\nGENERAL NOTES (1)\nTHE OFFICIAL RECORD OF THIS SHEET IS THE ELECTRONIC FILE DIGITALLY SIGNED AND SEALED UNDER RULE 61G15-23.004\u201a F.A.C.\nVOLUSIA COUNTY\nDESCRIPTION\nDATE\nDESCRIPTION\nDATE\nREVISIONS\nSHEET\nNO.\nX:\\jobs\\6400\\6478.00\\000_CADD\\64780000001\\Signalization\\GNNTSG01.dwg\nCad Users\n4/8/2025 8:42:15 AM\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\nT-5\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\nLTG\nEngineering\n& Planning\nVENDOR No.: F030424608005\nPH: 321.499.4679  FAX: 321.499.4680\nMELBOURNE, FL 32904\n1049 EBER BOULEVARD, SUITE 104\nJONATHAN M. BRASCH\nP.E.  No. 94069\nROAD NO.\nCOUNTY\nLTG PROJECT NO.\nVOLUSIA\n6478\n\u00a0CR 415\n\n\n--- Page Break ---\n\n[Page 6]\nSIGNS & STREET LIGHTS:\n1.\nLED INTERNALLY ILLUMINATED STREET NAME SIGNS SHALL BE INSTALLED AT ALL NEW AND REBUILT TRAFFIC SIGNALS.\n2.\nLED INTERNALLY ILLUMINATED STREET NAME SIGNS SHALL HAVE A SEPARATE POWER BREAKER, LOCATED IN THE\nCONTROLLER CABINET.\n3.\nLED INTERNALLY ILLUMINATED STREET NAME SIGNS SHALL BE SINGLE SIDED AND FACE MOUNTED ON THE MAST ARMS.\n4.\nTHE LUMINAIRE LIGHTS SHALL BE TIED INTO THE INTERNALLY ILLUMINATED STREET NAME SIGNS, PHOTOCELL, IN THE\nCABINET.\nCONDUIT / PULL BOXES / DETECTION SYSTEM:\n1.\nALL CONDUIT SHALL BE 2 INCH MINIMUM UNLESS OTHER WISE SPECIFIED IN THE PLANS, (ABOVE GROUND RIGID 2\"\nGALVANIZED STEEL), (UNDERGROUND SCHEDULE 40, BURIED @ 36\").\n2.\nCONTRACTOR SHALL COORDINATE WITH THE VOLUSIA COUNTY FOR TYPES AND MODELS OF THE DETECTION SYSTEM, PRIOR\nTO ORDERING.\n3.\nWHEN MULTIPLE RUNS OF CONDUIT ARE PLACED UNDER PAVEMENT BY DIRECTIONAL BORE, JACKING OR TRENCHING,ONLY\nONE RUN IS PAID FOR AS UNDERPAVEMENT. ADDITIONAL RUNS ARE TO BE PAID FOR AS UNDERGROUND CONDUIT.\n4.\nAS DIRECTED BY THE PROJECT ENGINEER, THE CONTRACTOR SHALL ADJUST CONDUIT VERTICALLY TO AVOID ANY POSSIBLE\nCONFLICTS WITH UNDERGROUND UTILITIES.\n5.\nPULL BOXES SHALL BE PLACED BEHIND THE CURB AND GUTTER. IF THERE IS NO CURB AND GUTTER, PULL BOXES SHALL\nBE LOCATED AT LEAST 10' FROM THE EDGE OF PAVEMENT. PULL BOXES WILL NOT BE LOCATED AT THE BOTTOM OF ANY\nDITCH OR RETENTION AREA/POND.\n6.\nALL ENDS OF CONDUITS IN PULL BOXES AND CABINETS SHALL BE SEALED WITH ELECTRICAL PUTTY AFTER WIRING IS\nCOMPLETE.\n7.\nPULL BOXES SHALL BE COMPOSITE AND THE COVERS SHALL BE F.D.O.T. APPROVED OF NON-METALLIC CONSTRUCTION WITH\nRECESSED COVER LOGO \"TRAFFIC SIGNALS\". (QUAZITE 1324 BK., 1212BA OR EQUAL).\n8.\nALL SIGNAL CABLE PULL BOXES SHALL BE 17\" X 30\" COVER SIZE.\n9.\nALL REGULAR AND FIBER OPTIC PULL BOXES SHALL HAVE A CONCRETE APRON PER FDOT SPEC. AROUND THE PULL BOXES.\nVOLUSIA COUNTY USE PERMIT NOTES:\nCONDUIT USED FOR ELECTRIC SERVICE SHALL BE 1 1/2\" MIN. AND A 1/2\" MIN. USE FOR\nEARTH GROUND.\nBREAKER CAN SHALL BE SQUARE D (OUT DOOR USE) TYPE Q0612L100RB BREAKER CAN.\nANTI - CORROSIVE PASTE SHALL BE USE ON ALL ELECTRIC SERVICE CONNECTIONS.\n1.\n2.\n3.\n1.\nNOTIFY VOLUSIA COUNTY DEVELOPMENT ENGINEERING OFFICE AT (386-736-5926), (2) TWO BUSINESS DAY PRIOR TO\nBEGINNING ANY PERMITTED WORK, BEFORE ANY CHANGES FROM APPROVED PLANS AND WHEN COMPLETED.\n-\nALL ROAD/LANE CLOSURES \"ARE SEPARATE FROM THE PERMIT\" AND REQUIRE PLAN VIEW AND APPROVAL WITH (7)\nSEVEN DAY ADVANCE NOTICE FROM VOLUSIA COUNTY TRAFFIC OPERATIONS AT (386-239-6535) PRIOR TO ANY LANE\nCLOSURE. MOT IS REQUIRED ON ALL PROJECTS.\n-\nALL TRAFFIC & PEDESTRIAN SIGNALS (& SURROUNDING AREAS), \"ARE NOT\" A MEMBER OF\n      SUNSHINE ONE CALL. LOCATES MUST BE REQUESTED/LOCATED, (2) TWO BUSINESS DAYS IN ADVANCE, FROM VOLUSIA \nCOUNTY TRAFFIC ENGINEERING AT 386-736-5968.\n-\nTHE VOLUSIA COUNTY-STAMPED \" APPROVED\" PERMIT PLANS MUST BE ONSITE AT ALL TIMES.\n-\nNO TRENCH/EXCAVATIONS SHALL BE LEFT OPEN OR UNATTENDED OVERNIGHT.\n-\nSOD ALL DISTURBED AREAS.\n-\nCONTRACTOR IS RESPONSIBLE FOR PRE/POST CONSTRUCTION VIDEO/PHOTO OF EXISTING ROADWAYS, DRIVEWAYS,\nSIDEWALKS, DITCHES, CULVERTS AND ABOVEGROUND UTILITIES.\n2.\nOPERATIONS WITHIN THE COUNTY RIGHT-OF-WAY SHALL NORMALLY BE CONDUCTED 7:00 AM TO 7:00 PM, MONDAY THROUGH\nFRIDAY. ANY DEVIATION FROM THESE HOURS REQUIRES PRIOR APPROVAL FROM COUNTY DEVELOPMENT ENGINEER.\nEMERGENCY REPAIRS ARE EXCLUDED FROM THIS TIME RESTRICTION.\n3.\nALL EXISTING SIDEWALKS WITHIN COUNTY RIGHT-OF WAY SHALL EITHER REMAIN OPEN OR BE PROVIDED A TEMPORARY\nWALKWAY IN ACCORDANCE WITH THE CURRENT VERSION OF FLORIDA DEPARTMENT OF TRANSPORTATION STANDARD PLANS\n102-660. ANY DAMAGE TO SIDEWALKS SHALL BE REPAIRED AND/OR REPLACED IN LIKE KIND BY THE CONTRACTOR. NEW\nSIDEWALKS AND SECTIONS THROUGH DRIVEWAYS MUST BE AT A 1.5% CROSS SLOPE AND 2% MAXIMUM CROSS SLOPE PER\nADA STANDARDS.\n4.\nDRIVING OR STAGING OF CONSTRUCTION VEHICLES OR MATERIALS ARE NOT PERMITTED WITHIN THE COUNTY\nRIGHT-OF-WAY OR ON PEDESTRIAN WALKWAYS AND PATHS. THERE SHALL BE NO OVERNIGHT CONSTRUCTION VEHICLE\nRELATED PARKING, CONSTRUCTION MATERIAL PLACEMENT OR STORAGE OF ANY KIND PERMITTED WITHIN THE COUNTY\nRIGHT-OF-WAY.\nTHE MAIN SERVICE DISCONNECT ENCLOSURE AND LOAD CENTER ENCLOSURE LOCATED\nADJACENT TO THE CONTROLLER CABINET SHALL BE NEMA 3R OR BETTER RATED.\nABOVEGROUND CONDUIT USED FOR ELECTRIC SERVICE SHALL BE RIGID GALVANIZED STEEL\nOR RIGID ALUMINUM CONDUIT: 2\" MIN. FOR POWER WIRES AND 3\n4\" MIN. FOR GROUNDING\nELECTRODE CONDUCTORS.\n4.\n5.\nTRAFFIC SHALL BE MAINTAINED IN ACCORDANCE WITH THE F.D.O.T. STANDARD PLANS\nINDEX 102-600 SERIES.\nPOWER SERVICE\nTEMPORARY TRAFFIC CONTROL (TTC) PLAN:\n1.\nPAY ITEM NOTES:\n1.\n101-1: MOBILIZATION SHALL INCLUDE COST FOR EROSION CONTROL.\n2.\n120-00 TO BE PAID AS LUMP SUM. APPROXIMATE QUANTITIES ARE 145 CY OF REGULAR EXCAVATION AND 250 CY OF EMBANKMENT.\n3.\nPER SECTION 102-5.8 OF THE FDOT SPECS; MAINTENANCE OF TRAFFIC SHALL INCLUDE ANY TEMPORARY PAINT STRIPING.\n4.\n630-2-12: CONTRACTOR SHALL VERIFY THE DEPTH OF THE EXISTING UTILITIES IN CONFLICT WITH THE DIRECTIONAL BORES,\nPRIOR TO BORING ACTION. THIS PAY ITEM INCLUDES THE COST OF UTILITY LOCATES. COST OF THE ALL CONDUIT RUNS IN THE\nDIRECTIONAL BORES SHALL BE INCLUDED IN THIS PAY ITEM.\nDIRECTIONAL BORE SHALL INCLUDE CONDUITS FOR:\n-\nSIGNAL CABLE (16C), #14AWG, 10C, #6 GREEN, BELDON FOR LED STREET- NAME SIGN;\n-\nLOOP CABLE;\n-\nFOR STREET LIGHTING;\n-\nFIBER OPTIC CABLE (IF NEEDED);\n-\nPOWER SERVICE WIRE (IF NEEDED);\n- 1 SPARE CONDUIT\n4.\n632-7-1: SHALL USE 16-CONDUCTOR SIGNAL CABLE.\n5.\n633-6: QUANTITY IS TO BE ENTIRE CONTRACT DURATION, IN DAYS.\n6.\n685-106: CONTRACTOR SHALL FURNISH AND INSTALL TRAFFIC SIGNAL UNINTERRUPTIBLE POWER SOURCE AS PER TECHPOWER\n         DEVELOPMENT/TRAFFIC UPS SYSTEM. DBL MX 1000-436, SEPARATE CABINET PIGGY BACK TO THE PROPOSED SIGNAL\n   CABINET.\nGENERAL NOTES (2)\nTHE OFFICIAL RECORD OF THIS SHEET IS THE ELECTRONIC FILE DIGITALLY SIGNED AND SEALED UNDER RULE 61G15-23.004\u201a F.A.C.\nVOLUSIA COUNTY\nDESCRIPTION\nDATE\nDESCRIPTION\nDATE\nREVISIONS\nSHEET\nNO.\nX:\\jobs\\6400\\6478.00\\000_CADD\\64780000001\\Signalization\\GNNTSG01.dwg\nCad Users\n4/8/2025 8:42:15 AM\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\nT-6\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\nLTG\nEngineering\n& Planning\nVENDOR No.: F030424608005\nPH: 321.499.4679  FAX: 321.499.4680\nMELBOURNE, FL 32904\n1049 EBER BOULEVARD, SUITE 104\nJONATHAN M. BRASCH\nP.E.  No. 94069\nROAD NO.\nCOUNTY\nLTG PROJECT NO.\nVOLUSIA\n6478\n\u00a0CR 415\n\n\n--- Page Break ---\n\n[Page 7]\n2.\nUTILITIES \nTHE CONTRACTOR IS RESPONSIBLE FOR CONTACTING ANY UTILITY OWNER(S) THAT\nMAY OR MAY NOT BE A \"SUNSHINE ONE-CALL\" MEMBER IN ORDER TO COORDINATE UTILITY\nMARKING AND LOCATING AT A MINIMUM OF TWO DAYS PRIOR TO DIGGING. IT SHOULD BE\nNOTED THAT FDOT & VOLUSIA COUNTY ARE NOT MEMBERS OF \"SUNSHINE ONE-CALL\" AND\nTHAT SEPARATE CONTACT WILL NEED TO BE MADE IN ORDER TO OBTAIN UTILITY LOCATE.\nLOCATION(S) OF THE UTILITIES SHOWN IN THE PLANS (INCLUDING Vv, Vh, Vvh)\nARE BASED ON LIMITED INVESTIGATION TECHNIQUES AND SHOULD BE CONSIDERED\nAPPROXIMATE ONLY; THE VERIFIED LOCATIONS/ELEVATIONS APPLY AT THE POINT SHOWN.\nINTERPOLATION BETWEEN THESE POINTS HAVE NOT BEEN VERIFIED.\n1.\nUTILITY CONTACTS\nCOUNTY OF VOLUSIA\nSIGNAL SHOP\nC/O ALLEN CATES\n123 W. INDIANA AVE.\nDELAND, FL 32720\n(386) 736-5968\nCOUNTY OF VOLUSIA\nKIM SECORD\n123 W. INDIANA AVE.\nDELAND, FL 32720\n(386) 736-5967\nAT&T DISTRIBUTION\nKIRBY SPENCER\nks2488@att.com\n(386) 366-4588\nCHARTER/SPECTRUM\nPAUL LIAKOS\nPaul.E.Liakos@charter.com\n(407) 214-8838\nCROWN CASTLE\nCHRIS PERKINS\nNorthFloridaPlansReview@crowncastle.com\nchristopher.perkins@crowncastle.com\n(813) 947-6009\nCITY OF PORT ORANGE\nPUBLIC UTILITIES\nGREGG MARINO\ngmarino@port-orange.org\n(386)  506-5756\nDUKE ENERGY DISTRIBUTION\nROBB BROWN\nrobb.brown@duke-energy.com\ndefdistributiongov@duke-energy.com\n(352) 459-4671\nDUKE ENERGY DISTRIBUTION\nJENNIFER WILLIAMS\nJEWilliams@pike.com\nDEFTransmissionGOV@duke-energy.com\n(813) 909-1210\nUNITI FIBER\nTRAVIS GEORGE\nTravis.george@uniti.com\n(251) 487-7225\nTHE CONTRACTOR IS RESPONSIBLE FOR CONTACTING ANY UTILITY OWNER(S) THAT\nMAY OR MAY NOT BE IN CONFLICT WITH THE PROPOSED MAST ARM FOUNDATION AND\nNOTIFYING THEM FOR RELOCATION OF THEIR UTILITIES. CONTRACTOR SHALL COORDINATE\nWITH UTILITY OWNERS TO SCHEDULE THE UTILITY RELOCATION PRIOR TO CONSTRUCTION\nOF THE MAST ARM FOUNDATION.\n3.\nTHE CONTRACTOR SHALL NOTIFY SUNSHINE ONE-CALL 1-800-432-4770 AT LEAST (2) TWO\nBUSINESS DAYS IN\nADVANCE OF ANY EXCAVATION WORK WHICH WOULD OTHERWISE\nINTERFERE WITH ANY ABOVE GROUND OR BELOW GROUND UTILITIES. THE CONTRACTOR\nSHALL ALSO BE RESPONSIBLE FOR MAINTAINING CURRENT LOCATE TICKET THROUGHOUT\nTHE DURATION OF THE WORK. THE COUNTY OF VOLUSIA IS NOT A MEMBER OF THE\nSUNSHINE ONE-CALL , FOR LOCATES CALL (386) 736-5968, TRAFFIC ENGINEERING TO\nREQUEST TO COMPLETE A LOCATE TICKET TO SCHEDULE THE LOCATE.\n4.\nFDOT\nTSM&O CONSTRUCTION\nPROJECT MANAGER\nDANIEL SIMPSON\n(386)  785-3980\nVvh INFORMATION\nVvh NUMBER\nDESCRITPION\nMATERIAL\nSTATION & OFFSET\nDEPTH\nUAO\n47-47D\nNO UTILITY FOUND\n-\nSTA. 1434+67, 54' LT (CL CONST. TOMOKA FARMS RD)\n7.00'\n-\n47E\nBURRIED FIBER OPTIC CABLE\nPVC\nSTA. 143+65, 53' LT (CL CONST. TOMOKA FARMS RD)\n4.00'\nUNITI FIBER\n48-48D\nNO UTILITY FOUND\n-\nSTA. 144+10, 58' RT (CL CONST. TOMOKA FARMS RD)\n7.00'\n-\n48E\nBURRIED ELECTRIC LINE\nPVC\nSTA. 144+11, 59' LT (CL CONST. TOMOKA FARMS RD)\n1.60'\nZAYO GROUP\n49-49D\nNO UTILITY FOUND\n-\nSTA. 142+85, 42' LT (CL CONST. TOMOKA FARMS RD)\n7.00'\n-\n50\nNO UTILITY FOUND\n-\nSTA. 142+95, 39' RT (CL CONST. TOMOKA FARMS RD)\n7.00'\n-\n51\nBURRIED FIBER OPTIC CABLE\nPVC\nSTA. 141+28, 34' RT (CL CONST. TOMOKA FARMS RD)\n3.80'\nFDOT\n52\nBURRIED FIBER OPTIC CABLE\nPVC\nSTA. 141+56, 25' RT (CL CONST. TOMOKA FARMS RD)\n2.30'\nFDOT\n53\nBURRIED FIBER OPTIC CABLE\nHDPE\nSTA. 141+56, 28' RT (CL CONST. TOMOKA FARMS RD)\n3.65'\nFDOT\n54\nNO UTILITY FOUND\n-\nSTA. 144+05, 57' RT (CL CONST. TOMOKA FARMS RD)\n7.00'\n-\n55\nNO UTILITY FOUND\n-\nSTA. 144+03, 57' RT (CL CONST. TOMOKA FARMS RD)\n7.00'\n-\nLUMEN\nLESLIE DINGMAN\nLeslie.Dingman@lumen.com\nGENERAL NOTES (3)\nTHE OFFICIAL RECORD OF THIS SHEET IS THE ELECTRONIC FILE DIGITALLY SIGNED AND SEALED UNDER RULE 61G15-23.004\u201a F.A.C.\nVOLUSIA COUNTY\nDESCRIPTION\nDATE\nDESCRIPTION\nDATE\nREVISIONS\nSHEET\nNO.\nX:\\jobs\\6400\\6478.00\\000_CADD\\64780000001\\Signalization\\GNNTSG01.dwg\nCad Users\n4/8/2025 8:42:15 AM\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\nT-7\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\nLTG\nEngineering\n& Planning\nVENDOR No.: F030424608005\nPH: 321.499.4679  FAX: 321.499.4680\nMELBOURNE, FL 32904\n1049 EBER BOULEVARD, SUITE 104\nJONATHAN M. BRASCH\nP.E.  No. 94069\nROAD NO.\nCOUNTY\nLTG PROJECT NO.\nVOLUSIA\n6478\n\u00a0CR 415\n\n\n--- Page Break ---\n\n[Page 8]\n48'\nR/W\n0.02\n12\" TYPE B STABILIZATION\nLBR 40 \n12'\n50'\nR/W\nTYPICAL SECTION\n(NB RIGHT TURN LANE) \nSTA. 139+00.00 TO STA. 143+00.00  \nN.T.S\nSAWCUT\nR/W LINE\nR/W LINE\nSTANDARD CLEARING & GRUBBING\nWIDENING\n12'\n5'\nVARIES 32'-38'\nSOD\n\u2104 CONST. CR 415\n0'-6'\n12'\n0.06\n4'\nWIDENING\n1\" TYPE FC-12.5 TL-C ASPHALT @ 20% MAX.\nRECYCLED MATERIAL FRICTION COURSE\n2\" TYPE SP-12.5 TL-C ASPHALT @ MAX 30%\nRECYCLED MATERIAL STRUCTURAL COURSE\n10\" LIMEROCK OR CRUSHED CONCRETE FINES\n(COMPACTED TO A 98% MAX. DRY DENSITY PER\nAASHTO T-180 AND CONSTRUCTED IN 2 LIFTS)\n12\" TYPE B STABILIZED SUBBASE, LBR 40 PER\nAASHTO T-180 AND CONSTRUCTED IN 1 LIFT\nMILLING & RESURFACING\nMILL 1\" OF EXISTING ASPHALT PAVEMENT\nRESURFACE WITH 1\" TYPE FC-12.5 TL-C ASPHALT @ 20%\nMAX. RECYCLED MATERIAL FRICTION COURSE\nNatural Ground\n3'\n0.06\nVARIES\nINTERSECTION\n4\"\nVARIES, SEE CROSS SECTIONS\nFOR DETAILS, 1:4 STD.\nDESIGN SPEED: 55 MPH\nMATCH EXIST. AT R/W LINE\nTOMOKA FARMS ROAD\nTYPICAL SECTION\nTHE OFFICIAL RECORD OF THIS SHEET IS THE ELECTRONIC FILE DIGITALLY SIGNED AND SEALED UNDER RULE 61G15-23.004\u201a F.A.C.\nVOLUSIA COUNTY\nDESCRIPTION\nDATE\nDESCRIPTION\nDATE\nREVISIONS\nSHEET\nNO.\nX:\\jobs\\6400\\6478.00\\000_CADD\\64780000001\\Roadway\\TYPSRD01.dwg\nCad Users\n4/8/2025 8:39:57 AM\n----\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\nT-8\n----\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\nLTG\nEngineering\n& Planning\nVENDOR No.: F030424608005\nPH: 321.499.4679  FAX: 321.499.4680\nMELBOURNE, FL 32904\n1049 EBER BOULEVARD, SUITE 104\nGIL A. RAMIREZ\nP.E.  No. 62600\nROAD NO.\nCOUNTY\nLTG PROJECT NO.\nVOLUSIA\n6478\n\u00a0CR 415\n\n\n--- Page Break ---\n\n[Page 9]\nWATER\nWATER\nTEL\nWATER\n22.69\nA1 5/8 CSTP\n22.39\nA2 5/8 CSTP\n21.46\nA3 5/8 CSTP\n21.15\nA4 5/8 CSTP\n21.79\nA5 5/8 CSTP\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nG(D)\nG(D)\nG(D)\nBFOC(D)\nBFOC(D)\nCAS(D)\nBFOC(D)\nBFOC(D)\nCAS(D)\nCAS(D)\nCAS(D)\nBFOC(D)\nBFOC(D)\nCAS(D)\nCAS(D)\nCAS(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nCAS(D)\nG(D)\nG(D)\nG(D)\nG(D)\nG(D)\nG(D)\nG(D)\nG(D)\nG(D)\nG(D)\nG(D)\nW(D)\nW(D)\nBFOC(D)\nW(D)\nW(D)\nBFOC(D)\nW(D)\nW(D)\nBFOC(D)\nBFOC(D)\nW(D)\nW(D)\nBFOC(D)\nBFOC(D)\nW(D)\nW(D)\nW(D)\nBFOC(D)\nBFOC(D)\nW(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nW(D)\nW(D)\nBFOC(D)\nBFOC(D)\nOE\nOE\nOE\nOE\nOE\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nINV ELEV: 18.46'\nTOP ELEV: 19.21'\nS INV ELEV: 16.56'\nN INV ELEV: 16.53'\nTOP ELEV 19.81'\nN INV ELEV: 12.36'\nE INV ELEV: 12.26'\nW INV ELEV: 12.29'\nTOP ELEV: 20.23'\nW INV ELEV: 13.91'\nS INV ELEV: 13.81'\nTOP ELEV: 21.17'\nE INV ELEV: 14.57'\nTOP ELEV: 21.21'\nE INV ELEV: 12.66'\nW INV ELEV: 17.09'\nS INV ELEV: 17.29'\n18\" CMP\n18\" HDPE\n48\" RCP\n48\" RCP\n24\" RCP\n15\" CMP\n18\" CMP\n18\" RCP\nINV ELEV: 18.63'\n24\" PVC\n24\" RCP\nINV ELEV: 18.70'\nINV ELEV: 18.64'\nINV ELEV: 19.14'\nINV ELEV: 19.28'\n28+00\n29+00\n30+00\n31+00\n32+00\n139+00\n140+00\n141+00\n142+00\n143+00\n144+00\n145+00\n146+\nPI STA. 143+54.46\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nG(D)\nG(D)\nG(D)\nBFOC(D)\nBFOC(D)\nCAS(D)\nBFOC(D)\nBFOC(D)\nCAS(D)\nCAS(D)\nCAS(D)\nBFOC(D)\nBFOC(D)\nCAS(D)\nCAS(D)\nCAS(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nCAS(D)\nG(D)\nG(D)\nG(D)\nG(D)\nG(D)\nG(D)\nG(D)\nG(D)\nG(D)\nG(D)\nG(D)\nW(D)\nW(D)\nBFOC(D)\nW(D)\nW(D)\nBFOC(D)\nW(D)\nW(D)\nBFOC(D)\nBFOC(D)\nW(D)\nW(D)\nBFOC(D)\nBFOC(D)\nW(D)\nW(D)\nW(D)\nBFOC(D)\nBFOC(D)\nW(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nW(D)\nW(D)\nBFOC(D)\nBFOC(D)\nOE\nOE\nOE\nOE\nOE\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\n28+00\n29+00\n30+00\n31+00\n32+00\n139+00\n140+00\n141+00\n142+00\n143+00\n144+00\n145+00\n146+\nPI STA. 143+54.46\nINV ELEV: 18.46'\nTOP ELEV: 19.21'\nS INV ELEV: 16.56'\nN INV ELEV: 16.53'\nTOP ELEV 19.81'\nN INV ELEV: 12.36'\nE INV ELEV: 12.26'\nW INV ELEV: 12.29'\nTOP ELEV: 20.23'\nW INV ELEV: 13.91'\nS INV ELEV: 13.81'\nTOP ELEV: 21.17'\nE INV ELEV: 14.57'\nTOP ELEV: 21.21'\nE INV ELEV: 12.66'\nW INV ELEV: 17.09'\nS INV ELEV: 17.29'\n18\" CMP\n18\" HDPE\n48\" RCP\n48\" RCP\n24\" RCP\n15\" CMP\n18\" CMP\n18\" RCP\nINV ELEV: 18.63'\n24\" PVC\n24\" RCP\nINV ELEV: 18.70'\nINV ELEV: 18.64'\nINV ELEV: 19.14'\nINV ELEV: 19.28'\nINV ELEV: 18.46'\nTOP ELEV: 19.21'\nS INV ELEV: 16.56'\nN INV ELEV: 16.53'\nTOP ELEV 19.81'\nN INV ELEV: 12.36'\nE INV ELEV: 12.26'\nW INV ELEV: 12.29'\nTOP ELEV: 20.23'\nW INV ELEV: 13.91'\nS INV ELEV: 13.81'\nTOP ELEV: 21.17'\nE INV ELEV: 14.57'\nTOP ELEV: 21.21'\nE INV ELEV: 12.66'\nW INV ELEV: 17.09'\nS INV ELEV: 17.29'\n18\" CMP\n18\" HDPE\n48\" RCP\n48\" RCP\n24\" RCP\n15\" CMP\n18\" CMP\n18\" RCP\nINV ELEV: 18.63'\n24\" PVC\n24\" RCP\nINV ELEV: 18.70'\nINV ELEV: 18.64'\nINV ELEV: 19.14'\nINV ELEV: 19.28'\nINV ELEV: 18.46'\nTOP ELEV: 19.21'\nS INV ELEV: 16.56'\nN INV ELEV: 16.53'\nTOP ELEV 19.81'\nN INV ELEV: 12.36'\nE INV ELEV: 12.26'\nW INV ELEV: 12.29'\nTOP ELEV: 20.23'\nW INV ELEV: 13.91'\nS INV ELEV: 13.81'\nTOP ELEV: 21.17'\nE INV ELEV: 14.57'\nTOP ELEV: 21.21'\nE INV ELEV: 12.66'\nW INV ELEV: 17.09'\nS INV ELEV: 17.29'\n18\" CMP\n18\" HDPE\n48\" RCP\n48\" RCP\n24\" RCP\n15\" CMP\n18\" CMP\n18\" RCP\nINV ELEV: 18.63'\n24\" PVC\n24\" RCP\nINV ELEV: 18.70'\nINV ELEV: 18.64'\nINV ELEV: 19.14'\nINV ELEV: 19.28'\nINV ELEV: 18.46'\nTOP ELEV: 19.21'\nS INV ELEV: 16.56'\nN INV ELEV: 16.53'\nTOP ELEV 19.81'\nN INV ELEV: 12.36'\nE INV ELEV: 12.26'\nW INV ELEV: 12.29'\nTOP ELEV: 20.23'\nW INV ELEV: 13.91'\nS INV ELEV: 13.81'\nTOP ELEV: 21.17'\nE INV ELEV: 14.57'\nTOP ELEV: 21.21'\nE INV ELEV: 12.66'\nW INV ELEV: 17.09'\nS INV ELEV: 17.29'\n18\" CMP\n18\" HDPE\n48\" RCP\n48\" RCP\n24\" RCP\n15\" CMP\n18\" CMP\n18\" RCP\nINV ELEV: 18.63'\n24\" PVC\n24\" RCP\nINV ELEV: 18.70'\nINV ELEV: 18.64'\nINV ELEV: 19.14'\nINV ELEV: 19.28'\n+60.75\n25.16 RT.\n+11.00\n11.89 RT.\n+10.00\n39.82 RT.\n+00.00\n44.00 RT.\n+48.22\n18.73 RT.\nELEV.: 21.79'\n+49.41\n22.26 LT.\n\u2104CONST. CR 415\nREMOVE EXIST.\nMES's AND 18\" CMP.\nREMOVE EXIST.\nMES. CONST.\nTYPE C INLET.\nGRATE EL: 21.20'\nFL: 19.14'\nFDOT INDEX\n425-052\nEXIST. R/W\nEXIST. R/W\nEXIST. R/W\nEXIST. R/W\nEXIST. R/W\nEXIST. R/W\nEXIST. R/W\nMATCH EXIST.\nCONST. 186'\nOF 18\" RCP\nREMOVE EXIST. INLET TOP TO ELEVATION\n16.81(3.42') AND CONST. CURB INLET TOP\nTYPE P-4, ALT A 3.5' DIAMETER WITH\nTOP SLAB AND A 1.16' RISER. TOP SLAB\nDIMENSIONS TO MATCH EXIST. INLET.\nINLET TOP 20.73', GUTTER 20.23'.\nMATCH\nEXIST.\nEXIST. DRIVEWAY TO\nBE ABANDONED\nEXIST. DRIVEWAY TO BE ABANDONED\nEXIST. ITS MESSAGE\nSIGN TO REMAIN\nSAWCUT ALONG EXIST.\nEDGE AND CONST. 5'\nPAVED SHOULDER (TYP.)\nMODIFY EXIST. INLET AND\nCONVERT TO MANHOLE\nRING & COVER 21.58\nTOP EL. 20.58\nS. FL 16.56 FOR NEW 18\" RCP\nSEE FDOT INDEX 425-001\nEXIST.\nPROPERTY\nBOUNDARY\nCR 415 (TOMOKA FARMS RD)\nSPEED LIMIT: 50 MPH\nCR 421 (TAYLOR RD)\nSPEED LIMIT: 45 MPH\nCR 421 (TAYLOR RD)\nSPEED LIMIT: 30 MPH\nMATCH EXIST.\nMATCH\nEXIST.\nS-01\nS-02\nE-01\nMATCH\nEXIST.\nMATCH\nEXIST.\n+96.61\n23.39 LT.\nMATCH\nEXIST.\nMATCH\nEXIST.\nMATCH EXIST.\n+14.11\n34.69 LT.\nMATCH EXIST.\nMATCH EXIST.\nMATCH\nEXIST.\n+01.16\n28.07 LT.\nMATCH\nEXIST.\nMATCH EXIST.\nR60'\nR51.5'\nR40'\nR60'\n+92.00\n40.00 RT.\n+06.00\n38.00 RT.\n\u2104CONST. CR 421\nSAWCUT (TYP.)\nE-02\n+99.31\n30.34 RT.\nSAWCUT & REMOVE PAVEMENT\n& CONST. TYPE F C&G (TYP.)\nCONST. TYPE C INLET\nGRATE EL: 20.00\nFL: 17.88'\nBEGIN\nROADWAY PROJECT\nSTA. 138+80.00\nEND ROADWAY PROJECT\nSTA. 144+48.78\n73.2\u00b0'\nCONST. WIDENING (12' TYP.)\nAND 8' SHOULDER (5' PAVED)\nSTA. 143+54.19 \u2104 CONST. CR 415\nSTA. 30+00.00 \u2104 CONST. CR 421\n+93.24\n18.33 LT.\nELEV.: 20.94'\n+93.29\n20.33 LT.\n+91.94\n18.92 RT.\n+67.59\n19.55 RT.\n+42.88\n13.97 LT.\n+15.63\n11.73 LT.\n+15.29\n10.21 RT.\n+69.62\n19.19 LT.\n+69.14\n18.07 RT.\nMATCH\nEXIST.\n50'\nEXIST. UTILITY POLE TO\nBE REMOVED BY OTHERS\nEXIST. 18\" CMP TO BE REMOVED\nEXIST.\n18\" CMP TO\nBE REPLACED\nREMOVE EXIST.\nMES's AND 18\" CMP\nCONST. 205' OF 18\" RCP\nEXIST. 18\" RCP INTO\nEXIST. 48\" RCP TO REMAIN\nFLOATING TURBIDITY BARRIER\nCR-E\nEND SHOULDER PAVEMENT\nBEGIN TYPE F C&G WITH 3'\nSTRAIGHT TRANSITION\nEND TYPE F C&G WITH 3'\nSTRAIGHT TRANSITION\nBEGIN TYPE F C&G WITH 3'\nSTRAIGHT TRANSITION (TYP.)\nCONCRETE PEDESTRIAN\nLANDING\nEND TYPE F C&G WITH 3'\nFLARED TRANSITION\n2'\n5'\n5.7'\nVvH 52\nVvH 53\nVvH 51\nVvH 55\nVvH 54\nVvH 48-48D\nVvH 50\nVvH 47-47D\nVvH 47E\nVvH 49-49D\n21.17\nVvH 48E\n+82.30\n39.31 RT.\nREPLACE\nEXIST. MES.\nFL: 19.28'\nFDOT INDEX\n430-021\nS-00\n+10.90\n17.03 RT.\nMATCH EXIST.\n+91.90\n49.76 RT.\nMATCH EXIST.\n+01.89\n49.77 RT.\nMATCH EXIST.\nEXIST. DRIVEWAY\nTO BE REPLACED\n+82.91\n15.53 RT.\nMATCH EXIST.\n10'\nNOTES:\n1. INSTALL INLET PROTECTION DEVICES AT ALL EXISTING AND PROPOSED INLETS, 7 INCLUDED.\n2. DRIVEWAY REPLACEMENT TO BE CONSTRUCTED PER VOLUSIA COUNTY PAVEMENT REPAIR\nDETAIL-DRIVEWAY DETAIL (002), PROVIDED AS SHEET T-20.\nTOMOKA FARMS ROAD\nROADWAY PLAN\nTHE OFFICIAL RECORD OF THIS SHEET IS THE ELECTRONIC FILE DIGITALLY SIGNED AND SEALED UNDER RULE 61G15-23.004\u201a F.A.C.\nVOLUSIA COUNTY\nDESCRIPTION\nDATE\nDESCRIPTION\nDATE\nREVISIONS\nSHEET\nNO.\nX:\\jobs\\6400\\6478.00\\000_CADD\\64780000001\\Roadway\\PLANRD01.dwg\nCad Users\n4/8/2025 8:40:16 AM\n----\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\nT-9\n----\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\nLTG\nEngineering\n& Planning\nVENDOR No.: F030424608005\nPH: 321.499.4679  FAX: 321.499.4680\nMELBOURNE, FL 32904\n1049 EBER BOULEVARD, SUITE 104\nGIL A. RAMIREZ\nP.E.  No. 62600\nROAD NO.\nCOUNTY\nLTG PROJECT NO.\nVOLUSIA\n6478\n\u00a0CR 415\nN\n50\nFeet\n0\n10\nMILLING & RESURFACING\nLEGEND:\nROADWAY WIDENING\nPAVED SHOULDER\nCOORDINATE DATA\nPOINT NUMBER\nDESCRIPTION\nELEV\nSTATION & OFFSET\nCOORDINATES\nNORTH\nEAST\nBM A1\nSET 5/8 CSTP\n22.69\nSTA. 138+57.65, 22.30 LT (CL CONST. CR 415)\n1725980.508\n634317.808\nBM A2\nSET 5/8 CSTP\n22.39\nSTA. 140+88.83, 24.59 LT (CL CONST. CR 415)\n1726211.610\n634310.972\nBM A3\nSET 5/8 CSTP\n21.46\nSTA. 143+73.13, 39.73 LT (CL CONST. CR 415)\n1726495.260\n634290.113\nBM A4\nSET 5/8 CSTP\n21.15\nSTA. 145+77.70, 40.19 RT (CL CONST. CR 415)\n1726701.917\n634364.458\nBM A5\nSET 5/8 CSTP\n21.79\nSTA. 141+92.03, 29.10 LT (CL CONST. CR 415)\n1726315.837\n634362.624\nSEDIMENT BARRIER\nCIVILSURV TRAVERSE POINT\nCTSP\nDETECTABLE WARNING\nCONCRETE DRIVEWAYS, 6\" THICK\n\n\n--- Page Break ---\n\n[Page 10]\nElevation\n139+50.00\n15\n20\n25\n0\n20\n40\n60\n80\n0\n20\n40\n60\n80\nElevation\n140+00.00\n15\n20\n25\n0\n20\n40\n60\n80\n0\n20\n40\n60\n80\nR\\W\nR\\W\nR\\W\nR\\W\nElevation\n139+10.00\n15\n20\n25\n0\n20\n40\n60\n80\n0\n20\n40\n60\n80\nR\\W\nR\\W\nEmbankment\nRegular Exc.\n1\" = 20' Horizontal\n1\" = 10' Vertical\nV(cy)\nA(sf)\nV(cy)\nA(sf)\nTOMOKA FARMS ROAD\nCROSS SECTION (1)\nTHE OFFICIAL RECORD OF THIS SHEET IS THE ELECTRONIC FILE DIGITALLY SIGNED AND SEALED UNDER RULE 61G15-23.004\u201a F.A.C.\nVOLUSIA COUNTY\nDESCRIPTION\nDATE\nDESCRIPTION\nDATE\nREVISIONS\nSHEET\nNO.\nX:\\jobs\\6400\\6478.00\\000_CADD\\64780000001\\Roadway\\RDXSRD01.dwg\nCad Users\n4/8/2025 8:40:22 AM\n----\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\nT-10\n----\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\nLTG\nEngineering\n& Planning\nVENDOR No.: F030424608005\nPH: 321.499.4679  FAX: 321.499.4680\nMELBOURNE, FL 32904\n1049 EBER BOULEVARD, SUITE 104\nGIL A. RAMIREZ\nP.E.  No. 62600\nROAD NO.\nCOUNTY\nLTG PROJECT NO.\nVOLUSIA\n6478\n\u00a0CR 415\nBL SURVEY\nBL SURVEY\n18\" RCP, FL 19.14\nEXIST. CAS (D)\nEXIST. CAS (D)\nEXIST. FOC (D)\n24.00'\n23.98'\n24.02'\n18\" RCP, FL 18.54\nEXIST. CAS (D)\nEXIST. CAS (D)\nEXIST. FOC (D)\n18\" RCP, FL 18.88\nEXIST. CAS (D)\nEXIST. CAS (D)\nEXIST. FOC (D)\nNOTE: DEPTH OF EXIST. UTILITIES HAS NOT BEEN\nVERIFIED. EXIST. UTILITIES SHOWN AT DEPTH OF 3'.\nSEE Vvh INFORMATION TABLE ON T-7 FOR ADDITIONAL INFORMATION.\n0.02\n0.06\n1:4\n0.02\n0.06\n1:4\n0.06\nSAWCUT\nSAWCUT\nSAWCUT\nBL SURVEY\nTOP OF GRATE 21.20, 39.82' RT\n20.42 @ 43.24' RT\n20.60 @ 41.00' RT\nS-1\n\n\n--- Page Break ---\n\n[Page 11]\nElevation\n141+00.00\n15\n20\n25\n0\n20\n40\n60\n80\n0\n20\n40\n60\n80\nElevation\n142+00.00\n15\n20\n25\n0\n20\n40\n60\n80\n0\n20\n40\n60\n80\nElevation\n143+00.00\n15\n20\n25\n0\n20\n40\n60\n80\n0\n20\n40\n60\n80\nR\\W\nR\\W\nR\\W\nR\\W\nR\\W\nR\\W\nEmbankment\nRegular Exc.\nV(cy)\nA(sf)\nV(cy)\nA(sf)\nTOMOKA FARMS ROAD\nCROSS SECTION (2)\nTHE OFFICIAL RECORD OF THIS SHEET IS THE ELECTRONIC FILE DIGITALLY SIGNED AND SEALED UNDER RULE 61G15-23.004\u201a F.A.C.\nVOLUSIA COUNTY\nDESCRIPTION\nDATE\nDESCRIPTION\nDATE\nREVISIONS\nX:\\jobs\\6400\\6478.00\\000_CADD\\64780000001\\Roadway\\RDXSRD01.dwg\n4/8/2025 8:40:22 AM\n----\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\nT-11\n----\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\nLTG\nEngineering\n& Planning\nVENDOR No.: F030424608005\nPH: 321.499.4679  FAX: 321.499.4680\nMELBOURNE, FL 32904\n1049 EBER BOULEVARD, SUITE 104\nGIL A. RAMIREZ\nP.E.  No. 62600\nROAD NO.\nCOUNTY\nLTG PROJECT NO.\nSHEET\nNO.\n23.30'\n23.00'\nVOLUSIA\n6478\n\u00a0CR 415\n1\" = 20' Horizontal\n1\" = 10' Vertical\nBL SURVEY\nBL SURVEY\n18\" RCP, FL 17.22\nEXIST. CAS (D)\nEXIST. FOC (D)\n18\" RCP, FL 16.56\nEXIST. CAS (D)\nEXIST. FOC (D)\n0.02\n0.06\n1:4\n0.02\n1:4\nNOTE: DEPTH OF EXIST. UTILITIES HAS NOT BEEN\nVERIFIED. EXIST. UTILITIES SHOWN AT DEPTH OF 3'.\nSEE Vvh INFORMATION TABLE ON T-7 FOR ADDITIONAL INFORMATION.\nSAWCUT\nSAWCUT\nBL SURVEY\n18\" RCP, FL 17.88\nEXIST. CAS (D)\nEXIST. CAS (D)\nEXIST. FOC (D)\n23.60'\n0.02\n0.06\n1:2.67\nSAWCUT\nTOP OF GRATE 20.00, 44.00' RT\nCONVERT TO MANHOLE, 38.00' RT,\nRING & COVER EL. 21.58, TOP 20.58\nSEE FDOT INDEX 425-001\n20.40 @ 44.00' RT\n20.20 @ 46.00' RT\n1:4\nS-2\nE-01\nSTA 143+06\n\n\n--- Page Break ---\n\n[Page 12]\nWATER\nWATER\nTEL\nWATER\n22.69\nA1 5/8 CSTP\n22.39\nA2 5/8 CSTP\n21.46\nA3 5/8 CSTP\n21.15\nA4 5/8 CSTP\n21.79\nA5 5/8 CSTP\n8+00\n29+00\n30+00\n31+00\n32+00\n139+00\n140+00\n141+00\n142+00\n143+00\n144+00\n145+00\n146\n+44\n0 LT.\n+11\n7 RT.\n+07\n19 LT.\n+12\n6 RT.\n+12\n31 RT.\n+53\n36 LT.\n+52\n6 LT.\n+13\n6 LT.\n12'\n13'\n12'\n11'\n12'\n12'\n13'\n12'\nBEGIN PAVEMENT MARKINGS\nMATCH EXIST.\nSTA. 139+11\nEND PAVEMENT MARKINGS\nMATCH EXIST.\nSTA. 144+48\n+92\n6 RT.\nMATCH\nEXIST.\n+15\n0 RT.\n+60\n7 RT.\n+43\n17 RT.\nMATCH\nEXIST.\nMATCH\nEXIST.\n+02\n7 LT.\n+33\n7 RT.\n6'\n+67\n42 LT.\n+47\n6 RT.\n+69\n7 LT.\nMATCH\nEXIST.\n+11\n12 RT.\n+61\n25 RT.\n+36\n15 RT.\nSIGNING AND PAVEMENT\nMARKING PLAN\nTHE OFFICIAL RECORD OF THIS SHEET IS THE ELECTRONIC FILE DIGITALLY SIGNED AND SEALED UNDER RULE 61G15-23.004\u201a F.A.C.\nVOLUSIA COUNTY\nDESCRIPTION\nDATE\nDESCRIPTION\nDATE\nREVISIONS\nSHEET\nNO.\nX:\\jobs\\6400\\6478.00\\000_CADD\\64780000001\\signingandmarking\\PLANSP01.dwg\nCad Users\n4/8/2025 8:40:41 AM\n----\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\nT-12\n----\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\nLTG\nEngineering\n& Planning\nVENDOR No.: F030424608005\nPH: 321.499.4679  FAX: 321.499.4680\nMELBOURNE, FL 32904\n1049 EBER BOULEVARD, SUITE 104\nGIL A. RAMIREZ\nP.E.  No. 62600\nROAD NO.\nCOUNTY\nLTG PROJECT NO.\nVOLUSIA\n6478\n\u00a0CR 415\nNOTES:\n1.\nDENOTES TURN LANES USE ARROW PAVEMENT\nMARKING TO BE INSTALLED PER INDEX 711-001.\nCR 415 (TOMOKA FARMS RD)\nSPEED LIMIT: 50 MPH\nCR 421 (TAYLOR RD)\nSPEED LIMIT: 45 MPH\nN\n50\nFeet\n0\n10\nEXISTING R/W\nEXISTING R/W\nEXISTING R/W\nEXISTING R/W\nEXISTING R/W\nEXISTING R/W\n6\" DOUBLE YELLOW WITH\nY/Y RPM @ 20' C.C.\n6\" WHITE\n\u00a1 OF CONSTRUCTION\nTAYLOR ROAD\n\u00a1 OF CONSTRUCTION\nTOMOKA FARMS ROAD\n6\" WHITE\n24\" WHITE\n(TYP.)\n6\" WHITE WITH W/R\nRPM @ 20' C.C.\n6\" WHITE\n6\" DOUBLE YELLOW WITH\nY/Y RPM @ 20' C.C.\n6\" WHITE WITH\nW/R RPM @ 20' C.C.\n6\" DOUBLE YELLOW WITH\nY/Y RPM @ 20' C.C.\n6\" WHITE WITH\nW/R RPM @ 20' C.C.\n6\" WHITE\nCR 415 (TOMOKA FARMS RD)\nSPEED LIMIT: 50 MPH\n6\" WHITE\n6\" DOUBLE YELLOW WITH\nY/Y RPM @ 20' C.C.\n6\" WHITE WITH W/R\nRPM @ 20' C.C.\nTAYLOR RD\nSPEED LIMIT: 30 MPH.\nEXIST. ITS MESSAGE\nSIGN TO REMAIN\n6\" YELLOW\n(2'-4' SKIP)\nR=75'\n6\" YELLOW\n(2'-4' SKIP)\nR=60'\n12\" WHITE\n24\" WHITE\n\n\n--- Page Break ---\n\n[Page 13]\nWATER\nWATER\nTEL\nWATER\n53.03\n-WOOD\n21.98\n19.34\nB -18\" RCP C-2.81\n21.14\nE -18\" RCP DIR ONLY\n20.36\n-20\n21.46\nA3 5/8 CSTP\n21.79\nA5 5/8 CSTP\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nG(D)\nG(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nCAS(D)\nCAS(D)\nCAS(D)\nG(D)\nG(D)\nG(D)\nG(D)\nG(D)\nW(D)\nW(D)\nBFOC(D)\nW(D)\nBFOC(D)\nW(D)\nW(D)\nW(D)\nW(D)\nW(D)\nBFOC(D)\nW(D)\nBFOC(D)\nBFOC(D)\nW(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nW(D)\nW(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nCAS(D)\nOE\nOE\nOE\nOE\nOE\nOE\nOE\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D\n142+00\n143+00\n144+00\n145+00\nL-1\nL-6B\nL-6A\nL-4\nL-7\nL-2A\nL-5\nL-2B\nL-6C\n180'\n180'\nL-2C\n210'\nL-6D\n210'\nDELAY\nDELAY\nDELAY\nDELAY\nDELAY\nDELAY\nPS\nL-8\n2\n4\n6\n6\n2\n4\n7\nF1\n5\nB\nA\nA\nB\nC\nP4\nP4\n8\n8\nF3\nOF\nOFOC\nOFOC\nOFOC\nOFOC\nOFOC\nOFOC\nOFOC\nOFOC\nOFOC\nOFOC\nOFOC\nOFOC OFOC OFOC OFOC OFOC OFOC\nCAS(D)\nCAS(D)\nOFOC OFOC OFOC OFOC OFOC\n22.39\nA2 5/8 CSTP\nINV ELEV: 18.46'\nOE\nOE\nOE\nOE\nCAS\nCAS(D)\nBFOC(D)\nCAS(D)\nCAS(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D)\nBFOC(D\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\nBT(D)\n(D)\nBFOC(D)\n141+00\nOFOC\nOFOC\nOFOC\nOFOC\nSIGNALIZATION PLAN (1)\nTHE OFFICIAL RECORD OF THIS SHEET IS THE ELECTRONIC FILE DIGITALLY SIGNED AND SEALED UNDER RULE 61G15-23.004\u201a F.A.C.\nVOLUSIA COUNTY\nDESCRIPTION\nDATE\nDESCRIPTION\nDATE\nREVISIONS\nSHEET\nNO.\nX:\\jobs\\6400\\6478.00\\000_CADD\\64780000001\\Signalization\\PLANSG01.dwg\nCad Users\n4/8/2025 8:42:20 AM\n----\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\nT-13\n----\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\nLTG\nEngineering\n& Planning\nVENDOR No.: F030424608005\nPH: 321.499.4679  FAX: 321.499.4680\nMELBOURNE, FL 32904\n1049 EBER BOULEVARD, SUITE 104\nJONATHAN M. BRASCH\nP.E.  No. 94069\nROAD NO.\nCOUNTY\nLTG PROJECT NO.\nVOLUSIA\n6478\n\u00a0CR 415\nN\n40\nFeet\n0\n8\nR/W\nR/W\nR/W\nR/W\nR/W\nEOP\nEOP\nEOP\nEXISTING POWER SERVICE\nTAYLOR RD\nSPEED LIMIT 30 MPH\n1 AS\n660-2-102\n210 LF\n630-2-11\n1 EA\n635-2-14\nTAYLOR RD\nSPEED LIMIT 45 MPH\nTOMOKA FARMS RD\nSPEED LIMIT 50 MPH\nTOMOKA FARMS RD\nSPEED LIMIT 50 MPH\nR/W\n3 EA\n635-2-14\n145 LF\n630-2-11\n1 EA\n635-2-14\n33 LF\n630-2-11\n20 LF\n630-2-14\nPOLE 1\nSTA.: 144+22\nOFF.: 58' RT\nGRADE ELEV.: 20.60'\n3 RUNS\n80 LF\n630-2-12\n2 AS\n660-2-106\n39 LF\n630-2-11\n1 EA\n635-2-14\n2 RUNS\n10 LF  \n630-2-11\n5 RUNS\n122 LF\n630-2-12\n1 EA\n635-2-14\n1 AS\n660-2-102\n140 LF\n630-2-11\n1 EA\n635-2-14\n1 AS\n660-2-102\n210 LF\n630-2-11\n1 EA\n635-2-14\n10 LF  \n630-2-11\n2 EA\n635-2-14\n1 EA\n649-21-6\nPOLE 2\nSTA.: 142+85\nOFF.: 42' LT\nGRADE ELEV.: 21.36'\n1 AS\n660-2-106\n59 LF\n630-2-11\n1 EA\n635-2-14\n4 RUNS\n80 LF\n630-2-12\n2 AS\n660-2-106\n1 EA\n635-2-14\n33 LF\n639-2-1\nF&I 12' SERVICE POLE\n5 LF\n630-2-11\n1 EA\n635-2-14\n1 AS\n639-1-122\n10 LF\n639-2-1\n1 EA\n639-3-11\n1 EA\n641-2-12\nEOP\nEL. 22.57\nEL. 22.88\nEL. 21.75\nEL. 22.24\n1 EA\n715-5-31\nREMOVAL ITEMS:\n4 EA\n641-2-80\n1 AS\n670-5-600\nREMOVE EXISTING\nSTRAIN POLE.\nEXISTING TAG READER\nTO BE REMOVED AND\nREPLACED BY\nSHERIFF'S DEPT.\nREMOVE EXISTING\nSTRAIN POLE\nREMOVE EXISTING\nSTRAIN POLE\nREMOVE EXISTING\nSTRAIN POLE\nREMOVE EXISTING\nCONTROLLER AND CABINET\n10 LF  \n630-2-11\n3 EA\n635-2-14\n1 EA\n649-21-3\n2 EA\n635-2-14\n3 AS\n660-2-106\n40 LF\n630-2-11\n1 EA\n635-2-14\n3 RUNS\n86 LF\n630-2-11\n1 AS\n660-2-102\n1 EA\n676-2-600\nCONTROLLER CABINET\nSTA.: 144+38; OFF.: 58' RT\nF&I FIBER PULL BOX; F&I FDOT PATCH PANEL\nRELOCATE ALL EQUIPMENT FROM EXISTING\nFDOT POLE MOUNTED ITS CABINET AND\nINSTALL THEM IN NEW SIGNAL CABINET\nSPLICE 48  4-12 SM FOC\nCOIL 4-50' OF SLACK 12 SM FOC (DROP)\nEXISTING FDOT\nITS CABINET\nTO BE REMOVED\n2 EA\n635-2-12\nFIBER OPTIC LOCATOR\n633-6\n1 EA\n682-1-112\nF&I FIBER PULL BOX\nCOIL 2-50' OF SLACK\n12 SM FOC (DROP)\nPOLE #421-02: F&I RISER;\nF&I TWO (2) 12 SM DROPS IN RISER;\nF&I FIBER PULL BOX;\nCOIL 2-50' OF SLACK 12 SM FOC (DROP)\n1 EA\n635-2-12\n1 EA\n633-3-11\n200 LF\n633-1-121\n244 LF\n633-1-121\n100 LF\n633-1-121\n20 LF\n630-2-14\n24 EA\n633-2-31\n100 LF\n630-2-11\n1 EA\n715-5-31\nPED POLE 115\nSTA.: 144+21\nOFF.: 48' RT\n8 LF  \n630-2-11\n1 EA\n635-2-14\n1 EA\n646-1-11\n1 EA\n665-1-12\nPED POLE 2\nSTA.: 143+91\nOFF.: 34' LT\n40 LF  \n630-2-11\n1 EA\n635-2-14\n1 EA\n646-1-11\n1 EA\n665-1-12\nPOLE 3\nSTA.: 143+64\nOFF.: 62' LT\nGRADE ELEV.: 22.01'\nARM 1\nARM 2\nEXISTING FDOT AERIAL\nENCLOSURE TO REMAIN\nCOIL 2-100' OF SLACK 12 SM FOC\nF&I AERIAL SPLICE ENCLOSURE\nCOIL 2-50' 12 SM FOC IN SNOW-SHOE\nSIGNAL #275\nWORK DONE TO\nEXISTING TAG READER\nSERVICE POINT\nTO BE DONE BY\nSHERIFF'S DEPT.\n\ue100 OF CONSTRUCTION\n1 EA\n633-3-12\n200 LF\n633-1-111\n25 LF\n633-1-111\nEXISTING DMS, PULL BOX AND\nPATCH PANEL TO REMAIN\nCOIL 50' 12 SM FOC\nSPLICE 12 SM FOC\nMATCHLINE STA. 141+75\nMATCHLINE STA. 141+75\n12 EA\n633-2-31\nF&I OH 12 SM FOC FROM DMS TO\nEXISTING UTILITY POLE 421-02\n140 LF\n633-1-111\n1 AS\n670-5-161\n5 EA\n635-2-14\n6 EA\n660-1-109\n1 EA\n685-1-13\n1 EA\n685-2-1\n7 RUNS\n5 LF  \n630-2-11\n2 EA\n684-1-1\n60 LF\n633-1-121\n1 EA\n635-2-12\n1 PI\n632-7-1\n48 EA\n633-2-31\n1 EA\n633-3-15\nF&I 2-OH 12 SM FOC\nFROM POLE #421-03\nTO POLE #421-02\n114 LF\n633-1-111\n1 EA\n649-21-19\n1 EA\n715-5-31\nDMS #421-01 (E: 634632.549; N: 1726616.971)\nEXISTING PULL BOX AND PATCH PANEL TO REMAIN\nCOIL 50' 12 SM FOC SPLICE 12 SM FOC\nF&I 12 SM FOC FROM DMS #421-01 TO UTILITY\nPOLE #421-03 USING EXISTING CONDUIT\nCOIL 50' FOC IN EXISTING PULL BOX\n50 LF\n633-1-121\n12 EA\n633-2-31\n120 LF\n633-1-121\nF&I OH 12 SM FOC FROM\nPOLE #421-03 TO\nPOLE #421-02\n225 LF\n633-1-111\nPOLE #421-03\nADD RISER\nADD 12 SM FOC IN RISER\nCOIL 50' OF SLACK 12 SM FOC\n20 LF  \n630-2-14\n70 LF\n633-1-111\n4-12 SM FOC DROP\n65 LF\n630-2-11\n65 LF\n633-1-121\nF&I 4-12 SM FOC (DROP)\n6O LF\n633-1-121\nF&I OH 12 SM FOC\n6O LF\n633-1-111\nEXISTING PULL BOX\nAND CONDUIT TO REMAIN\nCOIL 50' 12 SM FOC\n75 LF\n633-1-121\n25 LF  \n630-2-14\n\n\n--- Page Break ---\n\n[Page 14]\nSIGNALIZATION PLANS (2)\nTHE OFFICIAL RECORD OF THIS SHEET IS THE ELECTRONIC FILE DIGITALLY SIGNED AND SEALED UNDER RULE 61G15-23.004\u201a F.A.C.\nVOLUSIA COUNTY\nDESCRIPTION\nDATE\nDESCRIPTION\nDATE\nREVISIONS\nSHEET\nNO.\nX:\\jobs\\6400\\6478.00\\000_CADD\\64780000001\\Signalization\\PLANSG02.dwg\nCad Users\n4/8/2025 8:42:22 AM\n----\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\nT-14\n----\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\nLTG\nEngineering\n& Planning\nVENDOR No.: F030424608005\nPH: 321.499.4679  FAX: 321.499.4680\nMELBOURNE, FL 32904\n1049 EBER BOULEVARD, SUITE 104\nJONATHAN M. BRASCH\nP.E.  No. 94069\nROAD NO.\nCOUNTY\nLTG PROJECT NO.\nVOLUSIA\n6478\n\u00a0CR 415\n3-SECT., 1-WAY\n 2 EA\n700-5-22\n 2 EA\n700-5-22\n\u22052\n\u22051\n\u22053\nA\nB\nCONTROLLER OPERATIONS:\n1. THE MAJOR STREET IS CR 415 (TOMOKA FARMS ROAD) (MOVEMENTS 2, 5 AND 6).\n   THE MINOR STREET TAYLOR ROAD (MOVEMENTS 4, 7, AND 8).\n2. SIGNAL OPERATING PLAN IS SOP 16 AS SHOWN ON THIS SHEET WITH THE\nFOLLOWING FEATURES:\nA.) DURING FLASHING OPERATION, SIGNAL HEADS FOR MOVEMENTS 2 AND 6 WILL\nFLASH YELLOW AND SIGNAL HEADS FOR MOVEMENTS 4, 5, 7, AND 8 WILL\nFLASH RED.\n3-SECT., 1-WAY\n8 EA\n650-1-34\nSIGNAL OPERATION PLAN\nSOP 16\n4-SECT., 1-WAY\n2 EA\n650-1-36\nA\nB\n3-SECT., 1-WAY\nG\nY\nR\n(2)\n6\n(2)\n4\n(2)\n2\n4-SECT., 1-WAY\nG\nFY\nSY\nR\n(1)\n7\n(1)\n5\n\u22054\n4\n8\n7\n6\n2\n5\n2\nSINGLE SIDED FACE MOUNTED\n4\nCONTROLLER TIMINGS\nTIMING FUNCTION\nMOVEMENT NUMBER\n2\n4\n5\n6\n7\n8\nTIMING FUNCTION\nMINIMUM GREEN\nEXTENSION\nMAXIMUM GREEN 1\nMAXIMUM GREEN 2\nYELLOW CLEARANCE\nALL RED\nPEDESTRIAN WALK\n7.0\nPED. CLEARANCE\n22.0\nRECALL\nDETECTOR FUNCTION\nNOTE: SIGNAL TIMING IS INITIAL\nCHANNELS NOT SHOWN IN THE DETECTION ASSIGNMENTS CHART WILL BE LEFT OPEN AS SPARES\n(2)\n8\nDETECTORS FOR LOOPS\nLOOP\nNO. OF LOOPS\nNO. OF NEW\nDETS.\nNO. OF EXIST.\nDETS.\nCOVERAGE\nAREA\nBIU\nCHANNEL\nDETECTOR\nOPERATIONS\nDELAY TIME\n(SEC)\nL-1\n1\n1\n-\n10'x40'\n1\n1\nPRESENCE\n-\nL-2A\n1\n-\n10'x40'\n2\nPRESENCE\n5\nL-2B\n1\n1\n-\n6'X6'\n10\nPULSE EXT.\n -\nL-2C\n1\n-\n6'X6'\n18\nPULSE EXT.\n -\nL-4\n1\n1\n-\n10'x40'\n4\nPRESENCE\n5\nL-5\n1\n-\n10'x40'\n5\nPRESENCE\n5\nL-6A\n1\n1\n-\n10'x40'\n6\nPRESENCE\n5\nL-6B\n1\n-\n10'x40'\n14\nPRESENCE\n -\nL-6C\n1\n1\n-\n6'X6'\n22\nPULSE EXT.\n -\nL-6D\n1\n-\n6'X6'\n30\nPULSE EXT.\n -\nL-7\n1\n1\n-\n10'x40'\n7\nPRESENCE\n5\nL-8\n1\n-\n10'x40'\n8\nPRESENCE\n5\n15.0\n10.0\n5.0\n15.0\n5.0\n10.0\n3.0\n3.0\n4.0\n3.0\n3.0\n4.0\n45.0\n25.0\n20.0\n45.0\n20.0\n25.0\n4.0\n5.0\n5.5\n5.5\n5.0\n5.5\n2.5\n3.5\n2.5\n2.5\n3.5\n3.5\n4-SECT., 1-WAY\nG\nFY\nSY\nR\n(1)\nF3\n(1)\nF1\n4-SECT., 1-WAY\nFUTURE SIGNAL\nHEADS\nR10-3i\nTO BE INCLUDED WITH\nEACH PEDESTRIAN DETECTOR STATION\nSTART CROSSING\nWatch For\nVehicles\nDON'T START\nFinish Crossing\nIf Started\nTIME REMAINING\nTo Finish Crossing\nDON'T CROSS\nSTEADY\nTIMER\nFLASHING\nPUSH BUTTON\n2 AS\n653-1-11\nPED. SIGNAL\nCOUNT-DOWN\n1-SECT., 1-WAY\n(2)\nP4\n(2)\nP4\nTO CROSS\nTOMOKA FARMS RD\nP4\nP4\nMIN\nMIN\nL\nNL\nNL\nL\nNL\nNL\n\n\n--- Page Break ---\n\n[Page 15]\nMAST ARM TABULATION\nTHE OFFICIAL RECORD OF THIS SHEET IS THE ELECTRONIC FILE DIGITALLY SIGNED AND SEALED UNDER RULE 61G15-23.004\u201a F.A.C.\nVOLUSIA COUNTY\nDESCRIPTION\nDATE\nDESCRIPTION\nDATE\nREVISIONS\nSHEET\nNO.\nX:\\jobs\\6400\\6478.00\\000_CADD\\64780000001\\Signalization\\MSSGSG01.dwg\nCad Users\n4/8/2025 8:42:28 AM\n----\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\nT-15\n----\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\nLTG\nEngineering\n& Planning\nVENDOR No.: F030424608005\nPH: 321.499.4679  FAX: 321.499.4680\nMELBOURNE, FL 32904\n1049 EBER BOULEVARD, SUITE 104\nJONATHAN M. BRASCH\nP.E.  No. 94069\nROAD NO.\nCOUNTY\nLTG PROJECT NO.\nVOLUSIA\n6478\n\u00a0CR 415\nSPECIAL INSTRUCTIONS\nID\nNO.\nHANDHOLE\nLOCATION\n  PED.\nBUTTON\n  PED.\nSIGNALS\nARM NO. 2 - DOUBLE ARM POLE ORIENTATION\nTO BE MEASURED IN A COUNTER CLOCKWISE\nDIRECTION FROM ROADWAY ARM NO. 1.\nARM NO. 1 - SINGLE ARM POLE OR\nLONGEST ARM FOR DOUBLE ARM POLE.\n   ARM\nMOUNTING\n HEIGHT\n(ARM M.H.)\nTOP OF FOUNDATION ELEVATION\nTOTAL ARM LENGTH\nSIGN A\nSIGN B\nSIGN E\nSIGN C\nSIGN D\nA\nH5\nE\nD\nC\nH4\n1\n2\n4\n3\nW3\nW2\nW4\n5\nW5\nB\nH3\nH2\nW1\nH1\nPAINT\nCOLOR\nW2\n*\n*\n3\nB\nH2\nW1\nC\nH3\n1\n*\nSIGN  DATA\n5\n*\n2\n*\n4\nH1\nA\nW3\nLOCATION\nBY STA.\nARM\nM.H.\nD\nH4\nW5\nE\nH5\nDISTANCE FROM POLE / HEIGHT AND WIDTH OF SIGN\nDISTANCE  FROM  POLE\n* DENOTES NUMBER OF SECTIONS IN SIGNAL HEAD ASSEMBLY\nW4\nSIGNAL  DATA\nSHEET\n NO.\nID\nNO.\n  TOP OF\nFOUNDATION\n ELEVATION\nRDWY\nARM\n NO.\nCROWN\n ELEV.\nSIGNAL\n V/H\n BACK\nPLATES\n Y/N\n PED.\nSIGNAL\n Y/N\n TOTAL\n  ARM\nLENGTH\n\u2221 BETWEEN\nDUAL ARMS\n 90/270\nGRADE\n ELEVATION\n1\nT-13\nV\nY\nN\n2.0\n18.0\n8.0\n60.0\n20.60'\n144+22, 58' RT\n38.5\n3\n3\n46.5\n21.10'\n21.75'\n2\n1\nV\nY\nN\n22.88'\n50.0\n14.0\n21.0\n3\n3\n29.0\n43.5\n4\nT-13\n21.36'\n142+85, 42' LT\n21.86'\nV\nY\nN\n29.5\n8.0\n70.0\n21.5\n57.0\n3\n65.0\n22.24'\n270\n2.0\n2.0\n8.0\n3\n21.5\n21.5\n3\nV\nY\nN\n40.0\n15.0\n3\n3\n23.0\n31.0\n4\nT-13\n22.01'\n143+64, 62' LT\n22.51'\n22.57'\n21.0\n1\n1\n2\n2.0\n8.0\n6.0\n** FUTURE SIGNAL HEADS\n49.0\n4**\n54.5\n4**\n\n\n--- Page Break ---\n\n[Page 16]\nMAST ARM ASSEMBLIES\nTHE OFFICIAL RECORD OF THIS SHEET IS THE ELECTRONIC FILE DIGITALLY SIGNED AND SEALED UNDER RULE 61G15-23.004\u201a F.A.C.\nVOLUSIA COUNTY\nDESCRIPTION\nDATE\nDESCRIPTION\nDATE\nREVISIONS\nSHEET\nNO.\nX:\\jobs\\6400\\6478.00\\000_CADD\\64780000001\\Signalization\\PLDTSG01.dwg\nCad Users\n4/8/2025 8:42:33 AM\n----\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\nT-16\n----\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\nLTG\nEngineering\n& Planning\nVENDOR No.: F030424608005\nPH: 321.499.4679  FAX: 321.499.4680\nMELBOURNE, FL 32904\n1049 EBER BOULEVARD, SUITE 104\nJONATHAN M. BRASCH\nP.E.  No. 94069\nROAD NO.\nCOUNTY\nLTG PROJECT NO.\nVOLUSIA\n6478\n\u00a0CR 415\nUB\n(ft.)\nUAA\n(ft.)\nPOLE\nSTANDARD MAST ARM ASSEMBLIES DATA TABLE\nLL\n(deg)\nUF\n(deg)\nSECOND ARM\nFAA\n(ft.)\nFIRST ARM\nSTRUCTURE\nID\nNUMBERS\nTABLE DATE XX-XX-XX\nDRILLED\nSHAFT\nID\nARM\nID\nARM\nID\nDESIGNATION\nPOLE\nID\nNOTES:\n1.\nIF AN ENTRY APPEARS IN COLUMN FAA, A SHORTER ARM IS REQUIRED.  THIS IS OBTAINED BY REMOVING LENGTH\nFROM THE ARM TIP AND THE ARM LENGTH SHORTENED FROM FA TO FAA. SAA SIMILAR.\n2.\nIF AN ENTRY APPEARS IN COLUMN UAA, A SHORTER POLE IS REQUIRED.  THIS IS OBTAINED BY REMOVING LENGTH\nFROM THE POLE TIP AND THE POLE HEIGHT SHORTENED FROM UA TO UAA.\n3.\nWORK THIS SHEET WITH THE SIGNAL DESIGNER\u2019S \u201cMAST ARM TABULATION\u201d.  SEE \u201cMAST ARM TABULATION\u201d FOR\nSPECIAL INSTRUCTIONS THAT INCLUDE NON-STANDARD HANDHOLE LOCATION, PAINT COLOR, TERMINAL COMPARTMENT\nREQUIREMENT, AND PEDESTRIAN FEATURES.\n4.\nWORK WITH INDEX 649-030 AND 649-031.\n5.\nDESIGN WIND SPEED = 150 MPH, IN ACCORDANCE WITH LATEST FDOT STRUCTURES MANUAL.\n*REFER TO PLANSHEET T-13 FOR THE NUMBERS AND ANGLES OF LUMINAIRES ON THE MAST ARM.\nSAA\n(ft.)\nPOLE 1\nPOLE 2\nA50/S/H-P3/S/L-DS/25/5\nA70/D\n-\n-\nP6/D/L\n-\n21.5\nA50/S/H\n-\n-\n-\n-\nP3/S/L\n-\n21.5\nDS/25/5\nDS/25/5\n-\nA70/D-A60/D-P6/D/L-DS/25/5\nA60/D\n270\n-\nFOUNDATION NOTES:\n1.\nDESIGN BASED ON RECOMMENDED SOIL PARAMETERS PROVIDED BY\nGEOTECHNICAL AND ENVIRONMENTAL CONSULTANTS, INC PERFORMED\nON 12/21/2023.\n2.\nASSUMPTIONS AND VALUES USED IN STRUCTURE ID POLE 1 DESIGN:\nSOIL TYPE = SAND\nSOIL LAYER THICKNESS = 40 FT.\nSOIL FRICTION ANGLE = 29 DEG.\nSOIL WEIGHT = 42 PCF\nCONVERTED N-VALUE = 7\nDESIGN WATER TABLE IS 3.5 FT. BELOW SURFACE\n3.\nASSUMPTIONS AND VALUES USED IN STRUCTURE ID POLE 2 AND 3\nDESIGN:\nSOIL TYPE = SAND\nSOIL LAYER THICKNESS = 40 FT.\nSOIL FRICTION ANGLE = 29 DEG.\nSOIL WEIGHT = 42 PCF\nCONVERTED N-VALUE = 6\nDESIGN WATER TABLE IS 3.5 FT. BELOW SURFACE\nPOLE 3\nA40/S-P2/S/L-DS/25/5\nA40/S\n-\n-\n-\n-\nP2/S/L\n-\n21.0\nDS/25/5\n-\n\n\n--- Page Break ---\n\n[Page 17]\nSPLICE DIAGRAM\nTHE OFFICIAL RECORD OF THIS SHEET IS THE ELECTRONIC FILE DIGITALLY SIGNED AND SEALED UNDER RULE 61G15-23.004\u201a F.A.C.\nVOLUSIA COUNTY\nDESCRIPTION\nDATE\nDESCRIPTION\nDATE\nREVISIONS\nSHEET\nNO.\nX:\\jobs\\6400\\6478.00\\000_CADD\\64780000001\\ITS\\SPLYIT01.dwg\nCad Users\n4/8/2025 8:42:39 AM\n----\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\nT-17\n----\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\nLTG\nEngineering\n& Planning\nVENDOR No.: F030424608005\nPH: 321.499.4679  FAX: 321.499.4680\nMELBOURNE, FL 32904\n1049 EBER BOULEVARD, SUITE 104\nJONATHAN M. BRASCH\nP.E.  No. 94069\nROAD NO.\nCOUNTY\nLTG PROJECT NO.\nVOLUSIA\n6478\n\u00a0CR 415\nEXISTING FIBER OR JUMPER\nPROPOSED FIBER OR JUMPER\nSPLICE\nUNTERMINATED FIBER\nETHERNET SWITCH\nPROPOSED 2-12 SM\nFOC DROP\nEXISTING 24SM/12MM FOC CABLE TRUNK\nBLUE\nORANGE\nGREEN\nBROWN\nSLATE\nWHITE\nSM GREEN\nSM ORANGE\nSM BROWN\nSM BLUE\nEXISTING 24SM/12MM TRUNK\nEAST TOWARD SPRUCE CREEK BLVD.\nSM SLATE\nSM WHITE\nEXISTING FDOT AERIAL SPLICE ENCLOSURE\nTOMOKA FARMS RD AT TAYLOR RD\nPROPOSED TOMOKA FARMS RD\nAT TAYLOR RD CABINET\nSTA: 144+38\nOFFSET: 58' RT\nBLUE\nORANGE\nGREEN\nBROWN\nSLATE\nWHITE\nBLUE BUFFER\nSC ADAPTERS\nB\nL\nK\nY\nL\nV\nI\nR\nO\nA\nQ\nB\nL\nO\nR\nG\nR\nB\nR\nS\nL\nW\nH\nR\nD\nPATCH PANEL\nGREEN BUFFER\nSC ADAPTERS\nB\nL\nK\nY\nL\nV\nI\nR\nO\nA\nQ\nB\nL\nO\nR\nG\nR\nB\nR\nS\nL\nW\nH\nR\nD\nPATCH PANEL\nPROPOSED 12 SM FOC\nBROWN BUFFER\nSC ADAPTERS\nB\nL\nK\nY\nL\nV\nI\nR\nO\nA\nQ\nB\nL\nO\nR\nG\nR\nB\nR\nS\nL\nW\nH\nR\nD\nPATCH PANEL\nORANGE BUFFER\nSC ADAPTERS\nB\nL\nK\nY\nL\nV\nI\nR\nO\nA\nQ\nB\nL\nO\nR\nG\nR\nB\nR\nS\nL\nW\nH\nR\nD\nPATCH PANEL\nPROPOSED 12 SM FOC\nBLUE BUFFER\nSC ADAPTERS\nB\nL\nK\nY\nL\nV\nI\nR\nO\nA\nQ\nB\nL\nO\nR\nG\nR\nB\nR\nS\nL\nW\nH\nR\nD\nPATCH PANEL\nPROPOSED AERIAL\nSPLICE ENCLOSURE\nTOMOKA FARMS RD AT\nTAYLOR RD\nPROPOSED 12 SM FOC\nDROP EAST TOWARD\nDMS #421-01\nBLUE BUFFER\nSC ADAPTERS\nB\nL\nK\nY\nL\nV\nI\nR\nO\nA\nQ\nB\nL\nO\nR\nG\nR\nB\nR\nS\nL\nW\nH\nR\nD\nPATCH PANEL\nPROPOSED 12 SM FOC\nDROP SOUTH TOWARD\nDMS #421-02\nEXISTING DMS CABINET\n#421-01\nEXISTING DMS #421-02\n\n\n--- Page Break ---\n\n[Page 18]\nSPACE\nSPACE\nCOPY\nSPACE\nCOPY\nSPACE\nCOPY\nCOPY\nSPACE\nCOPY\nCOPY\nCOPY\nSPACE\nSPACE\nCOPY\nSPACE\nCOPY\nSPACE\nCOPY\nSPACE\nCOPY\nCOPY\nSPACE\nSPACE\nCOPY\nSPACE\nCOPY\nSPACE\nCOPY\nSPACE\nCOPY\nSPACE\nSPACE\nCOPY\nSPACE\nCOPY\nSPACE\nSPACE\nCOPY\nSPACE\nCOPY\nSPACE\nCOPY\nCOPY\nSPACE\nCOPY\nCOPY\nCOPY\nSPACE\nSPACE\nCOPY\nSPACE\nCOPY\nSPACE\nCOPY\nSPACE\nCOPY\nCOPY\nSPACE\nSPACE\nCOPY\nSPACE\nCOPY\nSPACE\nCOPY\nSPACE\nCOPY\nSPACE\nSPACE\nCOPY\nSPACE\nCOPY\nT\n5.3\no\n10.9\nm\n17.1\no\n26.2\nk\n32.4\na\n38.1\n \n42.6\nF\n47.6\na\n53.2\nr\n59.3\nm\n63.3\ns\n72.3\nL\n70.8\nR\n79.6\nd\n86\nL\n11.1\nT\n5.3\na\n15.8\ny\n26.9\nl\n40.2\no\n45.9\nr\n57.4\nL\n58.1\nR\n70.9\nd\n82.8\nL\n19.8\nGUIDE SIGN WORKSHEET\nTHE OFFICIAL RECORD OF THIS SHEET IS THE ELECTRONIC FILE DIGITALLY SIGNED AND SEALED UNDER RULE 61G15-23.004\u201a F.A.C.\nVOLUSIA COUNTY\nDESCRIPTION\nDATE\nDESCRIPTION\nDATE\nREVISIONS\nSHEET\nNO.\nX:\\jobs\\6400\\6478.00\\000_CADD\\64780000001\\Signalization\\GSWKSG01.dwg\nCad Users\n4/8/2025 8:42:45 AM\n----\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\nT-18\n----\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\n\u00a0\nLTG\nEngineering\n& Planning\nVENDOR No.: F030424608005\nPH: 321.499.4679  FAX: 321.499.4680\nMELBOURNE, FL 32904\n1049 EBER BOULEVARD, SUITE 104\nJONATHAN M. BRASCH\nP.E.  No. 94069\nROAD NO.\nCOUNTY\nLTG PROJECT NO.\nVOLUSIA\n6478\n\u00a0CR 415\n\n\n--- Page Break ---\n\n[Page 19]\n\n\n--- Page Break ---\n\n[Page 20]\n",
+  "notes": [
+    "Extracted via native",
+    "Source: Taylor Rd and Tomoka Farms Rd Intersection Improvements Civil Plan Set.pdf",
+    "Pages: 20",
+    "AI matched: 5 items",
+    "Needs review: 8 items",
+    "Material: 411.0 LF pipe, 211 structures"
+  ]
+}

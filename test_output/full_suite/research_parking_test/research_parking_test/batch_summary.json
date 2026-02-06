@@ -1,0 +1,19 @@
+{
+  "run_datetime": "2026-02-06T11:05:34.154662",
+  "input_folder": "/Users/joe/.openclaw/workspace/projects/autowork/test_plans/research_parking_test.pdf",
+  "output_folder": "/Users/joe/.openclaw/workspace/projects/autowork/code/test_output/full_suite/research_parking_test/research_parking_test",
+  "statistics": {
+    "total_files": 1,
+    "successful_files": 1,
+    "failed_files": 0,
+    "total_pages_analyzed": 1,
+    "total_pay_items": 8,
+    "total_matched_items": 8,
+    "grand_total_estimate": 0.0,
+    "processing_time_seconds": 43.57
+  },
+  "files_completed": [
+    "/Users/joe/.openclaw/workspace/projects/autowork/test_plans/research_parking_test.pdf"
+  ],
+  "files_failed": []
+}

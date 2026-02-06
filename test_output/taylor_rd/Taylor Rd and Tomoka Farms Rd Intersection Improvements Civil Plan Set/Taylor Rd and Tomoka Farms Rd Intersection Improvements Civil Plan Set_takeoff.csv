@@ -1,0 +1,152 @@
+Pay Item No,Description,Unit,Quantity,Unit Price,Line Cost,Page,Source,Confidence,Matched,Match Source,AI Match Reason
+104-10-3,SEDIMENT BARRIER,LF,735.0,,,,fdot,high,No,,
+110-1-1,CLEARING & GRUBBING,AC,0.46,,,,fdot,high,No,,
+110-4-10,REMOVAL OF EXISTING CONCRETE PAVEMENT/REMOVAL IF EXISTING CONCRETE,SY,43.0,,,,fdot,high,No,,
+327-70-1,"MILLING EXISTING ASPHALT PAVEMENT, 1"" AVG DEPTH",SY,1551.0,,,,fdot,high,No,,
+425-1-345,"INLETS, CURB, TYPE P-4, PARTIAL",EA,1.0,,,,fdot,high,Yes,ai,Direct match in inlet category with specific type
+425-1-521,"INLETS, DT BOT, TYPE C, <10'",EA,2.0,,,,fdot,high,Yes,ai,Direct match in inlet category with ditch bottom type
+430-174-118,"PIPE CULVERT, OPTIONAL MATERIAL, ROUND, 18""SD",LF,20.0,40.0,800.0,,fdot,high,Yes,rules,
+430-175-118,"PIPE CULVERT, OPTIONAL MATERIAL, ROUND, 18""S/CD",LF,391.0,40.0,15640.0,,fdot,high,Yes,rules,
+430-984-125,"MITERED END SECTION, OPTIONAL ROUND, 18"" SD",EA,1.0,2100.0,2100.0,,fdot,high,Yes,rules,
+520-1-10,"CONCRETE CURB & GUTTER, TYPE F",LF,155.0,,,,fdot,high,No,,
+570-1-2,"PERFORMANCE TURF, SOD",SY,1397.0,,,,fdot,high,No,,
+630-2-11,"CONDUIT, F&I, OPEN TRENCH",LF,1215.0,,,,fdot,high,No,,
+630-2-12,"CONDUIT, F&I, DIRECTIONAL BORE",LF,282.0,,,,fdot,high,No,,
+630-2-14,"CONDUIT, F&I, ABOVEGROUND",LF,85.0,,,,fdot,high,No,,
+633-1-111,"FIBER OPTIC CABLE, F&I, OVERHEAD,2-12 FIBERS",LF,834.0,,,,fdot,high,No,,
+633-1-121,"FIBER OPTIC CABLE, F&I, UNDERGROUND,2-12 FIBERS",LF,974.0,,,,fdot,high,No,,
+633-2-31,"FIBER OPTIC CONNECTION, INSTALL, SPLICE",EA,96.0,,,,fdot,high,No,,
+633-3-11,"FIBER OPTIC CONNECTION HARDWARE, F&I, SPLICE ENCLOSURE",EA,1.0,,,,fdot,high,No,,
+633-3-12,"FIBER OPTIC CONNECTION HARDWARE, F&I, SPLICE TRAY",EA,1.0,,,,fdot,high,No,,
+633-3-15,"FIBER OPTIC CONNECTION HARDWARE, F&I, PRETERMINATED PATCH PANEL",EA,1.0,,,,fdot,high,No,,
+635-2-12,"PULL & SPLICE BOX, F&I, 24"" X 36"" COVER SIZE",EA,4.0,,,,fdot,high,No,,
+635-2-14,"PULL & SPLICE BOX, F&I, 17"" X 30"" COVER SIZE",EA,27.0,,,,fdot,high,No,,
+639-2-1,"ELECTRICAL SERVICE WIRE, F&I",LF,43.0,,,,fdot,high,No,,
+639-3-11,"ELECTRICAL SERVICE DISCONNECT, F&I, POLE MOUNT",EA,1.0,,,,fdot,high,No,,
+641-2-12,"PRESTRESSED CONCRETE POLE, F&I TYPE P-II SERVICE POLE",EA,1.0,,,,fdot,high,No,,
+641-2-80,"PRESTRESSED CONCRETE POLE, COMPLETE POLE REMOVAL- POLE 30' AND GREATER",EA,4.0,,,,fdot,high,No,,
+646-1-11,"ALUMINUM SIGNALS POLE, PEDESTAL",EA,2.0,,,,fdot,high,No,,
+649-21-3,"STEEL MAST ARM ASSEMBLY, FURNISH AND INSTALL, SINGLE ARM 40'",EA,1.0,,,,fdot,high,No,,
+649-21-6,"STEEL MAST ARM ASSEMBLY, FURNISH AND INSTALL, SINGLE ARM 50'",EA,1.0,,,,fdot,high,No,,
+649-21-19,"STEEL MAST ARM ASSEMBLY, FURNISH AND INSTALL, DOUBLE ARM 70'-60'",EA,1.0,,,,fdot,high,No,,
+660-1-109,"LOOP DETECTOR INDUCTIVE, F&I, TYPE 5, 2CHANNEL, SOLID STATE, RACK MOUNTED",EA,6.0,,,,fdot,high,No,,
+665-1-12,"PEDESTRIAN DETECTOR, FURNISH & INSTALL, ACCESSIBLE1",EA,2.0,,,,fdot,high,No,,
+682-1-112,"ITS CCTV CAMERA, F&I, DOME ENCLOSURE - PRESSURIZED, IP, STANDARD DEFINITION",EA,1.0,,,,fdot,high,No,,
+684-1-1,"MANAGED FIELD ETHERNET SWITCH, FURNISH & INSTALL",EA,1.0,,,,fdot,high,No,,
+685-1-13,"UNINTERRUPTIBLE POWER SUPPLY, F&I, LINE INTERACTIVE WITH CABINET",EA,1.0,,,,fdot,high,No,,
+685-2-1,"REMOTE POWER MANAGEMENT UNIT- RPMU, FURNISH AND INSTALL",EA,1.0,,,,fdot,high,No,,
+700-5-22,"INTERNALLY ILLUMINATED SIGN, F&I, OVERHEAD MOUNT 12-18 SF",EA,4.0,,,,fdot,high,No,,
+706-1-3,"RAISED PAVEMENT MARKER, TYPE B",EA,38.0,,,,fdot,high,No,,
+711-11-123,"THERMOPLASTIC, STANDARD, WHITE, SOLID, 12"" FOR CROSSWALK AND ROUNDABOUT",LF,140.0,,,,fdot,high,No,,
+711-11-125,"THERMOPLASTIC, STANDARD, WHITE, SOLID, 24"" FOR STOP LINE AND CROSSWALK",LF,185.0,,,,fdot,high,No,,
+711-11-170,"THERMOPLASTIC, STANDARD, WHITE, ARROW",EA,7.0,,,,fdot,high,No,,
+715-5-31,"LUMINAIRE & BRACKET ARM- ALUM., FURNISH & INSTALL NEW LUMINAIRE AND ARM ON NEW/EXISTING POLE",EA,2.0,,,,fdot,high,No,,
+660-2-102,210,LF,630.0,,,,fdot,high,No,,
+635-2-14,145,LF,630.0,,,,fdot,high,No,,
+660-2-106,39,LF,630.0,,,,fdot,high,No,,
+630-2-12,1,EA,635.0,,,,fdot,high,No,,
+635-2-14,1,EA,649.0,,,,fdot,high,No,,
+660-2-106,1,EA,635.0,,,,fdot,high,No,,
+630-2-11,1,EA,635.0,,,,fdot,high,No,,
+639-1-122,10,LF,639.0,,,,fdot,high,No,,
+639-3-11,1,EA,641.0,,,,fdot,high,No,,
+649-21-3,2,EA,635.0,,,,fdot,high,No,,
+660-2-102,1,EA,676.0,,,,fdot,high,No,,
+635-2-12,1,EA,633.0,,,,fdot,high,No,,
+633-1-121,244,LF,633.0,,,,fdot,high,No,,
+633-1-121,20,LF,630.0,,,,fdot,high,No,,
+633-2-31,100,LF,630.0,,,,fdot,high,No,,
+646-1-11,1,EA,665.0,,,,fdot,high,No,,
+633-3-12,200,LF,633.0,,,,fdot,high,No,,
+670-5-161,5,EA,635.0,,,,fdot,high,No,,
+660-1-109,1,EA,685.0,,,,fdot,high,No,,
+630-2-11,2,EA,684.0,,,,fdot,high,No,,
+633-1-121,1,EA,635.0,,,,fdot,high,No,,
+632-7-1,48,EA,633.0,,,,fdot,high,No,,
+633-1-111,1,EA,649.0,,,,fdot,high,No,,
+630-2-14,70,LF,633.0,,,,fdot,high,No,,
+630-2-11,65,LF,633.0,,,,fdot,high,No,,
+700-5-22,2,EA,700.0,,,,fdot,high,No,,
+101-1,MOBILIZATION,LS,1.0,,,,fdot,high,No,,
+102-1,MAINTENANCE OF TRAFFIC,LS,1.0,,,,fdot,high,No,,
+104-11,FLOATING TURBIDITY BARRIER,LF,15.0,,,,fdot,high,No,,
+120-00,EARTHWORK,LS,1.0,,,,fdot,high,No,,
+160-4,TYPE B STABILIZATION,SY,1027.0,,,,fdot,high,No,,
+425-11,MODIFY EXISTING DRAINAGE STRUCTURE,EA,1.0,,,,fdot,high,Yes,ai,Generic drainage structure modification
+522-1,"CONCRETE SIDEWALK AND DRIVEWAYS, 4"" THICK",SY,11.0,,,,fdot,high,No,,
+522-2,"CONCRETE SIDEWALK AND DRIVEWAYS, 6"" THICK",SY,49.0,,,,fdot,high,No,,
+527-2,DETECTABLE WARNINGS,SF,20.0,,,,fdot,high,No,,
+633-6,1,EA,682.0,,,,fdot,high,No,,
+421-02,140,LF,633.0,,,,fdot,high,No,,
+CMP-18,"18"" CMP PIPE (VERIFY QTY)",LF,0,40.0,,,callout,low,Yes,rules,
+HDPE-48,"48"" HDPE PIPE (VERIFY QTY)",LF,0,215.0,,,callout,low,Yes,rules,
+RCP-48,"48"" RCP PIPE (VERIFY QTY)",LF,0,215.0,,,callout,low,Yes,rules,
+RCP-24,"24"" RCP PIPE (VERIFY QTY)",LF,0,62.0,,,callout,low,Yes,rules,
+RCP-15,"15"" RCP PIPE (VERIFY QTY)",LF,0,30.0,,,callout,low,Yes,rules,
+PVC-24,"24"" PVC PIPE (VERIFY QTY)",LF,0,62.0,,,callout,low,Yes,rules,
+HDPE-18,"18"" HDPE PIPE (VERIFY QTY)",LF,0,40.0,,,callout,low,Yes,rules,
+CMP-15,"15"" CMP PIPE (VERIFY QTY)",LF,0,30.0,,,callout,low,Yes,rules,
+RCP-18,"18"" RCP PIPE (VERIFY QTY)",LF,0,40.0,,,callout,low,Yes,rules,
+MANHOLE,MANHOLE (VERIFY QTY),EA,0,,,,drainage_label,low,Yes,ai,Generic manhole from drainage catalog
+INLET,INLET (VERIFY QTY),EA,0,,,,drainage_label,low,Yes,ai,Generic inlet from drainage catalog
+
+DRAINAGE STRUCTURES
+Type,ID,Size,Description,Quantity,Page,Confidence
+Inlet,,Type P,"INLETS, CURB, TYPE P-4, PARTIAL",1.0,,
+Inlet,,Standard,"INLETS, DT BOT, TYPE C, <10'",2.0,,
+Pipe,,"18""","PIPE CULVERT, OPTIONAL MATERIAL, ROUND, 18""SD",20.0,,
+Pipe,,"18""","PIPE CULVERT, OPTIONAL MATERIAL, ROUND, 18""S/CD",391.0,,
+Endwall,,"18""","MES - MITERED END SECTION, OPTIONAL ROUND, 18"" SD",1.0,,
+Inlet,,Standard,MODIFY EXISTING DRAINAGE STRUCTURE,1.0,,
+Pipe,,"18""","18"" CMP PIPE (VERIFY QTY)",0,,
+Pipe,,"48""","48"" HDPE PIPE (VERIFY QTY)",0,,
+Pipe,,"48""","48"" RCP PIPE (VERIFY QTY)",0,,
+Pipe,,"24""","24"" RCP PIPE (VERIFY QTY)",0,,
+Pipe,,"15""","15"" RCP PIPE (VERIFY QTY)",0,,
+Pipe,,"24""","24"" PVC PIPE (VERIFY QTY)",0,,
+Pipe,,"18""","18"" HDPE PIPE (VERIFY QTY)",0,,
+Pipe,,"15""","15"" CMP PIPE (VERIFY QTY)",0,,
+Pipe,,"18""","18"" RCP PIPE (VERIFY QTY)",0,,
+Manhole,,Standard,MANHOLE (VERIFY QTY),0,,
+Inlet,,Standard,INLET (VERIFY QTY),0,,
+
+ITEMS NEEDING REVIEW
+Description,Quantity,Unit,Page,Reason,Region Hint
+"18"" CMP PIPE",0,LF,0,"Zero quantity is suspicious. Corrman pipe (CMP) is a standard drainage item, but quantity needs verification from plan details.",Unknown location
+"48"" HDPE PIPE",0,LF,0,"High-density polyethylene (HDPE) pipe is common in drainage, but zero quantity requires plan review.",Unknown location
+"48"" RCP PIPE",0,LF,0,"Reinforced concrete pipe (RCP) is standard for drainage, but zero quantity is problematic.",Unknown location
+"24"" RCP PIPE",0,LF,0,"RCP pipe is valid drainage item, but zero quantity suggests extraction error.",Unknown location
+"15"" RCP PIPE",0,LF,0,"Pipe size and type seem standard, but zero quantity needs verification.",Unknown location
+"24"" PVC PIPE",0,LF,0,"PVC pipe is common in drainage, but zero quantity requires plan review.",Unknown location
+"18"" HDPE PIPE",0,LF,0,"HDPE pipe is valid drainage material, but zero quantity is suspicious.",Unknown location
+"15"" CMP PIPE",0,LF,0,"Corrugated metal pipe is standard drainage item, but zero quantity needs confirmation.",Unknown location
+"18"" RCP PIPE",0,LF,0,"RCP pipe is valid drainage item, but zero quantity suggests extraction error.",Unknown location
+MANHOLE,0,EA,0,"Manholes are typical in drainage systems, but zero quantity requires plan verification.",Unknown location
+
+MATERIAL TAKEOFF SUMMARY
+
+PIPE SUMMARY
+Size/Material,Total LF,Count
+"15""_CMP",0,1
+"15""_RCP",0,1
+"18""_CMP",0,1
+"18""_HDPE",0,1
+"18""_PIPE",411.0,2
+"18""_RCP",0,1
+"24""_PVC",0,1
+"24""_RCP",0,1
+"48""_HDPE",0,1
+"48""_RCP",0,1
+
+STRUCTURE SUMMARY
+Type,Count
+INLET,4
+MANHOLE,1
+OTHER,11313
+
+GRAND TOTALS
+Metric,Value
+Total Pipe LF,411.0
+Total Pipe Sizes,10
+Total Structures,11318
+Total Structure Types,3

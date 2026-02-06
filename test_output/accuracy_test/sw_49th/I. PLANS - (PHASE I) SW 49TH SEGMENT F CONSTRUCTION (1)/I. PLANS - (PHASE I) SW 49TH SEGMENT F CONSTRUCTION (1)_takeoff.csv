@@ -1,0 +1,24 @@
+Pay Item No,Description,Unit,Quantity,Unit Price,Line Cost,Page,Source,Confidence,Matched,Match Source,AI Match Reason
+700-1-11,"SINGLE POST SIGN, F&I, GROUND MOUNT, UP TO 12",SF,5.0,,,,fdot,high,No,,
+INLET,INLET (VERIFY QTY),EA,0,,,,drainage_label,low,Yes,ai,Exact unit match (EA) and inlet type matches drainage catalog inlet category
+
+DRAINAGE STRUCTURES
+Type,ID,Size,Description,Quantity,Page,Confidence
+Inlet,,Standard,INLET (VERIFY QTY),0,,
+
+ITEMS NEEDING REVIEW
+Description,Quantity,Unit,Page,Reason,Region Hint
+INLET,0,EA,0,"Zero quantity for an inlet is suspicious. Typical Florida DOT drainage plans usually have a specific number of inlets. Quantity needs manual review from plan. Description looks like a standard drainage structure item, but the zero quantity suggests an extraction error or incomplete data.",Unknown location
+
+MATERIAL TAKEOFF SUMMARY
+
+STRUCTURE SUMMARY
+Type,Count
+INLET,1
+
+GRAND TOTALS
+Metric,Value
+Total Pipe LF,0
+Total Pipe Sizes,0
+Total Structures,1
+Total Structure Types,1

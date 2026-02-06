@@ -1,0 +1,9 @@
+
+============================================================
+Error at: 2026-01-31T11:12:24.511626
+============================================================
+Traceback (most recent call last):
+  File "/Users/joedu/Documents/ProjectJoe/AutoWork/gui/app.py", line 751, in _run_workflow
+    final_state.update(state_update)
+TypeError: 'NoneType' object is not iterable
+

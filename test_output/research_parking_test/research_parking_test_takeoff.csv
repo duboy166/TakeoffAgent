@@ -1,0 +1,43 @@
+Pay Item No,Description,Unit,Quantity,Unit Price,Line Cost,Page,Source,Confidence,Matched,Match Source,AI Match Reason
+RCP-24,"24"" RCP PIPE (VERIFY QTY)",LF,0,62.0,,1,callout,low,Yes,rules,
+RCP-30,"30"" RCP PIPE (VERIFY QTY)",LF,0,95.0,,1,callout,low,Yes,rules,
+INLET,INLET #30,EA,1,,,1,drainage_label,high,Yes,ai,Inlet number directly maps to catalog inlet type
+INLET,INLET #11,EA,1,,,1,drainage_label,high,Yes,ai,Inlet number directly maps to catalog inlet type
+INLET,INLET #622,EA,1,,,1,drainage_label,high,Yes,ai,Inlet number maps to catalog inlet type
+INLET,INLET #21,EA,1,,,1,drainage_label,high,Yes,ai,Inlet number directly maps to catalog inlet type
+INLET,INLET #918,EA,1,,,1,drainage_label,high,Yes,ai,Inlet number maps to catalog inlet type
+INLET,INLET #17,EA,1,,,1,drainage_label,high,Yes,ai,Inlet number directly maps to catalog inlet type
+
+DRAINAGE STRUCTURES
+Type,ID,Size,Description,Quantity,Page,Confidence
+Pipe,,"24""","24"" RCP PIPE (VERIFY QTY)",0,,
+Pipe,,"30""","30"" RCP PIPE (VERIFY QTY)",0,,
+Inlet,,Standard,INLET #30,1,,
+Inlet,,Standard,INLET #11,1,,
+Inlet,,Standard,INLET #622,1,,
+Inlet,,Standard,INLET #21,1,,
+Inlet,,Standard,INLET #918,1,,
+Inlet,,Standard,INLET #17,1,,
+
+ITEMS NEEDING REVIEW
+Description,Quantity,Unit,Page,Reason,Region Hint
+"24"" RCP PIPE",24.9,LF,1,Text context suggests quantity of 24.90 LF might be correct. Original extraction showed 0 quantity. Description seems correct for drainage pipe.,Middle-right region
+"30"" RCP PIPE",30.0,LF,1,"Text context shows 30.00, which likely represents pipe length. Original extraction showed 0 quantity. Description appears correct for drainage pipe.",Bottom-right region
+
+MATERIAL TAKEOFF SUMMARY
+
+PIPE SUMMARY
+Size/Material,Total LF,Count
+"24""_RCP",0,1
+"30""_RCP",0,1
+
+STRUCTURE SUMMARY
+Type,Count
+INLET,6
+
+GRAND TOTALS
+Metric,Value
+Total Pipe LF,0
+Total Pipe Sizes,2
+Total Structures,6
+Total Structure Types,1

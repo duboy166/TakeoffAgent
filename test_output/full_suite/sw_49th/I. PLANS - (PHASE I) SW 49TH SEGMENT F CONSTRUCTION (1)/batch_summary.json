@@ -1,0 +1,19 @@
+{
+  "run_datetime": "2026-02-06T11:07:23.573422",
+  "input_folder": "/Users/joe/.openclaw/workspace/projects/autowork/test_plans/I. PLANS - (PHASE I) SW 49TH SEGMENT F CONSTRUCTION (1).pdf",
+  "output_folder": "/Users/joe/.openclaw/workspace/projects/autowork/code/test_output/full_suite/sw_49th/I. PLANS - (PHASE I) SW 49TH SEGMENT F CONSTRUCTION (1)",
+  "statistics": {
+    "total_files": 1,
+    "successful_files": 1,
+    "failed_files": 0,
+    "total_pages_analyzed": 20,
+    "total_pay_items": 2,
+    "total_matched_items": 1,
+    "grand_total_estimate": 0.0,
+    "processing_time_seconds": 5.92
+  },
+  "files_completed": [
+    "/Users/joe/.openclaw/workspace/projects/autowork/test_plans/I. PLANS - (PHASE I) SW 49TH SEGMENT F CONSTRUCTION (1).pdf"
+  ],
+  "files_failed": []
+}
