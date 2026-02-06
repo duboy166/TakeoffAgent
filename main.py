@@ -90,9 +90,11 @@ Examples:
     )
 
     parser.add_argument(
-        "--parallel",
-        action="store_true",
-        help="Enable parallel page processing (3-4x faster on multi-core CPUs)"
+        "--no-parallel",
+        dest="parallel",
+        action="store_false",
+        default=True,
+        help="Disable parallel page processing (parallel is enabled by default)"
     )
 
     parser.add_argument(
