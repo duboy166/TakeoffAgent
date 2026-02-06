@@ -5,7 +5,7 @@ Conditionally splits large PDFs before processing.
 
 import logging
 from pathlib import Path
-from typing import Dict, Any, List
+from typing import Dict, Any
 
 from ..state import TakeoffState
 
@@ -53,7 +53,11 @@ def check_split_pdf_node(state: TakeoffState) -> Dict[str, Any]:
 
     if not current_file:
         logger.warning("No current file to check for splitting")
-        return {}
+        return {
+            "last_error": "No current file to check for splitting",
+            "needs_split": False,
+            "extraction_method": "error"
+        }
 
     if not SPLITTER_AVAILABLE:
         logger.warning("PDF splitter not available - skipping split check")
@@ -107,7 +111,7 @@ def check_split_pdf_node(state: TakeoffState) -> Dict[str, Any]:
         # Update files_pending:
         # 1. Remove the original large file
         # 2. Add all split chunks in its place
-        files_pending = state.get("files_pending", [])
+        files_pending = state.get("files_pending") or []
         new_pending = []
 
         for f in files_pending:
@@ -118,7 +122,7 @@ def check_split_pdf_node(state: TakeoffState) -> Dict[str, Any]:
                 new_pending.append(f)
 
         # Track that we've split files
-        split_files_map = state.get("split_files_map", {})
+        split_files_map = state.get("split_files_map") or {}
         split_files_map[current_file] = split_files
 
         return {

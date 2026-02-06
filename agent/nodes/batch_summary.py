@@ -46,8 +46,8 @@ def batch_summary_node(state: TakeoffState) -> Dict[str, Any]:
         State updates with master_summary, end_time
     """
     output_path = state.get("output_path", "")
-    files_completed = state.get("files_completed", [])
-    files_failed = state.get("files_failed", [])
+    files_completed = state.get("files_completed") or []
+    files_failed = state.get("files_failed") or []
     start_time = state.get("start_time")
     input_path = state.get("input_path", "")
 

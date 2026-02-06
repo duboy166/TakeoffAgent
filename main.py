@@ -92,7 +92,7 @@ Examples:
     parser.add_argument(
         "--parallel",
         action="store_true",
-        help="Enable parallel PDF extraction (experimental)"
+        help="Enable parallel page processing (3-4x faster on multi-core CPUs)"
     )
 
     parser.add_argument(
@@ -155,6 +155,14 @@ Examples:
     if not args.input_path or not args.output_path:
         parser.error("input_path and output_path are required (unless using --show-graph)")
 
+    # Validate numeric arguments (BUG-058 fix)
+    if args.dpi < 72 or args.dpi > 600:
+        parser.error(f"DPI must be between 72 and 600, got {args.dpi}")
+    if args.max_retries < 0:
+        parser.error(f"max-retries must be non-negative, got {args.max_retries}")
+    if args.vision_budget < 1:
+        parser.error(f"vision-budget must be at least 1, got {args.vision_budget}")
+
     # Resolve paths
     input_path = Path(args.input_path).resolve()
     output_path = Path(args.output_path).resolve()
@@ -193,14 +201,15 @@ Examples:
     print("  Construction Takeoff Agent")
     print("  LangGraph Workflow for FL Construction Plans")
     print("=" * 60)
-    print(f"  Input:  {input_path}")
-    print(f"  Output: {output_path}")
-    print(f"  DPI:    {args.dpi}")
-    print(f"  Mode:   {mode_display.get(extraction_mode, extraction_mode)}")
+    print(f"  Input:    {input_path}")
+    print(f"  Output:   {output_path}")
+    print(f"  DPI:      {args.dpi}")
+    print(f"  Parallel: {'Enabled' if args.parallel else 'Disabled'}")
+    print(f"  Mode:     {mode_display.get(extraction_mode, extraction_mode)}")
     if extraction_mode == "hybrid":
         print(f"  Vision Budget: {args.vision_budget} pages/PDF")
     if price_list_path:
-        print(f"  Prices: {price_list_path}")
+        print(f"  Prices:   {price_list_path}")
     print("=" * 60 + "\n")
 
     # Run the workflow

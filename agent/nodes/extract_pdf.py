@@ -10,7 +10,7 @@ Supports three extraction modes:
 
 import logging
 from pathlib import Path
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Tuple
 
 from ..state import TakeoffState
 
@@ -86,11 +86,17 @@ def extract_pdf_node(state: TakeoffState) -> Dict[str, Any]:
         # OCR extraction (for both 'ocr_only' and 'hybrid' modes)
         # In hybrid mode, we also track per-page confidence for selective Vision
         is_hybrid = extraction_mode == "hybrid"
-        logger.info(f"Using PaddleOCR extraction (hybrid={is_hybrid})")
-        return _extract_with_paddleocr(pdf_path, dpi, track_per_page=is_hybrid)
+        use_parallel = state.get("parallel", False)
+        logger.info(f"Using PaddleOCR extraction (hybrid={is_hybrid}, parallel={use_parallel})")
+        return _extract_with_paddleocr(pdf_path, dpi, track_per_page=is_hybrid, parallel=use_parallel)
 
 
-def _extract_with_paddleocr(pdf_path: Path, dpi: int, track_per_page: bool = False) -> Dict[str, Any]:
+def _extract_with_paddleocr(
+    pdf_path: Path,
+    dpi: int,
+    track_per_page: bool = False,
+    parallel: bool = False
+) -> Dict[str, Any]:
     """
     Extract text using local PaddleOCR.
 
@@ -99,6 +105,7 @@ def _extract_with_paddleocr(pdf_path: Path, dpi: int, track_per_page: bool = Fal
         dpi: Resolution for OCR
         track_per_page: If True (hybrid mode), track per-page confidence
                         and flag low-confidence pages for Vision API
+        parallel: If True, use parallel processing for multi-page PDFs
 
     Returns:
         State updates including extracted_text, and optionally
@@ -107,8 +114,8 @@ def _extract_with_paddleocr(pdf_path: Path, dpi: int, track_per_page: bool = Fal
     try:
         from tools.ocr_extractor import OCRExtractor
 
-        logger.info("Using local PaddleOCR for extraction")
-        extractor = OCRExtractor()
+        logger.info(f"Using local PaddleOCR for extraction (parallel={parallel})")
+        extractor = OCRExtractor(parallel=parallel)
         doc = extractor.extract_from_pdf(str(pdf_path), dpi=dpi)
 
         if doc.errors:
@@ -122,12 +129,13 @@ def _extract_with_paddleocr(pdf_path: Path, dpi: int, track_per_page: bool = Fal
                 "page_count": doc.page_count,
                 "text_blocks": [],
                 "pages_ocr_results": [],
-                "pages_flagged_for_vision": []
+                "pages_flagged_for_vision": [],
+                "pages_product_analysis": []
             }
 
         # Convert TextBlock objects to dicts for state serialization
         text_blocks = []
-        for block in doc.all_text_blocks:
+        for block in (doc.all_text_blocks or []):
             text_blocks.append({
                 "text": block.text,
                 "confidence": block.confidence,
@@ -147,16 +155,26 @@ def _extract_with_paddleocr(pdf_path: Path, dpi: int, track_per_page: bool = Fal
             "last_error": None
         }
 
+        # Add parallel processing metrics if available
+        if hasattr(doc, 'parallel_workers') and doc.parallel_workers > 0:
+            result["parallel_workers"] = doc.parallel_workers
+            result["pages_classified"] = getattr(doc, 'pages_classified', [])
+            result["pages_skipped"] = getattr(doc, 'pages_skipped', 0)
+            logger.info(f"Parallel extraction: {doc.parallel_workers} workers, {doc.pages_skipped} pages skipped")
+
         # For hybrid mode: track per-page results and flag low-confidence pages
         if track_per_page:
-            pages_ocr_results, pages_flagged = _analyze_ocr_pages(doc)
+            pages_ocr_results, pages_flagged, pages_product_analysis = _analyze_ocr_pages(doc)
             result["pages_ocr_results"] = pages_ocr_results
             result["pages_flagged_for_vision"] = pages_flagged
+            result["pages_product_analysis"] = pages_product_analysis
 
             if pages_flagged:
-                logger.info(f"Hybrid mode: Flagged {len(pages_flagged)} pages for Vision: {pages_flagged}")
+                # Summarize flagging reasons
+                product_flags = sum(1 for p in pages_product_analysis if p.get("needs_vision"))
+                logger.info(f"Hybrid mode: Flagged {len(pages_flagged)} pages for Vision: {pages_flagged} (product issues: {product_flags})")
             else:
-                logger.info("Hybrid mode: All pages have good OCR confidence, no Vision needed")
+                logger.info("Hybrid mode: All pages have good OCR and product detection, no Vision needed")
 
         return result
 
@@ -178,43 +196,82 @@ def _extract_with_paddleocr(pdf_path: Path, dpi: int, track_per_page: bool = Fal
         }
 
 
-def _analyze_ocr_pages(doc) -> tuple:
+def _analyze_ocr_pages(doc) -> Tuple[List[Dict], List[int], List[Dict]]:
     """
     Analyze OCR results per page and flag low-confidence pages.
 
     A page is flagged for Vision if:
-    1. Average OCR confidence < 0.65
-    2. Very few text blocks detected (< 5)
-    3. Page has minimal text content (< 50 chars)
+    1. OCR Quality Issues:
+       - Average OCR confidence < 0.65
+       - Very few text blocks detected (< 5)
+       - Page has minimal text content (< 50 chars)
+    2. Product Detection Issues (NEW):
+       - Product keywords found but items incomplete
+       - CAD callouts without quantities
+       - Complex tables/pipe schedules detected
 
     Args:
         doc: ExtractedDocument from OCR
 
     Returns:
-        Tuple of (pages_ocr_results list, pages_flagged_for_vision list)
+        Tuple of:
+        - pages_ocr_results: List of per-page OCR metrics
+        - pages_flagged_for_vision: List of page numbers needing Vision
+        - pages_product_analysis: List of per-page product analysis results
     """
+    from tools.analyze_takeoff import analyze_page_product_quality
+
     pages_ocr_results = []
     pages_flagged = []
+    pages_product_analysis = []
+
+    # Safety check in case doc.pages is None
+    if not doc.pages:
+        return pages_ocr_results, pages_flagged, pages_product_analysis
 
     for page in doc.pages:
         page_num = page.page_num
         confidence = page.confidence
         text_length = len(page.text.strip()) if page.text else 0
         block_count = len(page.text_blocks) if page.text_blocks else 0
+        page_text = page.text or ""
+
+        # Run product quality analysis on the page
+        product_analysis = analyze_page_product_quality(page_text, page_num)
 
         page_result = {
             "page_num": page_num,
             "confidence": confidence,
             "text_length": text_length,
             "block_count": block_count,
-            "text_preview": page.text[:200] if page.text else ""
+            "text_preview": page.text[:200] if page.text else "",
+            # Add product analysis metrics
+            "product_keywords_found": product_analysis.product_keywords_found,
+            "complete_items_found": product_analysis.complete_items_found,
+            "incomplete_items_found": product_analysis.incomplete_items_found,
+            "callouts_without_quantity": product_analysis.callouts_without_quantity,
+            "has_pipe_schedule": product_analysis.has_pipe_schedule
         }
         pages_ocr_results.append(page_result)
+
+        # Store product analysis for state
+        pages_product_analysis.append({
+            "page_num": page_num,
+            "product_keywords_found": product_analysis.product_keywords_found,
+            "complete_items_found": product_analysis.complete_items_found,
+            "incomplete_items_found": product_analysis.incomplete_items_found,
+            "callouts_without_quantity": product_analysis.callouts_without_quantity,
+            "has_complex_tables": product_analysis.has_complex_tables,
+            "has_pipe_schedule": product_analysis.has_pipe_schedule,
+            "needs_vision": product_analysis.needs_vision,
+            "reasons": product_analysis.reasons
+        })
 
         # Determine if this page needs Vision review
         needs_vision = False
         reasons = []
 
+        # === OCR Quality Checks ===
         # Check confidence threshold
         if confidence < OCR_CONFIDENCE_THRESHOLD:
             needs_vision = True
@@ -230,11 +287,17 @@ def _analyze_ocr_pages(doc) -> tuple:
             needs_vision = True
             reasons.append(f"minimal_text ({text_length} chars)")
 
+        # === Product Detection Checks (NEW) ===
+        # Use product analysis to flag pages
+        if product_analysis.needs_vision:
+            needs_vision = True
+            reasons.extend(product_analysis.reasons)
+
         if needs_vision:
             pages_flagged.append(page_num)
-            logger.debug(f"Page {page_num} flagged for Vision: {', '.join(reasons)}")
+            logger.info(f"Page {page_num} flagged for Vision: {', '.join(reasons)}")
 
-    return pages_ocr_results, pages_flagged
+    return pages_ocr_results, pages_flagged, pages_product_analysis
 
 
 def _extract_with_vision(pdf_path: Path, dpi: int) -> Dict[str, Any]:
@@ -271,11 +334,15 @@ def _extract_with_vision(pdf_path: Path, dpi: int) -> Dict[str, Any]:
         # This allows the parse_items node to work with vision output
         extracted_text = vision_to_text(doc)
 
+        # Safety: ensure lists are not None
+        all_pay_items = doc.all_pay_items or []
+        all_drainage_structures = doc.all_drainage_structures or []
+
         # Also pass the pre-extracted items directly
         # The parse_items node can use these if available
         logger.info(
-            f"Vision extracted {len(doc.all_pay_items)} pay items, "
-            f"{len(doc.all_drainage_structures)} structures from {doc.page_count} pages "
+            f"Vision extracted {len(all_pay_items)} pay items, "
+            f"{len(all_drainage_structures)} structures from {doc.page_count} pages "
             f"(tokens: {doc.total_tokens})"
         )
 
@@ -285,8 +352,8 @@ def _extract_with_vision(pdf_path: Path, dpi: int) -> Dict[str, Any]:
             "page_count": doc.page_count,
             "last_error": None,
             # Pass pre-extracted items for parse_items to use
-            "pay_items": doc.all_pay_items,
-            "drainage_structures": doc.all_drainage_structures,
+            "pay_items": all_pay_items,
+            "drainage_structures": all_drainage_structures,
             # Vision API doesn't provide bounding boxes like OCR
             "text_blocks": [],
         }
@@ -296,7 +363,8 @@ def _extract_with_vision(pdf_path: Path, dpi: int) -> Dict[str, Any]:
         return {
             "last_error": f"Vision extractor module not available: {e}",
             "extraction_method": "error",
-            "extracted_text": ""
+            "extracted_text": "",
+            "text_blocks": []
         }
     except ValueError as e:
         # Usually missing API key
@@ -304,12 +372,14 @@ def _extract_with_vision(pdf_path: Path, dpi: int) -> Dict[str, Any]:
         return {
             "last_error": f"Vision extraction config error: {str(e)}",
             "extraction_method": "error",
-            "extracted_text": ""
+            "extracted_text": "",
+            "text_blocks": []
         }
     except Exception as e:
         logger.error(f"Vision extraction failed: {e}")
         return {
             "last_error": f"Vision extraction failed: {str(e)}",
             "extraction_method": "error",
-            "extracted_text": ""
+            "extracted_text": "",
+            "text_blocks": []
         }

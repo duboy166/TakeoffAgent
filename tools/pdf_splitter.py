@@ -32,9 +32,18 @@ def get_file_size_mb(filepath: str) -> float:
 
 
 def get_page_count(filepath: str) -> int:
-    """Get page count of a PDF file."""
+    """
+    Get page count of a PDF file.
+
+    Uses pypdf for reliable page counting. PyMuPDF (fitz) is intentionally
+    NOT used here because it can hang indefinitely on certain PDFs,
+    consuming excessive memory and CPU.
+    """
+    # Use pypdf only - fitz can hang on problematic PDFs
     if not PYPDF_AVAILABLE:
+        logger.warning("pypdf not available, cannot get page count")
         return 0
+
     try:
         reader = PdfReader(str(filepath))
         return len(reader.pages)

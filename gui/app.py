@@ -9,6 +9,8 @@ import queue
 import threading
 import subprocess
 import platform
+import traceback
+import logging
 from pathlib import Path
 from datetime import datetime
 from typing import Optional, List, Dict, Any
@@ -41,6 +43,19 @@ from gui.progress import (
 from gui.updater import UpdateChecker
 from gui.update_dialog import UpdateDialog
 
+# Import settings functionality
+from gui.settings import SettingsManager, get_settings_manager
+from gui.settings_dialog import show_settings_dialog
+
+# Import OCR warmup for background initialization
+from tools.ocr_warmup import (
+    start_ocr_warmup,
+    get_warmup_status,
+    is_ocr_ready,
+    WarmupStatus,
+    WarmupProgress
+)
+
 
 class TakeoffAgentApp(ctk.CTk):
     """Main application window for Takeoff Agent."""
@@ -63,6 +78,16 @@ class TakeoffAgentApp(ctk.CTk):
         self.processing = False
         self.results: List[Dict[str, Any]] = []
 
+        # Thread management (BUG-027, BUG-028 fixes)
+        self._worker_thread: Optional[threading.Thread] = None
+        self._cancel_event = threading.Event()
+
+        # Settings
+        self.settings = get_settings_manager()
+
+        # Window close handler (BUG-029 fix)
+        self.protocol("WM_DELETE_WINDOW", self._on_window_close)
+
         # Progress feedback
         self.progress_queue: queue.Queue = queue.Queue()
         self._polling_active = False
@@ -70,6 +95,9 @@ class TakeoffAgentApp(ctk.CTk):
 
         # Build UI
         self._create_widgets()
+
+        # Start OCR warmup in background (reduces first-run delay)
+        self.after(200, self._start_ocr_warmup)
 
         # Check for updates after window is shown
         self.after(100, self._check_for_updates)
@@ -202,7 +230,7 @@ class TakeoffAgentApp(ctk.CTk):
         dpi_label = ctk.CTkLabel(options_row1, text="OCR Resolution (DPI):")
         dpi_label.pack(side="left", padx=(0, 10))
 
-        self.dpi_var = ctk.StringVar(value="200")
+        self.dpi_var = ctk.StringVar(value="100")  # Lower DPI = faster OCR (100 is 6x faster than 200)
         dpi_menu = ctk.CTkOptionMenu(
             options_row1,
             values=["150", "200", "300"],
@@ -219,11 +247,33 @@ class TakeoffAgentApp(ctk.CTk):
         )
         dpi_hint.pack(side="left", padx=(10, 0))
 
-        # Row 2: Extraction mode dropdown
+        # Row 2: Parallel processing checkbox
         options_row2 = ctk.CTkFrame(options_frame, fg_color="transparent")
-        options_row2.pack(fill="x", padx=10, pady=(0, 10))
+        options_row2.pack(fill="x", padx=10, pady=(0, 5))
 
-        extraction_label = ctk.CTkLabel(options_row2, text="Extraction Mode:")
+        self.parallel_var = ctk.BooleanVar(value=True)  # Enable by default
+        self.parallel_checkbox = ctk.CTkCheckBox(
+            options_row2,
+            text="Enable Parallel Processing",
+            variable=self.parallel_var,
+            onvalue=True,
+            offvalue=False
+        )
+        self.parallel_checkbox.pack(side="left")
+
+        parallel_hint = ctk.CTkLabel(
+            options_row2,
+            text="(3-4x faster on multi-core CPUs)",
+            text_color="gray",
+            font=ctk.CTkFont(size=11)
+        )
+        parallel_hint.pack(side="left", padx=(10, 0))
+
+        # Row 3: Extraction mode dropdown with settings button
+        options_row3 = ctk.CTkFrame(options_frame, fg_color="transparent")
+        options_row3.pack(fill="x", padx=10, pady=(0, 10))
+
+        extraction_label = ctk.CTkLabel(options_row3, text="Extraction Mode:")
         extraction_label.pack(side="left", padx=(0, 10))
 
         # Extraction mode options:
@@ -232,7 +282,7 @@ class TakeoffAgentApp(ctk.CTk):
         # - vision_only: Full Vision API for all pages (most accurate, highest cost)
         self.extraction_mode_var = ctk.StringVar(value="Local OCR Only")
         self.extraction_mode_menu = ctk.CTkOptionMenu(
-            options_row2,
+            options_row3,
             values=[
                 "Local OCR Only",
                 "Hybrid (OCR + Vision)",
@@ -244,35 +294,92 @@ class TakeoffAgentApp(ctk.CTk):
         )
         self.extraction_mode_menu.pack(side="left")
 
+        # Settings button (gear icon)
+        self.settings_btn = ctk.CTkButton(
+            options_row3,
+            text="Settings",
+            width=80,
+            command=self._open_settings
+        )
+        self.settings_btn.pack(side="left", padx=(10, 0))
+
+        # Provider indicator label
+        self.provider_label = ctk.CTkLabel(
+            options_row3,
+            text="",
+            text_color="#2CC985",
+            font=ctk.CTkFont(size=11, weight="bold")
+        )
+        self.provider_label.pack(side="left", padx=(10, 0))
+
+        # Hint label
         self.extraction_hint = ctk.CTkLabel(
-            options_row2,
+            options_row3,
             text="(Free, runs locally)",
             text_color="gray",
             font=ctk.CTkFont(size=11)
         )
         self.extraction_hint.pack(side="left", padx=(10, 0))
 
+        # Update provider indicator on startup
+        self._update_provider_indicator()
+
     def _on_extraction_mode_change(self, choice):
         """Handle extraction mode change - update hint and check API key."""
         hints = {
             "Local OCR Only": "(Free, runs locally)",
-            "Hybrid (OCR + Vision)": "(Vision only for low-confidence pages, ~85% cost savings)",
-            "Vision Only": "(AI-powered, requires ANTHROPIC_API_KEY)"
+            "Hybrid (OCR + Vision)": "(Vision for low-confidence pages)",
+            "Vision Only": "(AI-powered extraction)"
         }
         self.extraction_hint.configure(text=hints.get(choice, ""))
 
         # Check for API key if Vision is involved
         if choice in ["Hybrid (OCR + Vision)", "Vision Only"]:
-            api_key = os.environ.get("ANTHROPIC_API_KEY")
+            # Check settings manager first, then env var
+            provider = self.settings.get_active_provider()
+            api_key = self.settings.get_api_key(provider)
+
             if not api_key:
-                messagebox.showwarning(
+                # No API key configured - prompt to open settings
+                result = messagebox.askyesno(
                     "API Key Required",
-                    f"'{choice}' requires an ANTHROPIC_API_KEY environment variable.\n\n"
-                    "Set it in your .env file or system environment before using this mode.\n\n"
-                    "Reverting to 'Local OCR Only'."
+                    f"'{choice}' requires an API key.\n\n"
+                    f"Would you like to configure your API key now?\n\n"
+                    f"Click 'Yes' to open Settings, or 'No' to revert to OCR mode."
                 )
-                self.extraction_mode_var.set("Local OCR Only")
-                self.extraction_hint.configure(text="(Free, runs locally)")
+                if result:
+                    self._open_settings()
+                    # Re-check after settings dialog
+                    api_key = self.settings.get_api_key(self.settings.get_active_provider())
+
+                if not api_key:
+                    self.extraction_mode_var.set("Local OCR Only")
+                    self.extraction_hint.configure(text="(Free, runs locally)")
+                    return
+
+            # Update provider indicator
+            self._update_provider_indicator()
+
+    def _open_settings(self):
+        """Open the settings dialog."""
+        if show_settings_dialog(self):
+            # Settings were saved - update provider indicator
+            self._update_provider_indicator()
+
+    def _update_provider_indicator(self):
+        """Update the provider indicator label based on current settings."""
+        mode = self.extraction_mode_var.get()
+
+        if mode == "Local OCR Only":
+            self.provider_label.configure(text="")
+        else:
+            provider = self.settings.get_active_provider()
+            provider_names = {
+                SettingsManager.PROVIDER_ANTHROPIC: "[Claude]",
+                SettingsManager.PROVIDER_OPENAI: "[GPT-4V]"
+            }
+            display_name = provider_names.get(provider, f"[{provider}]")
+            self.provider_label.configure(text=display_name)
 
     def _create_action_buttons(self):
         """Create Start/New Run/Cancel buttons."""
@@ -360,25 +467,68 @@ class TakeoffAgentApp(ctk.CTk):
         self.results_text.insert("1.0", "No results yet. Select input files and click 'Start Processing'.")
         self.results_text.configure(state="disabled")
 
-    def _check_for_updates(self):
-        """Check for application updates on startup."""
+    def _start_ocr_warmup(self):
+        """Start background OCR engine warmup to reduce first-run delay."""
         try:
-            checker = UpdateChecker()
-            release_info = checker.check_for_update()
+            def warmup_callback(progress: WarmupProgress):
+                # Update status label on main thread
+                if progress.status == WarmupStatus.IN_PROGRESS:
+                    self.after(0, lambda: self.status_label.configure(
+                        text=f"Preparing: {progress.message}"
+                    ))
+                elif progress.status == WarmupStatus.READY:
+                    self.after(0, lambda: self.status_label.configure(text="Ready"))
+                elif progress.status == WarmupStatus.FAILED:
+                    # Don't show error - OCR will try again when processing starts
+                    self.after(0, lambda: self.status_label.configure(text="Ready"))
 
-            if release_info:
-                # Update available - show update dialog
-                dialog = UpdateDialog(self, release_info)
-                dialog.wait_window()
-
-                # If user chose to quit (either via quit button or after install)
-                if dialog.should_quit:
-                    self.destroy()
-                    return
-
+            start_ocr_warmup(progress_callback=warmup_callback)
         except Exception as e:
-            # Don't block the app if update check fails
-            print(f"Update check failed: {e}")
+            # Non-critical - OCR will initialize when processing starts
+            print(f"OCR warmup error (non-critical): {e}")
+
+    def _check_for_updates(self):
+        """Check for application updates on startup (runs in background thread)."""
+        def _do_update_check():
+            try:
+                checker = UpdateChecker()
+                release_info = checker.check_for_update()
+
+                if release_info:
+                    # Schedule dialog on main thread
+                    self.after(0, lambda: self._show_update_dialog(release_info))
+
+            except Exception as e:
+                # Don't block the app if update check fails
+                print(f"Update check failed: {e}")
+
+        # Run update check in background thread (BUG-006 fix)
+        update_thread = threading.Thread(target=_do_update_check, daemon=True)
+        update_thread.start()
+
+    def _show_update_dialog(self, release_info):
+        """Show update dialog on main thread."""
+        dialog = UpdateDialog(self, release_info)
+        dialog.wait_window()
+
+        # If user chose to quit (either via quit button or after install)
+        if dialog.should_quit:
+            self.destroy()
+
+    def _on_window_close(self):
+        """Handle window close event with confirmation if processing (BUG-029 fix)."""
+        if self._worker_thread and self._worker_thread.is_alive():
+            if messagebox.askyesno(
+                "Processing Active",
+                "Processing is still running. Are you sure you want to quit?\n\n"
+                "The current operation will be cancelled."
+            ):
+                self._cancel_event.set()
+                # Give thread a moment to notice cancellation
+                self._worker_thread.join(timeout=2)
+                self.destroy()
+        else:
+            self.destroy()
 
     def _reset_state(self):
         """Reset the application to initial state for a new run."""
@@ -414,11 +564,15 @@ class TakeoffAgentApp(ctk.CTk):
         self.output_entry.configure(state="readonly")
 
         # Reset DPI to default
-        self.dpi_var.set("200")
+        self.dpi_var.set("100")
+
+        # Reset parallel processing to default (enabled)
+        self.parallel_var.set(True)
 
         # Reset extraction mode to default
         self.extraction_mode_var.set("Local OCR Only")
         self.extraction_hint.configure(text="(Free, runs locally)")
+        self.provider_label.configure(text="")
 
         # Reset button states
         self.start_btn.configure(state="normal")
@@ -492,11 +646,13 @@ class TakeoffAgentApp(ctk.CTk):
 
         # Clear results and show processing log header
         mode_text = self.extraction_mode_var.get()
+        parallel_text = "Enabled" if self.parallel_var.get() else "Disabled"
         self.results_text.configure(state="normal")
         self.results_text.delete("1.0", "end")
         self.results_text.insert("1.0", "=" * 50 + "\n")
         self.results_text.insert("end", "PROCESSING LOG\n")
         self.results_text.insert("end", f"Mode: {mode_text}\n")
+        self.results_text.insert("end", f"Parallel: {parallel_text}\n")
         self.results_text.insert("end", "=" * 50 + "\n\n")
         self.results_text.configure(state="disabled")
 
@@ -510,24 +666,55 @@ class TakeoffAgentApp(ctk.CTk):
         # Reset accumulated state
         self._accumulated_state = {}
 
+        # Clear cancellation flag (BUG-027 fix)
+        self._cancel_event.clear()
+
         # Start progress polling BEFORE starting the thread
         self._start_progress_polling()
 
-        # Run processing in background thread
-        thread = threading.Thread(target=self._run_workflow, daemon=True)
-        thread.start()
+        # Run processing in background thread and store reference (BUG-028 fix)
+        self._worker_thread = threading.Thread(target=self._run_workflow, daemon=True)
+        self._worker_thread.start()
 
     def _run_workflow(self):
         """Run the takeoff workflow in a background thread with streaming progress."""
         try:
             from agent import stream_takeoff_workflow
             from tools.model_manager import ModelManager, ModelStatus
+            from tools.ocr_warmup import get_warmup_status, WarmupStatus
 
             dpi = int(self.dpi_var.get())
             start_time = datetime.now()
 
             # Send initial message
             self.progress_queue.put(create_init_message())
+
+            # Non-blocking warmup status check
+            # Don't block here - let OCRExtractor wait for warmup if needed during extraction
+            warmup_status = get_warmup_status()
+            if warmup_status == WarmupStatus.READY:
+                self.progress_queue.put(ProgressMessage(
+                    type=ProgressType.INIT,
+                    node_name="warmup",
+                    message="OCR engine ready",
+                    progress_percent=10
+                ))
+            elif warmup_status == WarmupStatus.IN_PROGRESS:
+                # Warmup running in background - proceed, extraction will wait for it
+                self.progress_queue.put(ProgressMessage(
+                    type=ProgressType.INIT,
+                    node_name="warmup",
+                    message="OCR initializing in background...",
+                    progress_percent=5
+                ))
+            else:
+                # NOT_STARTED or FAILED - proceed, OCRExtractor will handle init
+                self.progress_queue.put(ProgressMessage(
+                    type=ProgressType.INIT,
+                    node_name="warmup",
+                    message="OCR will initialize on first file",
+                    progress_percent=5
+                ))
 
             # Check if models need to be downloaded
             manager = ModelManager(progress_callback=self._model_download_callback)
@@ -555,23 +742,43 @@ class TakeoffAgentApp(ctk.CTk):
             }
             extraction_mode = mode_mapping.get(self.extraction_mode_var.get(), "ocr_only")
 
+            # Get vision provider settings
+            vision_provider = self.settings.get_active_provider()
+            vision_api_key = self.settings.get_api_key(vision_provider)
+
             # Stream through workflow nodes
             final_state = {}
             # use_vision is kept for backward compatibility, but extraction_mode takes precedence
             use_vision = extraction_mode == "vision_only"
+            use_parallel = self.parallel_var.get()
 
             for node_name, state_update in stream_takeoff_workflow(
                 input_path=self.input_path,
                 output_path=self.output_path,
                 dpi=dpi,
+                parallel=use_parallel,
                 max_retries=3,
                 enable_checkpoints=True,
                 use_vision=use_vision,
                 extraction_mode=extraction_mode,
-                vision_page_budget=5  # Max 5 pages to Vision API in hybrid mode
+                vision_page_budget=5,  # Max 5 pages to Vision API in hybrid mode
+                vision_provider=vision_provider,
+                vision_api_key=vision_api_key
             ):
-                # Accumulate state updates
-                final_state.update(state_update)
+                # Check for cancellation (BUG-027 fix)
+                if self._cancel_event.is_set():
+                    self.progress_queue.put(ProgressMessage(
+                        type=ProgressType.ERROR,
+                        node_name="cancelled",
+                        message="Processing cancelled by user",
+                        progress_percent=0
+                    ))
+                    self.after(0, lambda: self._handle_cancellation())
+                    return
+
+                # Accumulate state updates (skip if None)
+                if state_update is not None:
+                    final_state.update(state_update)
 
                 # Format and send progress message
                 progress_msg = format_node_message(node_name, final_state)
@@ -580,21 +787,43 @@ class TakeoffAgentApp(ctk.CTk):
             end_time = datetime.now()
             duration = (end_time - start_time).total_seconds()
 
-            # Send completion message
-            files_completed = len(final_state.get("files_completed", []))
-            files_failed = len(final_state.get("files_failed", []))
+            # Send completion message (use 'or []' to handle explicit None)
+            files_completed = len(final_state.get("files_completed") or [])
+            files_failed = len(final_state.get("files_failed") or [])
             total_estimate = final_state.get("total_estimate", 0)
 
             self.progress_queue.put(create_complete_message(
                 duration, files_completed, files_failed, total_estimate
             ))
 
-            # Schedule final results display
-            self.after(0, lambda: self._display_results(final_state, duration))
+            # Schedule final results display (capture values to avoid closure issues - BUG-049 fix)
+            captured_state = dict(final_state)
+            captured_duration = duration
+            self.after(0, lambda s=captured_state, d=captured_duration: self._display_results(s, d))
 
         except Exception as e:
+            # Capture full traceback for debugging
+            full_traceback = traceback.format_exc()
+            error_log_path = Path(__file__).parent.parent / "error_log.txt"
+
+            # Write to error log file
+            try:
+                with open(error_log_path, "a") as f:
+                    f.write(f"\n{'='*60}\n")
+                    f.write(f"Error at: {datetime.now().isoformat()}\n")
+                    f.write(f"{'='*60}\n")
+                    f.write(full_traceback)
+                    f.write("\n")
+                print(f"Full traceback saved to: {error_log_path}")
+                print(full_traceback)  # Also print to console
+            except Exception as log_err:
+                print(f"Could not write error log: {log_err}")
+                print(full_traceback)
+
             self.progress_queue.put(create_error_message(str(e)))
-            self.after(0, lambda: self._display_error(str(e)))
+            # Capture error message to avoid closure issues (BUG-049 fix)
+            error_msg = f"{str(e)}\n\nFull traceback saved to:\n{error_log_path}"
+            self.after(0, lambda msg=error_msg: self._display_error(msg))
 
     def _model_download_callback(self, progress):
         """Callback for model download progress."""
@@ -695,8 +924,8 @@ class TakeoffAgentApp(ctk.CTk):
         self.progress_bar.set(1.0)
         self.open_folder_btn.configure(state="normal")
 
-        files_completed = result.get("files_completed", [])
-        files_failed = result.get("files_failed", [])
+        files_completed = result.get("files_completed") or []
+        files_failed = result.get("files_failed") or []
         total_estimate = result.get("total_estimate", 0)
         total_items = result.get("total_pay_items", 0)
 
@@ -755,9 +984,36 @@ class TakeoffAgentApp(ctk.CTk):
         messagebox.showerror("Processing Error", error_msg)
 
     def _cancel_processing(self):
-        """Cancel the current processing (placeholder - actual cancellation is complex)."""
-        # Note: Proper cancellation would require more complex thread management
-        messagebox.showinfo("Cancel", "Cancellation requested. Please wait for current file to complete.")
+        """Cancel the current processing (BUG-027 fix: real cancellation)."""
+        if self._worker_thread and self._worker_thread.is_alive():
+            self._cancel_event.set()
+            self.status_label.configure(text="Cancelling...")
+            messagebox.showinfo(
+                "Cancel",
+                "Cancellation requested. Processing will stop after the current operation completes."
+            )
+        else:
+            messagebox.showinfo("Cancel", "No processing is currently running.")
+
+    def _handle_cancellation(self):
+        """Handle UI updates after cancellation."""
+        self._stop_progress_polling()
+        self.processing = False
+
+        # Reset button states
+        self.start_btn.configure(state="normal")
+        self.cancel_btn.configure(state="disabled")
+
+        # Update status
+        self.status_label.configure(text="Cancelled")
+        self.progress_bar.set(0)
+
+        # Update results text
+        self.results_text.configure(state="normal")
+        self.results_text.insert("end", "\n\n" + "=" * 50 + "\n")
+        self.results_text.insert("end", "PROCESSING CANCELLED\n")
+        self.results_text.insert("end", "=" * 50 + "\n")
+        self.results_text.configure(state="disabled")
 
     def _open_output_folder(self):
         """Open the output folder in the system file manager."""

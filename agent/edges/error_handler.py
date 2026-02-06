@@ -7,7 +7,7 @@ import logging
 from typing import Literal
 from pathlib import Path
 
-from ..state import TakeoffState, reset_file_state
+from ..state import TakeoffState, reset_file_state, get_per_file_reset_fields
 
 logger = logging.getLogger(__name__)
 
@@ -61,7 +61,7 @@ def route_after_report(state: TakeoffState) -> Literal["next_file", "summary"]:
     Returns:
         Next node: "next_file" or "summary"
     """
-    files_pending = state.get("files_pending", [])
+    files_pending = state.get("files_pending") or []
 
     if len(files_pending) > 1:
         # More files to process (current file is still in list)
@@ -115,8 +115,8 @@ def mark_file_failed(state: TakeoffState) -> dict:
     """
     current_file = state.get("current_file", "")
     last_error = state.get("last_error", "Unknown error")
-    files_pending = state.get("files_pending", [])
-    files_failed = state.get("files_failed", [])
+    files_pending = state.get("files_pending") or []
+    files_failed = state.get("files_failed") or []
 
     # Record failure
     failed_result = {
@@ -140,24 +140,17 @@ def mark_file_failed(state: TakeoffState) -> dict:
 
     logger.warning(f"File marked as failed: {current_file}")
 
-    return {
+    # Build result with file tracking updates + per-file state reset
+    result = {
         "files_failed": new_failed,
         "files_pending": new_pending,
         "current_file": new_pending[0] if new_pending else None,
-        # Reset per-file state
-        "extracted_text": None,
-        "extraction_method": None,
-        "pay_items": None,
-        "priced_items": None,
-        "drainage_structures": None,
-        "project_info": None,
-        "report_path": None,
-        "last_error": None,
-        "retry_count": 0,
-        # Reset hybrid extraction per-file state
-        "pages_ocr_results": None,
-        "pages_flagged_for_vision": None,
     }
+    # Use shared helper for per-file state reset (single source of truth)
+    result.update(get_per_file_reset_fields())
+    # Reset DPI to original value (may have been increased during retries)
+    result["dpi"] = state.get("original_dpi", 200)
+    return result
 
 
 def advance_to_next_file(state: TakeoffState) -> dict:
@@ -174,29 +167,21 @@ def advance_to_next_file(state: TakeoffState) -> dict:
         State updates with next file as current
     """
     current_file = state.get("current_file", "")
-    files_pending = state.get("files_pending", [])
+    files_pending = state.get("files_pending") or []
 
     # Remove from pending (files_completed already updated by generate_report_node)
     new_pending = [f for f in files_pending if f != current_file]
 
     logger.info(f"File completed: {current_file}")
 
-    return {
+    # Build result with file tracking updates + per-file state reset
+    # Note: totals and files_completed already updated by generate_report_node
+    result = {
         "files_pending": new_pending,
         "current_file": new_pending[0] if new_pending else None,
-        # Note: totals and files_completed already updated by generate_report_node
-        # Reset per-file state
-        "extracted_text": None,
-        "extraction_method": None,
-        "pay_items": None,
-        "priced_items": None,
-        "drainage_structures": None,
-        "project_info": None,
-        "report_path": None,
-        "last_error": None,
-        "retry_count": 0,
-        "_file_result": None,
-        # Reset hybrid extraction per-file state
-        "pages_ocr_results": None,
-        "pages_flagged_for_vision": None,
     }
+    # Use shared helper for per-file state reset (single source of truth)
+    result.update(get_per_file_reset_fields())
+    # Reset DPI to original value (may have been increased during retries)
+    result["dpi"] = state.get("original_dpi", 200)
+    return result

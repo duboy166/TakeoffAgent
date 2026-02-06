@@ -15,9 +15,17 @@ import sys
 import json
 import base64
 import logging
+import re
 from pathlib import Path
 from typing import List, Dict, Optional, Any, Tuple
 from dataclasses import dataclass, field
+
+# Retry logic
+try:
+    from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
+    TENACITY_AVAILABLE = True
+except ImportError:
+    TENACITY_AVAILABLE = False
 
 # PDF/Image handling
 try:
@@ -32,6 +40,12 @@ try:
     PIL_AVAILABLE = True
 except ImportError:
     PIL_AVAILABLE = False
+
+try:
+    from pdf2image import convert_from_path
+    PDF2IMAGE_AVAILABLE = True
+except ImportError:
+    PDF2IMAGE_AVAILABLE = False
 
 # Anthropic API
 try:
@@ -185,7 +199,10 @@ class VisionExtractedDocument:
 
 class VisionExtractor:
     """
-    Extracts construction pay items from PDFs using Claude Vision.
+    Extracts construction pay items from PDFs using Vision AI.
+
+    Supports multiple providers (Anthropic Claude, OpenAI GPT-4V) through
+    the vision_providers abstraction layer.
 
     This provides an alternative to OCR + regex that can understand
     spatial relationships and complex layouts.
@@ -194,32 +211,103 @@ class VisionExtractor:
     def __init__(
         self,
         api_key: Optional[str] = None,
-        model: str = "claude-sonnet-4-20250514",
-        max_tokens: int = 4096
+        model: str = None,
+        max_tokens: int = 4096,
+        provider: Optional[str] = None
     ):
         """
         Initialize the vision extractor.
 
         Args:
-            api_key: Anthropic API key (defaults to ANTHROPIC_API_KEY env var)
-            model: Claude model to use (sonnet recommended for balance of cost/accuracy)
+            api_key: API key (defaults to env var based on provider)
+            model: Model to use (defaults to provider's default model)
             max_tokens: Maximum tokens for response
+            provider: Provider name ('anthropic' or 'openai'). Defaults to 'anthropic'.
         """
-        if not ANTHROPIC_AVAILABLE:
-            raise ImportError("anthropic package not installed. Run: pip install anthropic")
+        # Import provider abstraction
+        try:
+            from tools.vision_providers import get_provider, AnthropicProvider, OpenAIProvider
+            PROVIDERS_AVAILABLE = True
+        except ImportError:
+            PROVIDERS_AVAILABLE = False
 
-        self.api_key = api_key or os.getenv("ANTHROPIC_API_KEY")
-        if not self.api_key:
+        # Determine provider (default to anthropic for backward compatibility)
+        self.provider_name = provider or "anthropic"
+
+        # Get API key from env var if not provided
+        if api_key is None:
+            env_var_map = {
+                "anthropic": "ANTHROPIC_API_KEY",
+                "openai": "OPENAI_API_KEY"
+            }
+            env_var = env_var_map.get(self.provider_name, "ANTHROPIC_API_KEY")
+            api_key = os.getenv(env_var)
+
+        if not api_key:
             raise ValueError(
-                "Anthropic API key required. Set ANTHROPIC_API_KEY environment variable "
-                "or pass api_key parameter."
+                f"API key required for {self.provider_name}. "
+                f"Set environment variable or pass api_key parameter."
             )
 
-        self.client = anthropic.Anthropic(api_key=self.api_key)
-        self.model = model
+        self.api_key = api_key
         self.max_tokens = max_tokens
 
-        logger.info(f"VisionExtractor initialized with model: {model}")
+        # Use provider abstraction if available
+        if PROVIDERS_AVAILABLE:
+            self.provider = get_provider(self.provider_name, api_key, model)
+            self.model = self.provider.model
+            # For backward compatibility, keep client reference for anthropic
+            if self.provider_name == "anthropic":
+                self.client = self.provider.client
+        else:
+            # Fallback to direct Anthropic usage (backward compatibility)
+            if not ANTHROPIC_AVAILABLE:
+                raise ImportError("anthropic package not installed. Run: pip install anthropic")
+            self.provider = None
+            self.model = model or "claude-sonnet-4-20250514"
+            self.client = anthropic.Anthropic(api_key=self.api_key)
+
+        logger.info(f"VisionExtractor initialized with provider: {self.provider_name}, model: {self.model}")
+
+    def _call_anthropic_api_with_retry(self, messages: List[Dict], timeout: float = 60.0) -> Any:
+        """
+        Call Anthropic API with timeout and retry logic.
+
+        Retries on rate limit and timeout errors with exponential backoff.
+
+        Args:
+            messages: Messages to send to the API
+            timeout: Timeout in seconds (default 60s)
+
+        Returns:
+            API response
+        """
+        # Define retry decorator if tenacity available
+        if TENACITY_AVAILABLE and ANTHROPIC_AVAILABLE:
+            @retry(
+                stop=stop_after_attempt(3),
+                wait=wait_exponential(multiplier=1, min=2, max=30),
+                retry=retry_if_exception_type((anthropic.RateLimitError, anthropic.APITimeoutError)),
+                before_sleep=lambda retry_state: logger.warning(
+                    f"API call failed, retrying (attempt {retry_state.attempt_number}/3)..."
+                )
+            )
+            def _make_request():
+                return self.client.messages.create(
+                    model=self.model,
+                    max_tokens=self.max_tokens,
+                    messages=messages,
+                    timeout=timeout
+                )
+            return _make_request()
+        else:
+            # Fallback without retry (still has timeout)
+            return self.client.messages.create(
+                model=self.model,
+                max_tokens=self.max_tokens,
+                messages=messages,
+                timeout=timeout
+            )
 
     def extract_from_pdf(
         self,
@@ -288,8 +376,9 @@ class VisionExtractor:
             try:
                 page_result = self._extract_from_image(img, page_num)
                 pages.append(page_result)
-                all_pay_items.extend(page_result.pay_items)
-                all_drainage_structures.extend(page_result.drainage_structures)
+                # Use 'or []' to handle None values
+                all_pay_items.extend(page_result.pay_items or [])
+                all_drainage_structures.extend(page_result.drainage_structures or [])
                 total_tokens += page_result.tokens_used
             except Exception as e:
                 logger.error(f"Failed to process page {page_num}: {e}")
@@ -321,31 +410,44 @@ class VisionExtractor:
         )
 
     def _pdf_to_images(self, pdf_path: Path, dpi: int) -> List[Image.Image]:
-        """Convert PDF pages to PIL Images."""
-        if not PYMUPDF_AVAILABLE:
-            logger.error("PyMuPDF not available for PDF conversion")
-            return []
+        """Convert PDF pages to PIL Images.
 
+        Prefers pdf2image (poppler-based) over PyMuPDF because fitz can hang
+        indefinitely on certain problematic PDFs.
+        """
         if not PIL_AVAILABLE:
             logger.error("PIL not available for image handling")
             return []
 
-        images = []
-        try:
-            doc = fitz.open(str(pdf_path))
-            for page in doc:
-                # Render page to pixmap
-                mat = fitz.Matrix(dpi / 72, dpi / 72)
-                pix = page.get_pixmap(matrix=mat)
+        # Prefer pdf2image (poppler-based) - more reliable, doesn't hang
+        if PDF2IMAGE_AVAILABLE:
+            try:
+                images = convert_from_path(str(pdf_path), dpi=dpi)
+                return images
+            except Exception as e:
+                logger.warning(f"pdf2image conversion failed: {e}")
 
-                # Convert to PIL Image
-                img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
-                images.append(img)
-            doc.close()
-        except Exception as e:
-            logger.error(f"PDF to image conversion failed: {e}")
+        # Fallback to PyMuPDF (can hang on some PDFs)
+        if PYMUPDF_AVAILABLE:
+            images = []
+            try:
+                logger.info("Using PyMuPDF fallback for PDF conversion")
+                doc = fitz.open(str(pdf_path))
+                for page in doc:
+                    # Render page to pixmap
+                    mat = fitz.Matrix(dpi / 72, dpi / 72)
+                    pix = page.get_pixmap(matrix=mat)
 
-        return images
+                    # Convert to PIL Image
+                    img = Image.frombytes("RGB", [pix.width, pix.height], pix.samples)
+                    images.append(img)
+                doc.close()
+                return images
+            except Exception as e:
+                logger.error(f"PyMuPDF PDF to image conversion failed: {e}")
+
+        logger.error("No PDF conversion library available")
+        return []
 
     def _image_to_base64(self, img: Image.Image, max_size: int = 1568) -> Tuple[str, str]:
         """
@@ -375,9 +477,83 @@ class VisionExtractor:
         base64_data = base64.standard_b64encode(buffer.read()).decode("utf-8")
         return base64_data, "image/jpeg"
 
+    def _parse_json_response(self, raw_response: str, page_num: int) -> Dict:
+        """
+        Parse JSON from API response with multiple fallback strategies.
+
+        BUG-017 fix: Improved JSON parsing that handles edge cases.
+
+        Args:
+            raw_response: Raw text response from API
+            page_num: Page number for logging
+
+        Returns:
+            Parsed JSON dict or default empty structure
+        """
+        default_data = {
+            "pay_items": [],
+            "drainage_structures": [],
+            "notes": [],
+            "page_summary": ""
+        }
+
+        if not raw_response:
+            return default_data
+
+        # Strategy 1: Try to parse directly
+        try:
+            return json.loads(raw_response)
+        except json.JSONDecodeError:
+            pass
+
+        # Strategy 2: Find JSON object with balanced braces
+        # This handles cases where there's text before/after the JSON
+        brace_count = 0
+        start_idx = -1
+        end_idx = -1
+
+        for i, char in enumerate(raw_response):
+            if char == '{':
+                if brace_count == 0:
+                    start_idx = i
+                brace_count += 1
+            elif char == '}':
+                brace_count -= 1
+                if brace_count == 0 and start_idx != -1:
+                    end_idx = i + 1
+                    break
+
+        if start_idx != -1 and end_idx != -1:
+            json_str = raw_response[start_idx:end_idx]
+            try:
+                return json.loads(json_str)
+            except json.JSONDecodeError:
+                pass
+
+        # Strategy 3: Try to find JSON in markdown code blocks
+        code_block_match = re.search(r'```(?:json)?\s*(\{[\s\S]*?\})\s*```', raw_response)
+        if code_block_match:
+            try:
+                return json.loads(code_block_match.group(1))
+            except json.JSONDecodeError:
+                pass
+
+        # Strategy 4: Greedy regex (last resort)
+        json_match = re.search(r'\{[\s\S]*\}', raw_response)
+        if json_match:
+            try:
+                return json.loads(json_match.group())
+            except json.JSONDecodeError:
+                logger.warning(f"Could not parse JSON from page {page_num} response (tried all strategies)")
+
+        default_data["notes"] = ["Failed to parse response"]
+        return default_data
+
     def _extract_from_image(self, img: Image.Image, page_num: int) -> VisionExtractedPage:
         """
-        Extract pay items from a single page image using Claude Vision.
+        Extract pay items from a single page image using Vision AI.
+
+        Supports both provider abstraction and direct Anthropic API (backward compatibility).
 
         Args:
             img: PIL Image of the page
@@ -389,59 +565,85 @@ class VisionExtractor:
         # Convert image to base64
         img_base64, media_type = self._image_to_base64(img)
 
-        # Call Claude Vision API
-        response = self.client.messages.create(
-            model=self.model,
-            max_tokens=self.max_tokens,
-            messages=[
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "image",
-                            "source": {
-                                "type": "base64",
-                                "media_type": media_type,
-                                "data": img_base64
-                            }
-                        },
-                        {
-                            "type": "text",
-                            "text": EXTRACTION_PROMPT
+        # Use provider abstraction if available
+        if self.provider is not None:
+            result = self.provider.extract_from_image(img_base64, media_type, EXTRACTION_PROMPT)
+
+            if not result.success:
+                logger.error(f"Vision extraction failed for page {page_num}: {result.error}")
+                return VisionExtractedPage(
+                    page_num=page_num,
+                    pay_items=[],
+                    drainage_structures=[],
+                    notes=[f"Extraction failed: {result.error}"],
+                    page_summary="",
+                    raw_response="",
+                    tokens_used=0
+                )
+
+            # Add page number to each item
+            # Use 'or []' to handle None values from JSON null
+            pay_items = result.pay_items or []
+            for item in pay_items:
+                item["page"] = page_num
+                item["source"] = item.get("source", "vision")
+
+            drainage_structures = result.drainage_structures or []
+            for struct in drainage_structures:
+                struct["page"] = page_num
+
+            return VisionExtractedPage(
+                page_num=page_num,
+                pay_items=pay_items,
+                drainage_structures=drainage_structures,
+                notes=result.notes,
+                page_summary=result.page_summary,
+                raw_response=result.raw_response,
+                tokens_used=result.tokens_used
+            )
+
+        # Fallback: Direct Anthropic API call with retry and timeout (backward compatibility)
+        messages = [
+            {
+                "role": "user",
+                "content": [
+                    {
+                        "type": "image",
+                        "source": {
+                            "type": "base64",
+                            "media_type": media_type,
+                            "data": img_base64
                         }
-                    ]
-                }
-            ]
-        )
+                    },
+                    {
+                        "type": "text",
+                        "text": EXTRACTION_PROMPT
+                    }
+                ]
+            }
+        ]
+
+        response = self._call_anthropic_api_with_retry(messages, timeout=60.0)
 
         # Parse response
-        raw_response = response.content[0].text
-        tokens_used = response.usage.input_tokens + response.usage.output_tokens
+        raw_response = response.content[0].text if response.content and len(response.content) > 0 else ""
 
-        # Extract JSON from response
-        try:
-            # Try to parse directly
-            data = json.loads(raw_response)
-        except json.JSONDecodeError:
-            # Try to find JSON in response
-            import re
-            json_match = re.search(r'\{[\s\S]*\}', raw_response)
-            if json_match:
-                try:
-                    data = json.loads(json_match.group())
-                except json.JSONDecodeError:
-                    logger.warning(f"Could not parse JSON from page {page_num} response")
-                    data = {"pay_items": [], "drainage_structures": [], "notes": ["Failed to parse response"], "page_summary": ""}
-            else:
-                data = {"pay_items": [], "drainage_structures": [], "notes": ["No JSON in response"], "page_summary": ""}
+        # Safely get token usage (BUG-016 fix: guard against None)
+        tokens_used = 0
+        if response.usage:
+            tokens_used = (response.usage.input_tokens or 0) + (response.usage.output_tokens or 0)
+
+        # Extract JSON from response with improved parsing (BUG-017 fix)
+        data = self._parse_json_response(raw_response, page_num)
 
         # Add page number to each item
-        pay_items = data.get("pay_items", [])
+        # Use 'or []' to handle None values from JSON null
+        pay_items = data.get("pay_items") or []
         for item in pay_items:
             item["page"] = page_num
             item["source"] = item.get("source", "vision")
 
-        drainage_structures = data.get("drainage_structures", [])
+        drainage_structures = data.get("drainage_structures") or []
         for struct in drainage_structures:
             struct["page"] = page_num
 
@@ -449,8 +651,8 @@ class VisionExtractor:
             page_num=page_num,
             pay_items=pay_items,
             drainage_structures=drainage_structures,
-            notes=data.get("notes", []),
-            page_summary=data.get("page_summary", ""),
+            notes=data.get("notes") or [],
+            page_summary=data.get("page_summary") or "",
             raw_response=raw_response,
             tokens_used=tokens_used
         )
@@ -588,8 +790,9 @@ class VisionExtractor:
             try:
                 page_result = self._extract_from_image(img, page_num)
                 pages.append(page_result)
-                all_pay_items.extend(page_result.pay_items)
-                all_drainage_structures.extend(page_result.drainage_structures)
+                # Use 'or []' to handle None values
+                all_pay_items.extend(page_result.pay_items or [])
+                all_drainage_structures.extend(page_result.drainage_structures or [])
                 total_tokens += page_result.tokens_used
             except Exception as e:
                 logger.error(f"Failed to process page {page_num}: {e}")
@@ -628,24 +831,26 @@ class VisionExtractor:
 def extract_with_vision(
     pdf_path: str,
     api_key: Optional[str] = None,
-    model: str = "claude-sonnet-4-20250514",
+    model: str = None,
     dpi: int = 150,
-    max_pages: Optional[int] = None
+    max_pages: Optional[int] = None,
+    provider: str = "anthropic"
 ) -> VisionExtractedDocument:
     """
-    Convenience function to extract pay items from a PDF using Claude Vision.
+    Convenience function to extract pay items from a PDF using Vision AI.
 
     Args:
         pdf_path: Path to PDF file
-        api_key: Anthropic API key (defaults to ANTHROPIC_API_KEY env var)
-        model: Claude model to use
+        api_key: API key (defaults to env var based on provider)
+        model: Model to use (defaults to provider's default)
         dpi: Resolution for page rendering
         max_pages: Maximum pages to process
+        provider: Vision provider ('anthropic' or 'openai')
 
     Returns:
         VisionExtractedDocument with all extracted items
     """
-    extractor = VisionExtractor(api_key=api_key, model=model)
+    extractor = VisionExtractor(api_key=api_key, model=model, provider=provider)
     return extractor.extract_from_pdf(pdf_path, dpi=dpi, max_pages=max_pages)
 
 
@@ -665,13 +870,17 @@ def vision_to_text(doc: VisionExtractedDocument) -> str:
     """
     lines = []
 
+    # Safety check for None pages
+    if not doc.pages:
+        return ""
+
     for page in doc.pages:
         lines.append(f"[Page {page.page_num}]")
-        lines.append(page.page_summary)
+        lines.append(page.page_summary or "")
         lines.append("")
 
-        # Format pay items as text
-        for item in page.pay_items:
+        # Format pay items as text (use 'or []' to handle None values)
+        for item in (page.pay_items or []):
             pay_no = item.get("pay_item_no", "")
             desc = item.get("description", "")
             unit = item.get("unit", "")
@@ -720,19 +929,19 @@ if __name__ == "__main__":
 
         print(f"Pages processed: {doc.page_count}")
         print(f"Total tokens used: {doc.total_tokens}")
-        print(f"Pay items found: {len(doc.all_pay_items)}")
-        print(f"Drainage structures found: {len(doc.all_drainage_structures)}")
+        print(f"Pay items found: {len(doc.all_pay_items or [])}")
+        print(f"Drainage structures found: {len(doc.all_drainage_structures or [])}")
         print()
 
         if doc.errors:
             print("Errors:")
-            for err in doc.errors:
+            for err in (doc.errors or []):
                 print(f"  - {err}")
             print()
 
         print("Pay Items:")
         print("-" * 80)
-        for item in doc.all_pay_items:
+        for item in (doc.all_pay_items or []):
             pay_no = item.get("pay_item_no", "N/A")
             desc = item.get("description", "")[:50]
             unit = item.get("unit", "")
@@ -743,7 +952,7 @@ if __name__ == "__main__":
         print()
         print("Drainage Structures:")
         print("-" * 80)
-        for struct in doc.all_drainage_structures:
+        for struct in (doc.all_drainage_structures or []):
             stype = struct.get("type", "")
             size = struct.get("size", "")
             qty = struct.get("quantity", 1)
@@ -765,12 +974,12 @@ if __name__ == "__main__":
                 "pages": [
                     {
                         "page_num": p.page_num,
-                        "pay_items": p.pay_items,
-                        "drainage_structures": p.drainage_structures,
-                        "notes": p.notes,
-                        "page_summary": p.page_summary
+                        "pay_items": p.pay_items or [],
+                        "drainage_structures": p.drainage_structures or [],
+                        "notes": p.notes or [],
+                        "page_summary": p.page_summary or ""
                     }
-                    for p in doc.pages
+                    for p in (doc.pages or [])
                 ]
             }
 

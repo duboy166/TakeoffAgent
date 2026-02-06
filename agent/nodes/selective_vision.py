@@ -23,8 +23,8 @@ def selective_vision_node(state: TakeoffState) -> Dict[str, Any]:
     This node:
     1. Reads pages_flagged_for_vision from state
     2. Respects vision_page_budget to control costs
-    3. Extracts only those page images from PDF
-    4. Runs VisionExtractor on selected pages
+    3. Gets provider and API key from state (or falls back to env var)
+    4. Runs VisionExtractor on selected pages using configured provider
     5. Merges Vision results with existing OCR text
 
     Args:
@@ -34,11 +34,15 @@ def selective_vision_node(state: TakeoffState) -> Dict[str, Any]:
         State updates with merged extracted_text and updated extraction_method
     """
     current_file = state.get("current_file")
-    pages_flagged = state.get("pages_flagged_for_vision", [])
+    pages_flagged = state.get("pages_flagged_for_vision") or []
     vision_page_budget = state.get("vision_page_budget", 5)
     dpi = state.get("dpi", 200)
-    pages_ocr_results = state.get("pages_ocr_results", [])
+    pages_ocr_results = state.get("pages_ocr_results") or []
     existing_text = state.get("extracted_text", "")
+
+    # Get provider configuration from state
+    vision_provider = state.get("vision_provider", "anthropic")
+    vision_api_key = state.get("vision_api_key")
 
     if not current_file:
         return {
@@ -54,12 +58,21 @@ def selective_vision_node(state: TakeoffState) -> Dict[str, Any]:
             "last_error": None
         }
 
-    # Check for API key
-    if not os.getenv("ANTHROPIC_API_KEY"):
-        logger.warning("No ANTHROPIC_API_KEY found - skipping Vision extraction")
+    # Check for API key (from state or env var)
+    api_key = vision_api_key
+    if not api_key:
+        env_var_map = {
+            "anthropic": "ANTHROPIC_API_KEY",
+            "openai": "OPENAI_API_KEY"
+        }
+        env_var = env_var_map.get(vision_provider, "ANTHROPIC_API_KEY")
+        api_key = os.getenv(env_var)
+
+    if not api_key:
+        logger.warning(f"No API key found for {vision_provider} - skipping Vision extraction")
         return {
             "extraction_method": "paddleocr",
-            "last_error": "Vision API key not configured (using OCR only)"
+            "last_error": f"Vision API key not configured for {vision_provider} (using OCR only)"
         }
 
     pdf_path = Path(current_file)
@@ -100,13 +113,21 @@ def selective_vision_node(state: TakeoffState) -> Dict[str, Any]:
     try:
         from tools.vision_extractor import VisionExtractor
 
-        extractor = VisionExtractor()
+        # Create extractor with provider configuration
+        extractor = VisionExtractor(
+            api_key=api_key,
+            provider=vision_provider
+        )
+
+        logger.info(f"Using vision provider: {vision_provider}")
 
         # Extract only specific pages using the new method
+        # Always use 200 DPI for Vision API (higher quality for reading small text)
+        # This is independent of OCR DPI which can be lower for speed
         vision_results = extractor.extract_specific_pages(
             str(pdf_path),
             page_numbers=pages_to_process,
-            dpi=max(dpi, 150)  # Ensure minimum DPI for vision
+            dpi=200  # Fixed 200 DPI for Vision quality
         )
 
         if vision_results.errors:
@@ -126,12 +147,16 @@ def selective_vision_node(state: TakeoffState) -> Dict[str, Any]:
             f"(tokens: {vision_results.total_tokens})"
         )
 
+        # Note: We do NOT set pay_items here for hybrid mode.
+        # The merged_text contains Vision-formatted text for flagged pages
+        # (formatted as parseable FDOT-style lines) and OCR text for other pages.
+        # parse_items will parse everything uniformly from merged_text.
+        # This ensures all items (from both OCR and Vision pages) are captured.
         return {
             "extracted_text": merged_text,
             "extraction_method": "hybrid_ocr_vision",
             "last_error": None,
-            # Pass pre-extracted items if Vision found any
-            "pay_items": vision_items if vision_items else None,
+            # Store Vision structures for merge in match_prices if needed
             "drainage_structures": vision_structures if vision_structures else None,
         }
 
@@ -178,7 +203,9 @@ def _merge_results(
         Tuple of (merged_text, all_pay_items, all_drainage_structures)
     """
     # Build a map of page number -> vision page result
-    vision_page_map = {page.page_num: page for page in vision_results.pages}
+    # Safety check in case pages is None
+    vision_pages = vision_results.pages or []
+    vision_page_map = {page.page_num: page for page in vision_pages}
 
     # Split existing text by page markers
     # Format: [Page X]\ntext\n\n--- Page Break ---\n\n
@@ -195,12 +222,14 @@ def _merge_results(
             # Use Vision result for this page
             vision_page = vision_page_map[page_num]
 
-            # Format vision page text
+            # Format vision page text (with null check for page_summary)
             vision_text = f"[Page {page_num}] (Vision)\n"
-            vision_text += vision_page.page_summary + "\n\n"
+            page_summary = vision_page.page_summary if vision_page.page_summary else ""
+            vision_text += page_summary + "\n\n"
 
-            # Add pay items as text
-            for item in vision_page.pay_items:
+            # Add pay items as text (with null check)
+            page_pay_items = vision_page.pay_items or []
+            for item in page_pay_items:
                 pay_no = item.get("pay_item_no", "")
                 desc = item.get("description", "")
                 unit = item.get("unit", "")
@@ -209,9 +238,9 @@ def _merge_results(
 
             merged_sections.append(vision_text)
 
-            # Collect pay items and structures from vision
-            all_pay_items.extend(vision_page.pay_items)
-            all_drainage_structures.extend(vision_page.drainage_structures)
+            # Collect pay items and structures from vision (with null checks)
+            all_pay_items.extend(page_pay_items)
+            all_drainage_structures.extend(vision_page.drainage_structures or [])
         else:
             # Keep OCR result for this page
             merged_sections.append(section.strip())

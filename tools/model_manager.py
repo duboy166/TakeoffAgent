@@ -305,8 +305,18 @@ class ModelManager:
                 shutil.rmtree(self.models_dir)
 
             with zipfile.ZipFile(zip_path, 'r') as zf:
-                # Extract all files
-                zf.extractall(self.app_data_dir)
+                # Safely extract files (BUG-026 fix: prevent zip slip attack)
+                safe_members = []
+                for member in zf.namelist():
+                    # Resolve the member path
+                    member_path = (self.app_data_dir / member).resolve()
+                    # Ensure it's within the target directory
+                    if not str(member_path).startswith(str(self.app_data_dir.resolve())):
+                        logger.error(f"Skipping potentially malicious zip entry: {member}")
+                        continue
+                    safe_members.append(member)
+                # Only extract validated members
+                zf.extractall(self.app_data_dir, members=safe_members)
 
             # Clean up zip file
             zip_path.unlink()

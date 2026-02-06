@@ -105,11 +105,11 @@ def format_node_message(node_name: str, state_update: dict) -> ProgressMessage:
     desc_tuple = NODE_DESCRIPTIONS.get(node_name, (f"Processing {node_name}...", node_name))
     status_text, _ = desc_tuple
 
-    # Extract state info
+    # Extract state info (use 'or []' pattern to handle explicit None values)
     current_file = state_update.get("current_file")
-    files_pending = state_update.get("files_pending", [])
-    files_completed = state_update.get("files_completed", [])
-    files_failed = state_update.get("files_failed", [])
+    files_pending = state_update.get("files_pending") or []
+    files_completed = state_update.get("files_completed") or []
+    files_failed = state_update.get("files_failed") or []
 
     # Calculate counts
     completed_count = len(files_completed)
@@ -129,7 +129,17 @@ def format_node_message(node_name: str, state_update: dict) -> ProgressMessage:
     elif node_name == "extract_pdf" and current_file:
         filename = Path(current_file).name
         dpi = state_update.get("dpi", 200)
-        details = f"File: {filename} (DPI: {dpi})"
+        extraction_method = state_update.get("extraction_method", "")
+        parallel_workers = state_update.get("parallel_workers", 0)
+        pages_skipped = state_update.get("pages_skipped", 0)
+
+        if parallel_workers > 1:
+            details = f"File: {filename} (DPI: {dpi}, {parallel_workers} workers"
+            if pages_skipped > 0:
+                details += f", {pages_skipped} pages skipped"
+            details += ")"
+        else:
+            details = f"File: {filename} (DPI: {dpi})"
 
     elif node_name == "analyze_document":
         recommended = state_update.get("recommended_extraction", "")
@@ -139,7 +149,7 @@ def format_node_message(node_name: str, state_update: dict) -> ProgressMessage:
             details = f"Recommended: {recommended}{quality_str}"
 
     elif node_name == "route_hybrid":
-        pages_flagged = state_update.get("pages_flagged_for_vision", [])
+        pages_flagged = state_update.get("pages_flagged_for_vision") or []
         extraction_mode = state_update.get("extraction_mode", "ocr_only")
         if extraction_mode == "hybrid" and pages_flagged:
             details = f"{len(pages_flagged)} page(s) flagged for Vision"
@@ -147,7 +157,7 @@ def format_node_message(node_name: str, state_update: dict) -> ProgressMessage:
             details = "All pages passed OCR confidence check"
 
     elif node_name == "selective_vision":
-        pages_flagged = state_update.get("pages_flagged_for_vision", [])
+        pages_flagged = state_update.get("pages_flagged_for_vision") or []
         extraction_method = state_update.get("extraction_method", "")
         if extraction_method == "hybrid_ocr_vision":
             details = f"Processed {len(pages_flagged)} page(s) with Vision API"
@@ -155,29 +165,29 @@ def format_node_message(node_name: str, state_update: dict) -> ProgressMessage:
             details = f"Running Vision on pages: {pages_flagged[:5]}{'...' if len(pages_flagged) > 5 else ''}"
 
     elif node_name == "parse_items":
-        items = state_update.get("pay_items", [])
+        items = state_update.get("pay_items") or []
         if items:
             details = f"Found {len(items)} pay items"
 
     elif node_name == "validate_items":
-        issues = state_update.get("validation_issues", [])
+        issues = state_update.get("validation_issues") or []
         corrected = state_update.get("items_corrected", 0)
         if issues or corrected:
             details = f"{len(issues)} issues found, {corrected} auto-corrected"
 
     elif node_name == "verify_low_confidence":
-        for_review = state_update.get("items_for_review", [])
+        for_review = state_update.get("items_for_review") or []
         if for_review:
             details = f"{len(for_review)} items flagged for review"
 
     elif node_name == "match_prices":
-        priced = state_update.get("priced_items", [])
+        priced = state_update.get("priced_items") or []
         if priced:
             matched = sum(1 for p in priced if p.get("matched"))
             details = f"Matched {matched}/{len(priced)} items"
 
     elif node_name == "ai_match_unmatched":
-        ai_matched = state_update.get("ai_matched_items", [])
+        ai_matched = state_update.get("ai_matched_items") or []
         if ai_matched:
             details = f"AI matched {len(ai_matched)} additional items"
 
@@ -193,7 +203,7 @@ def format_node_message(node_name: str, state_update: dict) -> ProgressMessage:
     elif node_name == "mark_failed":
         if current_file:
             filename = Path(current_file).name
-            errors = state_update.get("current_errors", [])
+            errors = state_update.get("current_errors") or []
             error_msg = errors[0] if errors else "Unknown error"
             details = f"Failed: {filename} - {error_msg[:50]}"
 

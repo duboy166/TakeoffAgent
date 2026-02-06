@@ -11,7 +11,7 @@ langchain-anthropic>=0.1.0
 
 # PDF Processing
 PyMuPDF>=1.24.0             # PDF rendering and text extraction
-pdf2image>=1.17.0           # Fallback PDF to image conversion
+pdf2image>=1.17.0           # PDF to image conversion (requires poppler - see CLAUDE.md)
 pypdf>=4.0.0                # PDF splitting and manipulation
 
 # OCR
@@ -25,8 +25,20 @@ numpy>=1.24.0               # Array operations
 # Environment
 python-dotenv>=1.0.0        # Load .env files
 
+# Retry logic
+tenacity>=8.2.0             # Retry with exponential backoff for API calls
+
 # GUI
 customtkinter>=5.2.0        # Modern Tkinter UI
+
+# Secure Storage
+keyring>=24.0.0             # System keychain integration (macOS Keychain, Windows Credential Manager)
+
+# Alternative Vision Provider
+openai>=1.0.0               # OpenAI GPT-4V support
+
+# System Monitoring (for parallel processing)
+psutil>=5.9.0               # CPU/memory detection for optimal parallelization
 
 # Optional: GPU support for faster OCR
 # Uncomment for GPU acceleration:

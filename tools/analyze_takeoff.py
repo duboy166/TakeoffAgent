@@ -7,22 +7,30 @@ Parses extracted text from construction plans and matches to FL 2025 price list.
 import csv
 import re
 import json
+import logging
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
+from dataclasses import dataclass, field
 
-# Standard FDOT round pipe sizes (inches) - used for validation
-# These are the only valid pipe diameters in the FL 2025 price catalog
-VALID_PIPE_SIZES = {12, 15, 18, 24, 30, 36, 42, 48, 54, 60, 64, 66, 72, 84, 96}
+# Import validation gates
+try:
+    from .validation_gates import (
+        VALID_PIPE_SIZES, VALID_ELLIPTICAL_SIZES, MAX_PIPE_SIZE,
+        validate_quantity, validate_description, validate_pipe_size,
+        validate_all_items, ValidationReport
+    )
+except ImportError:
+    # Fallback for direct script execution
+    from validation_gates import (
+        VALID_PIPE_SIZES, VALID_ELLIPTICAL_SIZES, MAX_PIPE_SIZE,
+        validate_quantity, validate_description, validate_pipe_size,
+        validate_all_items, ValidationReport
+    )
 
-# Maximum round pipe size in catalog - anything larger is likely a quantity, not a size
-MAX_PIPE_SIZE = 96
+logger = logging.getLogger(__name__)
 
-# Valid elliptical pipe sizes (rise x span format) from FL 2025 catalog
-# Format: (rise, span) - e.g., 14"x23" means 14" rise by 23" span
-VALID_ELLIPTICAL_SIZES = {
-    (12, 18), (14, 23), (19, 30), (24, 38), (29, 45),
-    (34, 53), (38, 60), (43, 68), (48, 76), (53, 83), (58, 91)
-}
+# Re-export for backward compatibility (sizes now come from validation_gates)
+# VALID_PIPE_SIZES, VALID_ELLIPTICAL_SIZES, MAX_PIPE_SIZE are imported above
 
 # Structure types for endwalls and end sections
 STRUCTURE_TYPES = {
@@ -43,6 +51,221 @@ VALID_MES_CONFIGS = {'SINGLE RUN', 'DOUBLE RUN', 'TRIPLE RUN'}
 # Valid MES frame options
 VALID_MES_FRAME_OPTIONS = {'WITH FRAME', 'NO FRAME'}
 
+# =============================================================================
+# Shared Constants for Product Detection
+# Used by page quality analysis, material summary, and item classification
+# =============================================================================
+
+# Pipe material keywords (canonical set for classification)
+PIPE_MATERIALS = {'RCP', 'PVC', 'HDPE', 'CMP', 'DIP', 'SRCP', 'ERCP', 'PIPE', 'CULVERT'}
+
+# Structure type keywords (canonical set for classification)
+STRUCTURE_TYPE_KEYWORDS = (
+    'INLET', 'MANHOLE', 'CATCH BASIN', 'JUNCTION BOX',
+    'ENDWALL', 'MES', 'FLARED END', 'CRADLE'
+)
+
+# Combined product keywords for page quality analysis
+# Includes materials, structures, abbreviations, and general terms
+PRODUCT_KEYWORDS = (
+    PIPE_MATERIALS |
+    set(STRUCTURE_TYPE_KEYWORDS) |
+    {'MH', 'CB', 'JB', 'FES'} |  # Common abbreviations
+    {'STORM', 'DRAIN', 'SEWER'}   # General drainage terms
+)
+
+# Annotation/callout indicators suggesting complex layouts
+ANNOTATION_KEYWORDS = {'SEE', 'NOTE', 'TYP', 'TYPICAL', 'DETAIL', 'SCHEDULE', 'TABLE'}
+
+
+@dataclass
+class PageProductAnalysis:
+    """Analysis of product detection quality for a single page."""
+    page_num: int
+    product_keywords_found: int = 0
+    complete_items_found: int = 0
+    incomplete_items_found: int = 0
+    callouts_without_quantity: int = 0
+    has_complex_tables: bool = False
+    has_pipe_schedule: bool = False
+    needs_vision: bool = False
+    reasons: List[str] = field(default_factory=list)
+
+
+def analyze_page_product_quality(page_text: str, page_num: int = 1) -> PageProductAnalysis:
+    """
+    Analyze a page's text to determine product detection quality.
+
+    This is used in hybrid mode to decide whether a page needs Vision API
+    for better extraction, based on product detection quality rather than
+    just OCR quality metrics.
+
+    Args:
+        page_text: The OCR-extracted text from a single page
+        page_num: Page number for reference
+
+    Returns:
+        PageProductAnalysis with detection metrics and needs_vision flag
+    """
+    analysis = PageProductAnalysis(page_num=page_num)
+    text_upper = page_text.upper()
+
+    # Count product keywords found
+    for keyword in PRODUCT_KEYWORDS:
+        if keyword in text_upper:
+            analysis.product_keywords_found += 1
+
+    # Quick patterns for complete items (has size AND quantity)
+    # These match items that have both a size and a quantity
+    complete_patterns = [
+        # FDOT format: 430-175-118 PIPE 18" LF 98
+        r'\d{3}-\d{1,3}-\d{1,3}\s+.+?\s+(?:LS|EA|LF|SY|CY|SF|TON)\s+\d+',
+        # Quantity-first: 51 LF 18" RCP
+        r'\d+\s*(?:LF|EA|SF|SY)\s+\d+\s*["\u201d]?\s*(?:RCP|PVC|HDPE|CMP)',
+        # Size-first with quantity: 18" RCP - 51 LF
+        r'\d+\s*["\u201d]\s*(?:RCP|PVC|HDPE|CMP).*?\d+\s*(?:LF|EA)',
+    ]
+
+    for pattern in complete_patterns:
+        matches = re.findall(pattern, text_upper, re.IGNORECASE)
+        analysis.complete_items_found += len(matches)
+
+    # Patterns for incomplete items (keyword but missing size or quantity)
+    # Callouts like "RCP 24" without a length
+    callout_pattern = r'\b(?:RCP|PVC|HDPE|CMP|DIP|SRCP)\s*-?\s*(\d{1,2})\b'
+    callout_matches = re.findall(callout_pattern, text_upper)
+
+    # Check if these callouts have quantities nearby
+    for match in callout_matches:
+        # Look for quantity pattern near the callout (within ~50 chars)
+        context_pattern = rf'(?:RCP|PVC|HDPE|CMP|DIP|SRCP)\s*-?\s*{match}.*?(\d+)\s*(?:LF|EA)'
+        if not re.search(context_pattern, text_upper):
+            analysis.callouts_without_quantity += 1
+
+    # Check for incomplete product mentions (keywords without full details)
+    incomplete_patterns = [
+        # Size mentioned but no quantity
+        r'\b\d{1,2}\s*["\u201d]\s*(?:RCP|PVC|HDPE|CMP|DIP|SRCP)\b(?!.*\d+\s*(?:LF|EA))',
+        # INLET/MANHOLE without ID number
+        r'\b(?:INLET|MANHOLE|CATCH\s*BASIN)\b(?!\s*[#-]?\s*\d)',
+    ]
+
+    for pattern in incomplete_patterns:
+        matches = re.findall(pattern, text_upper[:500], re.IGNORECASE)  # Check first 500 chars
+        analysis.incomplete_items_found += len(matches)
+
+    # Detect complex tables (pipe schedules)
+    table_indicators = [
+        'PIPE SCHEDULE', 'STORM SCHEDULE', 'DRAINAGE SCHEDULE',
+        'QTY', 'QUAN', 'SIZE', 'LENGTH', 'STATION'
+    ]
+    table_count = sum(1 for ind in table_indicators if ind in text_upper)
+    if table_count >= 2:
+        analysis.has_complex_tables = True
+        analysis.has_pipe_schedule = True
+
+    # Check for annotation references that suggest more data elsewhere
+    for ann in ANNOTATION_KEYWORDS:
+        if ann in text_upper:
+            analysis.has_complex_tables = True
+            break
+
+    # Determine if Vision is needed based on product detection issues
+    reasons = []
+
+    # Flag if products detected but items are incomplete
+    if analysis.product_keywords_found > 0 and analysis.complete_items_found == 0:
+        reasons.append(f"product_keywords_found ({analysis.product_keywords_found}) but no complete items")
+        analysis.needs_vision = True
+
+    # Flag if CAD callouts without quantities
+    if analysis.callouts_without_quantity > 0:
+        reasons.append(f"callouts_without_quantity ({analysis.callouts_without_quantity})")
+        analysis.needs_vision = True
+
+    # Flag if incomplete items exceed complete items
+    if analysis.incomplete_items_found > analysis.complete_items_found and analysis.product_keywords_found > 2:
+        reasons.append(f"incomplete_items ({analysis.incomplete_items_found}) > complete_items ({analysis.complete_items_found})")
+        analysis.needs_vision = True
+
+    # Flag if complex tables/schedules detected (Vision better at reading these)
+    if analysis.has_pipe_schedule:
+        reasons.append("pipe_schedule_detected")
+        analysis.needs_vision = True
+
+    analysis.reasons = reasons
+    return analysis
+
+
+def generate_material_summary(pay_items: List[Dict]) -> Dict:
+    """
+    Generate a material takeoff summary from pay items.
+
+    Groups items by type and size to provide totals:
+    - Pipe summary: total LF per size/material
+    - Structure summary: counts by type
+    - Grand totals
+
+    Args:
+        pay_items: List of pay item dictionaries
+
+    Returns:
+        Material summary dictionary
+    """
+    pipe_summary = {}  # key: "18\"_RCP" -> {"total_lf": X, "count": Y}
+    structure_summary = {}  # key: "INLET" -> {"count": X}
+
+    for item in pay_items:
+        desc = item.get('description', '').upper()
+        qty = item.get('quantity', 0) or 0
+        unit = item.get('unit', '').upper()
+
+        # Classify as pipe or structure using shared constants
+        is_pipe = any(mat in desc for mat in PIPE_MATERIALS)
+        is_structure = any(struct in desc for struct in STRUCTURE_TYPE_KEYWORDS)
+
+        if is_pipe and unit == 'LF':
+            # Extract size and material for grouping
+            size_match = re.search(r'(\d{1,2})\s*["\u201d]', desc)
+            mat_match = re.search(r'\b(RCP|PVC|HDPE|CMP|DIP|SRCP|ERCP)\b', desc)
+
+            if size_match:
+                size = size_match.group(1)
+                material = mat_match.group(1) if mat_match else 'PIPE'
+                key = f'{size}"_{material}'
+
+                if key not in pipe_summary:
+                    pipe_summary[key] = {'total_lf': 0, 'count': 0, 'size': size, 'material': material}
+                pipe_summary[key]['total_lf'] += qty
+                pipe_summary[key]['count'] += 1
+
+        elif is_structure or unit == 'EA':
+            # Determine structure type using shared constant
+            struct_type = 'OTHER'
+            for st in STRUCTURE_TYPE_KEYWORDS:
+                if st in desc:
+                    struct_type = st
+                    break
+
+            if struct_type not in structure_summary:
+                structure_summary[struct_type] = {'count': 0}
+            structure_summary[struct_type]['count'] += int(qty) if qty else 1
+
+    # Calculate totals
+    total_pipe_lf = sum(p['total_lf'] for p in pipe_summary.values())
+    total_structures = sum(s['count'] for s in structure_summary.values())
+
+    return {
+        'pipe_summary': pipe_summary,
+        'structure_summary': structure_summary,
+        'totals': {
+            'total_pipe_lf': total_pipe_lf,
+            'total_pipe_sizes': len(pipe_summary),
+            'total_structures': total_structures,
+            'total_structure_types': len(structure_summary)
+        }
+    }
+
 
 class TakeoffAnalyzer:
     """Analyzes construction plan text and generates takeoff reports."""
@@ -52,8 +275,86 @@ class TakeoffAnalyzer:
         self.price_list = {}
         self.price_list_by_fdot = {}  # Index by FDOT code for fast lookup
         self.price_list_loaded = False
+        self._text_blocks = []  # OCR text blocks with locations
         if price_list_path:
             self.load_price_list(price_list_path)
+
+    def _find_source_location(self, match_text: str, description: str = None) -> Optional[Dict]:
+        """
+        Find the source location for a matched text in the text blocks.
+
+        Args:
+            match_text: The text that was matched by regex
+            description: Optional additional text for matching
+
+        Returns:
+            Source location dict with page, bbox, and text_context, or None
+        """
+        if not self._text_blocks:
+            return None
+
+        # Normalize the match text for comparison
+        match_text_lower = match_text.lower().strip()
+        desc_lower = description.lower().strip() if description else ""
+
+        best_match = None
+        best_score = 0
+
+        for block in self._text_blocks:
+            block_text = block.get("text", "").lower()
+
+            # Calculate match score
+            score = 0
+
+            # Check if the block contains key parts of the match
+            if match_text_lower in block_text:
+                score += 100
+            elif any(part in block_text for part in match_text_lower.split() if len(part) > 2):
+                # Partial match - some words match
+                matching_words = sum(1 for part in match_text_lower.split() if part in block_text and len(part) > 2)
+                score += matching_words * 20
+
+            # Check description match
+            if desc_lower:
+                if desc_lower in block_text:
+                    score += 50
+                elif any(part in block_text for part in desc_lower.split() if len(part) > 2):
+                    matching_words = sum(1 for part in desc_lower.split() if part in block_text and len(part) > 2)
+                    score += matching_words * 10
+
+            if score > best_score:
+                best_score = score
+                best_match = block
+
+        if best_match and best_score >= 20:
+            return {
+                "page": best_match.get("page", 1),
+                "bbox": best_match.get("bbox", []),
+                "text_context": best_match.get("text", "")[:100],
+                "ocr_confidence": best_match.get("confidence", 0.0)
+            }
+
+        return None
+
+    def _attach_source_location(self, item: Dict, match_text: str) -> Dict:
+        """
+        Attach source location to an item if text_blocks are available.
+
+        Args:
+            item: Pay item dict
+            match_text: The text that was matched
+
+        Returns:
+            Item with source_location attached if found
+        """
+        if self._text_blocks:
+            location = self._find_source_location(
+                match_text,
+                item.get("description", "")
+            )
+            if location:
+                item["source_location"] = location
+        return item
 
     def load_price_list(self, path: str) -> bool:
         """
@@ -104,19 +405,24 @@ class TakeoffAnalyzer:
         """Parse price string to float."""
         try:
             return float(price_str.replace('$', '').replace(',', ''))
-        except:
+        except (ValueError, TypeError, AttributeError):
             return 0.0
 
-    def extract_pay_items(self, text: str) -> List[Dict]:
+    def extract_pay_items(self, text: str, text_blocks: List[Dict] = None) -> List[Dict]:
         """
         Extract pay items from plan text using multiple pattern strategies.
 
         Args:
             text: Extracted text from construction plans
+            text_blocks: Optional list of OCR text blocks with bounding boxes
+                         for source location tracking
 
         Returns:
-            List of pay item dictionaries
+            List of pay item dictionaries with optional source_location
         """
+        # Store text_blocks for location tracking
+        self._text_blocks = text_blocks or []
+
         seen = set()  # Avoid duplicates across all strategies
         return self._extract_items_from_page(text, seen)
 
@@ -160,7 +466,74 @@ class TakeoffAnalyzer:
         # Strategy 9: Drainage structure labels
         items.extend(self._extract_drainage_labels(page_text, seen))
 
+        # Post-processing: Remove redundant callouts that duplicate FDOT items
+        items = self._dedupe_callouts_against_fdot(items)
+
         return items
+
+    def _dedupe_callouts_against_fdot(self, items: List[Dict]) -> List[Dict]:
+        """
+        Remove callout items that are redundant with FDOT items.
+        
+        When an FDOT item like "430-175-118 PIPE CULVERT 18" RCP" exists,
+        we don't need a separate "RCP-18 (VERIFY QTY)" callout item.
+        """
+        import re
+        
+        # Build set of pipe sizes from high-confidence items
+        fdot_pipe_sizes = set()
+        for item in items:
+            if item.get('source') in ('fdot', 'quantity_first', 'table'):
+                desc = item.get('description', '').upper()
+                pay_item = item.get('pay_item_no', '').upper()
+                
+                # Extract size from various description formats:
+                # - "18" RCP", "24" HDPE" (size before material)
+                # - "ROUND 18"", "ROUND 24"" (size after ROUND)
+                # - "SRCP-CLASS III, ROUND 18"" (FDOT format)
+                size_patterns = [
+                    r'(\d+)["\u201d]?\s*(RCP|PVC|HDPE|CMP|DIP|SRCP)',  # 18" RCP
+                    r'(RCP|PVC|HDPE|CMP|DIP|SRCP)\s*-?\s*(\d+)',       # RCP-18
+                    r'ROUND\s+(\d+)["\u201d]',                          # ROUND 18"
+                ]
+                
+                for pattern in size_patterns:
+                    match = re.search(pattern, desc)
+                    if match:
+                        groups = match.groups()
+                        # Find the numeric group (the size)
+                        for g in groups:
+                            if g and g.isdigit():
+                                fdot_pipe_sizes.add(g)
+                                break
+                        break
+                
+                # Also check pay item codes like 430-175-118 where last 3 digits encode size
+                if pay_item.startswith('430-17'):
+                    # FDOT pipe culvert codes: 430-17X-YYY where YYY is size code
+                    # 118 = 18", 124 = 24", 130 = 30", etc.
+                    size_code = pay_item.split('-')[-1] if '-' in pay_item else ''
+                    if size_code.isdigit() and len(size_code) == 3:
+                        # Extract size: 118 -> 18, 124 -> 24, 130 -> 30
+                        size = size_code[1:]  # Remove first digit
+                        if int(size) in VALID_PIPE_SIZES:
+                            fdot_pipe_sizes.add(size)
+        
+        # Filter out callouts that match FDOT pipe sizes
+        filtered_items = []
+        for item in items:
+            if item.get('source') == 'callout':
+                # Extract size from pay_item_no like "RCP-18" -> "18"
+                pay_item = item.get('pay_item_no', '')
+                parts = pay_item.split('-')
+                if len(parts) == 2:
+                    size = parts[1]
+                    if size in fdot_pipe_sizes:
+                        # Skip - already covered by FDOT item with this size
+                        continue
+            filtered_items.append(item)
+        
+        return filtered_items
 
     def _extract_fdot_items(self, text: str, seen: set) -> List[Dict]:
         """Extract FDOT pay item codes (e.g., 430-175-118)."""
@@ -173,24 +546,59 @@ class TakeoffAnalyzer:
         ]
 
         for pattern in patterns:
-            matches = re.findall(pattern, text, re.IGNORECASE | re.MULTILINE)
-            for match in matches:
-                item_key = f"fdot_{match[0]}_{match[3]}"
+            for match in re.finditer(pattern, text, re.IGNORECASE | re.MULTILINE):
+                groups = match.groups()
+                description = groups[1].strip()
+                quantity = float(groups[3])
+                unit = groups[2].upper()
+                
+                # VALIDATION GATE: Description validation
+                # Reject items with invalid descriptions (numeric-only, too short, just units)
+                desc_result, desc_warnings = validate_description(
+                    description,
+                    pay_item_no=groups[0]
+                )
+                if desc_result is None:
+                    logger.debug(f"Rejected FDOT item {groups[0]}: invalid description '{description}'")
+                    continue
+                
+                # VALIDATION GATE: Quantity validation
+                # Reject quantities outside valid ranges for the unit type
+                qty_result, qty_warnings = validate_quantity(
+                    quantity, unit,
+                    pay_item_no=groups[0]
+                )
+                if qty_result is None:
+                    logger.debug(f"Rejected FDOT item {groups[0]}: invalid quantity {quantity} {unit}")
+                    continue
+                
+                item_key = f"fdot_{groups[0]}_{groups[3]}"
                 if item_key in seen:
                     continue
                 seen.add(item_key)
 
-                items.append({
-                    'pay_item_no': match[0],
-                    'description': match[1].strip(),
-                    'unit': match[2].upper(),
-                    'quantity': float(match[3]),
+                item = {
+                    'pay_item_no': groups[0],
+                    'description': description,
+                    'unit': unit,
+                    'quantity': quantity,
                     'matched': False,
                     'unit_price': None,
                     'line_cost': None,
                     'source': 'fdot',
                     'confidence': 'high'
-                })
+                }
+                
+                # Add validation warnings to item if any
+                if desc_warnings or qty_warnings:
+                    item['validation_warnings'] = [
+                        w.to_dict() for w in (desc_warnings + qty_warnings)
+                        if w.severity.value == 'warning'
+                    ]
+
+                # Attach source location if available
+                self._attach_source_location(item, match.group(0))
+                items.append(item)
 
         return items
 
@@ -281,12 +689,21 @@ class TakeoffAnalyzer:
                         else:
                             desc += f' SDR {spec}'
 
+                    # VALIDATION GATE: Quantity validation
+                    qty_result, qty_warnings = validate_quantity(
+                        qty, unit,
+                        pay_item_no=f'{material}-{size}'
+                    )
+                    if qty_result is None:
+                        logger.debug(f"Rejected qty-first item {material}-{size}: invalid quantity {qty} {unit}")
+                        continue
+
                     item_key = f"qty_{material}_{size}_{qty}"
                     if item_key in seen:
                         continue
                     seen.add(item_key)
 
-                    items.append({
+                    item = {
                         'pay_item_no': f'{material}-{size}',
                         'description': desc,
                         'unit': unit,
@@ -296,7 +713,18 @@ class TakeoffAnalyzer:
                         'line_cost': None,
                         'source': 'quantity_first',
                         'confidence': 'medium'
-                    })
+                    }
+                    
+                    # Add validation warnings if any
+                    if qty_warnings:
+                        item['validation_warnings'] = [
+                            w.to_dict() for w in qty_warnings
+                            if w.severity.value == 'warning'
+                        ]
+
+                    # Attach source location if available
+                    self._attach_source_location(item, match.group(0))
+                    items.append(item)
                 except (ValueError, IndexError):
                     # Skip malformed matches
                     continue
@@ -350,7 +778,7 @@ class TakeoffAnalyzer:
                 continue
             seen.add(item_key)
 
-            items.append({
+            item = {
                 'pay_item_no': f"{data['material']}-{data['size']}",
                 'description': f"{data['size']}\" {data['material']} PIPE (VERIFY QTY)",
                 'unit': 'LF',  # Pipes are typically measured in LF, not EA
@@ -362,7 +790,11 @@ class TakeoffAnalyzer:
                 'confidence': 'low',
                 'needs_verification': True,
                 'mentions': data['mentions']  # How many times seen (for reference)
-            })
+            }
+
+            # Attach source location if available
+            self._attach_source_location(item, f"{data['material']} {data['size']}")
+            items.append(item)
 
         return items
 
@@ -433,7 +865,7 @@ class TakeoffAnalyzer:
                 continue
             seen.add(item_key)
 
-            items.append({
+            item = {
                 'pay_item_no': data['type'],
                 'description': f"{data['type']} #{data['id']}",
                 'unit': 'EA',
@@ -443,7 +875,11 @@ class TakeoffAnalyzer:
                 'line_cost': None,
                 'source': 'drainage_label',
                 'confidence': 'high'  # High confidence when ID is present
-            })
+            }
+
+            # Attach source location if available
+            self._attach_source_location(item, f"{data['type']} #{data['id']}")
+            items.append(item)
 
         # Record generic mentions needing verification (if not already counted via IDs)
         for struct_type, mention_count in generic_mentions.items():
@@ -457,7 +893,7 @@ class TakeoffAnalyzer:
                 continue
             seen.add(item_key)
 
-            items.append({
+            item = {
                 'pay_item_no': struct_type,
                 'description': f"{struct_type} (VERIFY QTY)",
                 'unit': 'EA',
@@ -469,13 +905,20 @@ class TakeoffAnalyzer:
                 'confidence': 'low',  # Low confidence for generic mentions
                 'needs_verification': True,
                 'mentions': mention_count  # How many times mentioned (for reference)
-            })
+            }
+
+            # Attach source location if available
+            self._attach_source_location(item, struct_type)
+            items.append(item)
 
         return items
 
     def _is_valid_elliptical_size(self, rise: int, span: int) -> bool:
-        """Check if rise x span is a valid elliptical pipe size."""
-        return (rise, span) in VALID_ELLIPTICAL_SIZES
+        """Check if rise x span is a valid elliptical pipe size.
+
+        Checks both orientations since dimensions may be swapped in OCR text.
+        """
+        return (rise, span) in VALID_ELLIPTICAL_SIZES or (span, rise) in VALID_ELLIPTICAL_SIZES
 
     def _extract_elliptical_pipe_items(self, text: str, seen: set) -> List[Dict]:
         """
@@ -557,7 +1000,7 @@ class TakeoffAnalyzer:
                         continue
                     seen.add(item_key)
 
-                    items.append({
+                    item = {
                         'pay_item_no': f'ERCP-{rise}x{span}',
                         'description': desc,
                         'unit': unit,
@@ -571,7 +1014,11 @@ class TakeoffAnalyzer:
                         'rise': rise,
                         'span': span,
                         'needs_verification': qty == 0
-                    })
+                    }
+
+                    # Attach source location if available
+                    self._attach_source_location(item, match.group(0))
+                    items.append(item)
                 except (ValueError, IndexError):
                     continue
 
@@ -638,7 +1085,7 @@ class TakeoffAnalyzer:
                         continue
                     seen.add(item_key)
 
-                    items.append({
+                    item = {
                         'pay_item_no': f'ERCP-FE-{rise}x{span}',
                         'description': f'{size_str} ELLIPTICAL FLARED END',
                         'unit': 'EA',
@@ -651,7 +1098,11 @@ class TakeoffAnalyzer:
                         'structure_type': 'FLARED_END_ELLIPTICAL',
                         'rise': rise,
                         'span': span
-                    })
+                    }
+
+                    # Attach source location if available
+                    self._attach_source_location(item, match.group(0))
+                    items.append(item)
                 except (ValueError, IndexError):
                     continue
 
@@ -680,7 +1131,7 @@ class TakeoffAnalyzer:
                         continue
                     seen.add(item_key)
 
-                    items.append({
+                    item = {
                         'pay_item_no': f'ERCP-MES-{rise}x{span}',
                         'description': f'{size_str} ELLIPTICAL MES 4:1',
                         'unit': 'EA',
@@ -693,7 +1144,11 @@ class TakeoffAnalyzer:
                         'structure_type': 'MES_ELLIPTICAL',
                         'rise': rise,
                         'span': span
-                    })
+                    }
+
+                    # Attach source location if available
+                    self._attach_source_location(item, match.group(0))
+                    items.append(item)
                 except (ValueError, IndexError):
                     continue
 
@@ -846,7 +1301,7 @@ class TakeoffAnalyzer:
                     if option:
                         desc += f' {option}'
 
-                    items.append({
+                    item = {
                         'pay_item_no': f'{struct_type}-{size_str}',
                         'description': desc,
                         'unit': 'EA',
@@ -859,7 +1314,11 @@ class TakeoffAnalyzer:
                         'structure_type': struct_type,
                         'configuration': config if config else None,
                         'option': option if option else None
-                    })
+                    }
+
+                    # Attach source location if available
+                    self._attach_source_location(item, match.group(0))
+                    items.append(item)
                 except (ValueError, IndexError):
                     continue
 
@@ -940,7 +1399,7 @@ class TakeoffAnalyzer:
 
                     desc = f'{size_str} GALVANIZED STEEL 4:1 MES {run_config} {frame_option}'
 
-                    items.append({
+                    item = {
                         'pay_item_no': f'GALV-MES-{size}',
                         'description': desc,
                         'unit': 'EA',
@@ -953,7 +1412,11 @@ class TakeoffAnalyzer:
                         'structure_type': 'GALVANIZED_MES_ROUND',
                         'run_config': run_config,
                         'frame_option': frame_option
-                    })
+                    }
+
+                    # Attach source location if available
+                    self._attach_source_location(item, match.group(0))
+                    items.append(item)
                 except (ValueError, IndexError):
                     continue
 
@@ -989,7 +1452,7 @@ class TakeoffAnalyzer:
 
                     desc = f'{rise}"x{span}" GALVANIZED STEEL 4:1 MES {run_config} {frame_option}'
 
-                    items.append({
+                    item = {
                         'pay_item_no': f'GALV-MES-{rise}x{span}',
                         'description': desc,
                         'unit': 'EA',
@@ -1004,7 +1467,11 @@ class TakeoffAnalyzer:
                         'span': span,
                         'run_config': run_config,
                         'frame_option': frame_option
-                    })
+                    }
+
+                    # Attach source location if available
+                    self._attach_source_location(item, match.group(0))
+                    items.append(item)
                 except (ValueError, IndexError):
                     continue
 
@@ -1136,7 +1603,7 @@ class TakeoffAnalyzer:
                     continue
                 seen.add(item_key)
 
-                items.append({
+                item = {
                     'pay_item_no': f'{material}-{size}' if size else material,
                     'description': desc[:100] + ('...' if len(desc) > 100 else ''),
                     'unit': unit or 'LF',  # Default to LF for pipes
@@ -1146,7 +1613,12 @@ class TakeoffAnalyzer:
                     'line_cost': None,
                     'source': 'table',
                     'confidence': 'medium'
-                })
+                }
+
+                # Attach source location if available (using row content as match text)
+                row_text = ' '.join(row)
+                self._attach_source_location(item, row_text)
+                items.append(item)
 
         return items
 
@@ -1294,11 +1766,13 @@ class TakeoffAnalyzer:
             # Tokenize product info
             product_tokens = self._tokenize(f"{product_type} {config}")
 
-            # Calculate token overlap score
-            if product_tokens:
+            # Calculate token overlap score (guard against empty token sets)
+            if product_tokens and desc_tokens:
                 common_tokens = desc_tokens & product_tokens
-                token_score = len(common_tokens) / max(len(desc_tokens), len(product_tokens))
-                score += token_score * 60  # Up to 60 points for token match
+                max_tokens = max(len(desc_tokens), len(product_tokens))
+                if max_tokens > 0:
+                    token_score = len(common_tokens) / max_tokens
+                    score += token_score * 60  # Up to 60 points for token match
 
             # Size match bonus
             if size and size == product_size:
@@ -1606,7 +2080,8 @@ class TakeoffAnalyzer:
 def analyze_text(
     text: str,
     price_list_path: str = None,
-    filename: str = ""
+    filename: str = "",
+    validate: bool = True
 ) -> Dict:
     """
     Convenience function to analyze extracted text.
@@ -1615,14 +2090,20 @@ def analyze_text(
         text: Extracted text from PDF
         price_list_path: Path to FL 2025 price list CSV
         filename: Original filename for project info
+        validate: Whether to run validation gates (default True)
 
     Returns:
-        Dictionary with analysis results
+        Dictionary with analysis results including validation_warnings section
     """
     analyzer = TakeoffAnalyzer(price_list_path)
 
     # Extract pay items
     pay_items = analyzer.extract_pay_items(text)
+    
+    # Run validation gates if enabled
+    validation_report = None
+    if validate:
+        pay_items, validation_report = validate_all_items(pay_items)
 
     # Match to price list
     pay_items = analyzer.match_all_items(pay_items)
@@ -1637,7 +2118,7 @@ def analyze_text(
     matched_items = [p for p in pay_items if p.get('matched')]
     total_cost = sum(p.get('line_cost', 0) or 0 for p in pay_items)
 
-    return {
+    result = {
         "project_info": project_info,
         "pay_items": pay_items,
         "drainage_structures": drainage_structures,
@@ -1648,6 +2129,12 @@ def analyze_text(
             "total_cost": round(total_cost, 2)
         }
     }
+    
+    # Add validation report if validation was run
+    if validation_report:
+        result["validation_warnings"] = validation_report.to_dict()
+    
+    return result
 
 
 if __name__ == '__main__':

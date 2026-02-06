@@ -20,6 +20,10 @@ def route_after_ocr(state: TakeoffState) -> Literal["selective_vision", "parse_i
     - If pages are flagged for Vision AND API key is available: selective_vision
     - Otherwise: continue directly to parse_items
 
+    API key sources (in order of priority):
+    1. vision_api_key from state (passed from GUI settings)
+    2. Environment variable based on vision_provider
+
     Args:
         state: Current workflow state
 
@@ -27,7 +31,7 @@ def route_after_ocr(state: TakeoffState) -> Literal["selective_vision", "parse_i
         Next node: "selective_vision" or "parse_items"
     """
     extraction_mode = state.get("extraction_mode", "ocr_only")
-    pages_flagged = state.get("pages_flagged_for_vision", [])
+    pages_flagged = state.get("pages_flagged_for_vision") or []
     last_error = state.get("last_error")
 
     # If there was an extraction error, go directly to parse (which will handle it)
@@ -46,10 +50,23 @@ def route_after_ocr(state: TakeoffState) -> Literal["selective_vision", "parse_i
         return "parse_items"
 
     # Check for API key availability
-    api_key = os.getenv("ANTHROPIC_API_KEY")
+    # Priority: 1) state vision_api_key, 2) env var based on provider
+    api_key = state.get("vision_api_key")
+
     if not api_key:
+        # Fall back to environment variable based on provider
+        provider = state.get("vision_provider", "anthropic")
+        env_var_map = {
+            "anthropic": "ANTHROPIC_API_KEY",
+            "openai": "OPENAI_API_KEY"
+        }
+        env_var = env_var_map.get(provider, "ANTHROPIC_API_KEY")
+        api_key = os.getenv(env_var)
+
+    if not api_key:
+        provider = state.get("vision_provider", "anthropic")
         logger.warning(
-            "Hybrid mode: Pages flagged for Vision but ANTHROPIC_API_KEY not set. "
+            f"Hybrid mode: Pages flagged for Vision but no API key available for {provider}. "
             "Using OCR-only results."
         )
         return "parse_items"

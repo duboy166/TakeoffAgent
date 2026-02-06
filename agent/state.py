@@ -37,7 +37,8 @@ class TakeoffState(TypedDict):
     input_path: str                    # PDF file or folder path
     output_path: str                   # Output directory for reports
     price_list_path: str               # Path to FL 2025 price list CSV
-    dpi: int                           # OCR resolution (default: 200)
+    dpi: int                           # OCR resolution (current, may change on retry)
+    original_dpi: int                  # Original DPI from config (for reset between files)
     parallel: bool                     # Enable parallel processing
     use_vision: bool                   # Use Claude Vision API for extraction
 
@@ -143,6 +144,25 @@ class TakeoffState(TypedDict):
     vision_page_budget: int                        # Max pages to send to Vision (default: 5)
     extraction_mode: str                           # 'ocr_only', 'hybrid', 'vision_only'
 
+    # ========================
+    # Product-Aware Hybrid (Phase 6b)
+    # ========================
+    pages_product_analysis: Optional[List[Dict]]  # Per-page product detection quality
+    material_summary: Optional[Dict]               # Aggregated material takeoff summary
+
+    # ========================
+    # Multi-Provider Vision (Phase 7)
+    # ========================
+    vision_provider: str                           # 'anthropic' or 'openai'
+    vision_api_key: Optional[str]                  # API key passed from GUI (overrides env var)
+
+    # ========================
+    # Parallel Processing
+    # ========================
+    parallel_workers: int                          # Number of workers used for parallel OCR
+    pages_classified: Optional[List[Dict]]         # Page classification results
+    pages_skipped: Optional[List[int]]             # Page numbers that were skipped
+
 
 def create_initial_state(
     input_path: str,
@@ -153,7 +173,9 @@ def create_initial_state(
     max_retries: int = 3,
     use_vision: bool = False,
     extraction_mode: str = "ocr_only",
-    vision_page_budget: int = 5
+    vision_page_budget: int = 5,
+    vision_provider: str = "anthropic",
+    vision_api_key: str = None
 ) -> TakeoffState:
     """
     Create initial state for a new workflow run.
@@ -168,6 +190,8 @@ def create_initial_state(
         use_vision: Use Claude Vision API for extraction (requires ANTHROPIC_API_KEY)
         extraction_mode: 'ocr_only', 'hybrid', or 'vision_only'
         vision_page_budget: Max pages to send to Vision API in hybrid mode (default: 5)
+        vision_provider: Vision provider to use ('anthropic' or 'openai')
+        vision_api_key: API key for vision provider (overrides environment variable)
 
     Returns:
         Initialized TakeoffState
@@ -178,6 +202,7 @@ def create_initial_state(
         output_path=output_path,
         price_list_path=price_list_path or "",
         dpi=dpi,
+        original_dpi=dpi,  # Store original for reset between files
         parallel=parallel,
         use_vision=use_vision,
 
@@ -252,8 +277,80 @@ def create_initial_state(
         pages_ocr_results=None,
         pages_flagged_for_vision=None,
         vision_page_budget=vision_page_budget,
-        extraction_mode=extraction_mode
+        extraction_mode=extraction_mode,
+
+        # Product-Aware Hybrid (Phase 6b)
+        pages_product_analysis=None,
+        material_summary=None,
+
+        # Multi-Provider Vision (Phase 7)
+        vision_provider=vision_provider,
+        vision_api_key=vision_api_key,
+
+        # Parallel Processing
+        parallel_workers=0,
+        pages_classified=None,
+        pages_skipped=None
     )
+
+
+def get_per_file_reset_fields() -> Dict[str, Any]:
+    """
+    Get the dictionary of per-file state fields and their reset values.
+
+    This is the single source of truth for which fields need to be reset
+    between files. Used by reset_file_state(), mark_file_failed(), and
+    advance_to_next_file() to ensure consistency.
+
+    Returns:
+        Dictionary of field names to their reset values
+    """
+    return {
+        # Core extraction data
+        "extracted_text": None,
+        "extraction_method": None,
+        "page_count": 0,
+        "pay_items": None,
+        "priced_items": None,
+        "drainage_structures": None,
+        "project_info": None,
+        "report_path": None,
+        "csv_path": None,
+        "last_error": None,
+        "retry_count": 0,
+        # PDF splitting
+        "needs_split": False,
+        "is_split_chunk": False,
+        "original_file": None,
+        # Internal transfer
+        "_file_result": None,
+        # Location tracking
+        "text_blocks": None,
+        # Intelligent extraction router
+        "recommended_extraction": None,
+        "document_quality_score": None,
+        "analysis_notes": None,
+        # AI validation
+        "validation_issues": None,
+        "items_corrected": None,
+        "validation_confidence": None,
+        # AI price matching
+        "ai_matched_items": None,
+        "match_explanations": None,
+        # Low-confidence verification
+        "items_for_review": None,
+        "verification_results": None,
+        # Hybrid OCR + Vision
+        "pages_ocr_results": None,
+        "pages_flagged_for_vision": None,
+        # Product-aware hybrid
+        "pages_product_analysis": None,
+        "material_summary": None,
+        # Parallel processing
+        "parallel_workers": 0,
+        "pages_classified": None,
+        "pages_skipped": None,
+    }
 
 
 def reset_file_state(state: TakeoffState) -> TakeoffState:
@@ -261,39 +358,12 @@ def reset_file_state(state: TakeoffState) -> TakeoffState:
     Reset per-file state for processing the next file.
 
     Preserves batch-level state (totals, completed/failed lists).
+    Also resets DPI back to original value if it was increased during retries.
     """
-    state["extracted_text"] = None
-    state["extraction_method"] = None
-    state["page_count"] = 0
-    state["pay_items"] = None
-    state["priced_items"] = None
-    state["drainage_structures"] = None
-    state["project_info"] = None
-    state["report_path"] = None
-    state["csv_path"] = None
-    state["last_error"] = None
-    state["retry_count"] = 0
-    state["needs_split"] = False
-    state["is_split_chunk"] = False
-    state["original_file"] = None
-
-    # Reset agentic features per-file state
-    state["text_blocks"] = None
-    state["recommended_extraction"] = None
-    state["document_quality_score"] = None
-    state["analysis_notes"] = None
-    state["validation_issues"] = None
-    state["items_corrected"] = None
-    state["validation_confidence"] = None
-    state["ai_matched_items"] = None
-    state["match_explanations"] = None
-    state["items_for_review"] = None
-    state["verification_results"] = None
-
-    # Reset Hybrid OCR + Vision (Phase 6) per-file state
-    state["pages_ocr_results"] = None
-    state["pages_flagged_for_vision"] = None
-
+    for field, value in get_per_file_reset_fields().items():
+        state[field] = value
+    # Reset DPI to original value (may have been increased during retries)
+    state["dpi"] = state.get("original_dpi", 200)
     return state
 
 
@@ -303,9 +373,9 @@ def get_state_summary(state: TakeoffState) -> Dict[str, Any]:
     """
     return {
         "current_file": state.get("current_file"),
-        "files_pending": len(state.get("files_pending", [])),
-        "files_completed": len(state.get("files_completed", [])),
-        "files_failed": len(state.get("files_failed", [])),
+        "files_pending": len(state.get("files_pending") or []),
+        "files_completed": len(state.get("files_completed") or []),
+        "files_failed": len(state.get("files_failed") or []),
         "total_estimate": state.get("total_estimate", 0),
         "last_error": state.get("last_error"),
         "retry_count": state.get("retry_count", 0)

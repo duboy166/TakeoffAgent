@@ -19,14 +19,11 @@ from .nodes import (
     match_prices_node,
     generate_report_node,
     batch_summary_node,
-    # Agentic nodes
-    analyze_document_node,
-    route_after_analysis,
+    selective_vision_node,  # Hybrid mode
+    # AI enhancement nodes (optional - skip gracefully if no API key)
     validate_items_node,
     verify_low_confidence_node,
     ai_match_unmatched_node,
-    # Hybrid extraction nodes
-    selective_vision_node,
 )
 from .edges import (
     route_after_extraction,
@@ -34,7 +31,7 @@ from .edges import (
     increment_retry,
     mark_file_failed,
     advance_to_next_file,
-    route_after_ocr,
+    route_after_ocr,  # Hybrid mode routing
 )
 
 logger = logging.getLogger(__name__)
@@ -64,7 +61,16 @@ def create_takeoff_graph(checkpointer: Optional[MemorySaver] = None) -> StateGra
     parse_items ──────┘
         │       │ skip
         ▼       ▼
-    match_prices  mark_failed
+    validate_items  mark_failed
+        │             │
+        ▼             │
+    match_prices      │
+        │             │
+        ▼             │
+    ai_match_unmatched│
+        │             │
+        ▼             │
+    verify_low_conf.  │
         │             │
         ▼             │
     generate_report   │
@@ -81,6 +87,9 @@ def create_takeoff_graph(checkpointer: Optional[MemorySaver] = None) -> StateGra
         ▼
        END
     ```
+
+    Note: AI nodes (validate_items, ai_match_unmatched, verify_low_confidence)
+    skip gracefully if ANTHROPIC_API_KEY is not set.
 
     Args:
         checkpointer: Optional checkpointer for state persistence
@@ -102,9 +111,6 @@ def create_takeoff_graph(checkpointer: Optional[MemorySaver] = None) -> StateGra
     # Node 0: Check if PDF needs splitting
     workflow.add_node("check_split_pdf", check_split_pdf_node)
 
-    # AGENTIC: Analyze document to determine extraction method
-    workflow.add_node("analyze_document", analyze_document_node)
-
     # Node 1: Extract PDF text
     workflow.add_node("extract_pdf", extract_pdf_node)
 
@@ -117,22 +123,22 @@ def create_takeoff_graph(checkpointer: Optional[MemorySaver] = None) -> StateGra
     # Node 2: Parse pay items
     workflow.add_node("parse_items", parse_items_node)
 
-    # AGENTIC: Validate extracted items
+    # Node 3: Validate extracted items (AI-optional)
     workflow.add_node("validate_items", validate_items_node)
 
-    # AGENTIC: Verify low-confidence items
-    workflow.add_node("verify_low_confidence", verify_low_confidence_node)
-
-    # Node 3: Match prices
+    # Node 4: Match prices
     workflow.add_node("match_prices", match_prices_node)
 
-    # AGENTIC: AI matching for unmatched items
+    # Node 5: AI match unmatched items (AI-optional)
     workflow.add_node("ai_match_unmatched", ai_match_unmatched_node)
+
+    # Node 6: Verify low-confidence items (AI-optional)
+    workflow.add_node("verify_low_confidence", verify_low_confidence_node)
 
     # HYBRID: Selective vision for low-confidence pages
     workflow.add_node("selective_vision", selective_vision_node)
 
-    # Node 4: Generate report
+    # Node 7: Generate report
     workflow.add_node("generate_report", generate_report_node)
 
     # File transition: Advance to next file
@@ -151,26 +157,22 @@ def create_takeoff_graph(checkpointer: Optional[MemorySaver] = None) -> StateGra
     # After scanning, check if split needed
     workflow.add_edge("scan_pdfs", "check_split_pdf")
 
-    # After split check: conditional routing -> analyze_document instead of extract
+    # After split check: conditional routing
     workflow.add_conditional_edges(
         "check_split_pdf",
         route_after_split_check,
         {
-            "extract": "analyze_document",
+            "extract": "extract_pdf",
             "skip": "mark_failed"
         }
     )
-
-    # After document analysis: proceed to extraction
-    # (route_after_analysis just returns the recommended method, but we always go to extract_pdf)
-    workflow.add_edge("analyze_document", "extract_pdf")
 
     # After extraction: conditional routing (handles errors and retries)
     workflow.add_conditional_edges(
         "extract_pdf",
         route_after_extraction,
         {
-            "parse": "route_hybrid",  # Changed: go through hybrid router
+            "parse": "route_hybrid",  # Go through hybrid router
             "retry": "increment_retry",
             "skip": "mark_failed"
         }
@@ -203,13 +205,13 @@ def create_takeoff_graph(checkpointer: Optional[MemorySaver] = None) -> StateGra
         }
     )
 
-    # Enhanced linear flow with agentic nodes:
-    # parse -> validate -> verify_low_confidence -> match -> ai_match -> report
+    # Linear flow: parse -> validate -> match -> ai_match -> verify -> report
+    # AI nodes skip gracefully if no ANTHROPIC_API_KEY is set
     workflow.add_edge("parse_items", "validate_items")
-    workflow.add_edge("validate_items", "verify_low_confidence")
-    workflow.add_edge("verify_low_confidence", "match_prices")
+    workflow.add_edge("validate_items", "match_prices")
     workflow.add_edge("match_prices", "ai_match_unmatched")
-    workflow.add_edge("ai_match_unmatched", "generate_report")
+    workflow.add_edge("ai_match_unmatched", "verify_low_confidence")
+    workflow.add_edge("verify_low_confidence", "generate_report")
 
     # After report: conditional routing
     workflow.add_conditional_edges(
@@ -243,7 +245,9 @@ def run_takeoff_workflow(
     enable_checkpoints: bool = True,
     use_vision: bool = False,
     extraction_mode: str = "ocr_only",
-    vision_page_budget: int = 5
+    vision_page_budget: int = 5,
+    vision_provider: str = "anthropic",
+    vision_api_key: str = None
 ) -> Dict[str, Any]:
     """
     Run the complete takeoff workflow.
@@ -256,9 +260,11 @@ def run_takeoff_workflow(
         parallel: Enable parallel processing (future)
         max_retries: Max retries per file
         enable_checkpoints: Enable state persistence
-        use_vision: Use Claude Vision API for extraction (requires ANTHROPIC_API_KEY)
+        use_vision: Use Claude Vision API for extraction
         extraction_mode: 'ocr_only', 'hybrid', or 'vision_only'
         vision_page_budget: Max pages to send to Vision API in hybrid mode
+        vision_provider: Vision AI provider ('anthropic' or 'openai')
+        vision_api_key: API key for vision provider (overrides env var)
 
     Returns:
         Final workflow state with results
@@ -280,20 +286,22 @@ def run_takeoff_workflow(
         max_retries=max_retries,
         use_vision=use_vision,
         extraction_mode=extraction_mode,
-        vision_page_budget=vision_page_budget
+        vision_page_budget=vision_page_budget,
+        vision_provider=vision_provider,
+        vision_api_key=vision_api_key
     )
 
     logger.info(f"Starting takeoff workflow: {input_path} -> {output_path}")
 
     # Run the graph
-    # Recursion limit: each file uses ~10 nodes (with agentic features), so 250 handles ~20+ files
+    # Recursion limit: each file uses ~6 nodes, so 150 handles ~20+ files
     if enable_checkpoints:
         config = {
             "configurable": {"thread_id": "takeoff-1"},
-            "recursion_limit": 250
+            "recursion_limit": 150
         }
     else:
-        config = {"recursion_limit": 250}
+        config = {"recursion_limit": 150}
 
     try:
         final_state = graph.invoke(initial_state, config)
@@ -314,7 +322,9 @@ def stream_takeoff_workflow(
     enable_checkpoints: bool = True,
     use_vision: bool = False,
     extraction_mode: str = "ocr_only",
-    vision_page_budget: int = 5
+    vision_page_budget: int = 5,
+    vision_provider: str = "anthropic",
+    vision_api_key: str = None
 ) -> Iterator[Tuple[str, Dict[str, Any]]]:
     """
     Stream the takeoff workflow, yielding progress updates after each node.
@@ -330,9 +340,11 @@ def stream_takeoff_workflow(
         parallel: Enable parallel processing (future)
         max_retries: Max retries per file
         enable_checkpoints: Enable state persistence
-        use_vision: Use Claude Vision API for extraction (requires ANTHROPIC_API_KEY)
+        use_vision: Use Claude Vision API for extraction
         extraction_mode: 'ocr_only', 'hybrid', or 'vision_only'
         vision_page_budget: Max pages to send to Vision API in hybrid mode
+        vision_provider: Vision AI provider ('anthropic' or 'openai')
+        vision_api_key: API key for vision provider (overrides env var)
 
     Yields:
         Tuple of (node_name, state_update_dict) after each node executes
@@ -353,20 +365,22 @@ def stream_takeoff_workflow(
         max_retries=max_retries,
         use_vision=use_vision,
         extraction_mode=extraction_mode,
-        vision_page_budget=vision_page_budget
+        vision_page_budget=vision_page_budget,
+        vision_provider=vision_provider,
+        vision_api_key=vision_api_key
     )
 
     logger.info(f"Starting takeoff workflow (streaming): {input_path} -> {output_path}")
 
     # Run the graph with streaming
-    # Recursion limit: each file uses ~10 nodes (with agentic features), so 250 handles ~20+ files
+    # Recursion limit: each file uses ~6 nodes, so 150 handles ~20+ files
     if enable_checkpoints:
         config = {
             "configurable": {"thread_id": "takeoff-stream-1"},
-            "recursion_limit": 250
+            "recursion_limit": 150
         }
     else:
-        config = {"recursion_limit": 250}
+        config = {"recursion_limit": 150}
 
     try:
         # Stream with "updates" mode to get state updates after each node
@@ -375,7 +389,8 @@ def stream_takeoff_workflow(
             if update:
                 node_name = list(update.keys())[0]
                 node_output = update[node_name]
-                yield (node_name, node_output)
+                # Ensure we never yield None - use empty dict instead
+                yield (node_name, node_output if node_output is not None else {})
 
         logger.info("Workflow streaming completed successfully")
 
@@ -392,8 +407,8 @@ def get_workflow_visualization() -> str:
         ASCII art representation of the graph
     """
     return """
-    Construction Takeoff Workflow (Agentic + Hybrid)
-    =================================================
+    Construction Takeoff Workflow
+    =============================
 
                     ┌─────────────┐
                     │  scan_pdfs  │
@@ -405,60 +420,31 @@ def get_workflow_visualization() -> str:
               │  (split if >25MB/90pg)  │              │
               └────────────┬────────────┘              │
                            │                           │
-              ┌────────────▼────────────┐              │
-              │   analyze_document      │              │
-              │  (choose OCR/Vision)    │              │
-              └────────────┬────────────┘              │
+                    ┌──────▼──────┐                    │
+                    │route_split  │                    │
+                    └──────┬──────┘                    │
                            │                           │
               ┌────────────▼────────────┐              │
               │     extract_pdf         │◄──────────┐  │
-              │    (OCR or Vision)      │           │  │
+              │    (OCR or native)      │           │  │
               └────────────┬────────────┘           │  │
                            │                        │  │
+                    ┌──────▼──────┐                 │  │
+                    │route_after_ │                 │  │
+                    │ extraction  │                 │  │
+                    └──────┬──────┘                 │  │
+                           │                        │  │
               ┌────────────┼────────────┐           │  │
+              │            │            │           │  │
          success       retry        skip           │  │
               │            │            │           │  │
-              │            ▼            ▼           │  │
-              │      ┌──────────┐ ┌──────────┐     │  │
-              │      │increment │ │  mark    │─────┼──┘
-              │      │  retry   │ │ failed   │     │
-              │      └────┬─────┘ └──────────┘     │
-              │           └────────────────────────┘
-              ▼
-        ┌──────────────┐
-        │ route_hybrid │  (hybrid mode router)
-        └──────┬───────┘
-               │
-     ┌─────────┴─────────┐
-     │                   │
-  hybrid            ocr_only
-     │                   │
-     ▼                   │
-┌─────────────┐          │
-│ selective   │          │
-│  vision     │          │
-│(low-conf pg)│          │
-└──────┬──────┘          │
-       │                 │
-       └────────┬────────┘
-                ▼
-        ┌──────────┐
-        │  parse   │
-        │  items   │
-        └────┬─────┘
-             │
-             ▼
-        ┌──────────┐
-        │ validate │  (AI-powered validation)
-        │  items   │
-        └────┬─────┘
-             │
-             ▼
-        ┌──────────┐
-        │  verify  │  (low-confidence check)
-        │ low_conf │
-        └────┬─────┘
-             │
+              ▼            ▼            ▼           │  │
+        ┌──────────┐ ┌──────────┐ ┌──────────┐     │  │
+        │  parse   │ │increment │ │  mark    │     │  │
+        │  items   │ │  retry   │ │ failed   │─────┼──┘
+        └────┬─────┘ └────┬─────┘ └──────────┘     │
+             │            │                        │
+             │            └────────────────────────┘
              ▼
         ┌──────────┐
         │  match   │
@@ -467,17 +453,17 @@ def get_workflow_visualization() -> str:
              │
              ▼
         ┌──────────┐
-        │ai_match  │  (AI for unmatched)
-        │unmatched │
-        └────┬─────┘
-             │
-             ▼
-        ┌──────────┐
         │ generate │
         │  report  │
         └────┬─────┘
              │
+      ┌──────▼──────┐
+      │route_after_ │
+      │   report    │
+      └──────┬──────┘
+             │
       ┌──────┴──────┐
+      │             │
   next_file     summary
       │             │
       ▼             │
