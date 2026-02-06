@@ -56,3 +56,10 @@ output/
 *.tmp
 *.temp
 .cache/
+
+# Large bundled model archive (models come from GitHub Releases)
+models.zip
+
+# Test output (generated during testing)
+test_output/
+test_annotated/
