@@ -147,8 +147,21 @@ def _extract_with_paddleocr(
 
         logger.info(f"Extracted {len(doc.full_text)} chars from {doc.page_count} pages using {doc.extraction_method} ({len(text_blocks)} blocks)")
 
+        # Apply OCR cleanup to fix common OCR errors
+        cleaned_text = doc.full_text
+        if doc.extraction_method in ('paddleocr', 'paddleocr_parallel'):
+            try:
+                from tools.ocr_cleanup import cleanup_ocr_text
+                cleaned_text = cleanup_ocr_text(doc.full_text, use_ai=False)
+                if cleaned_text != doc.full_text:
+                    logger.info("OCR text cleanup applied")
+            except ImportError:
+                logger.debug("OCR cleanup module not available")
+            except Exception as e:
+                logger.warning(f"OCR cleanup failed: {e}")
+
         result = {
-            "extracted_text": doc.full_text,
+            "extracted_text": cleaned_text,
             "extraction_method": doc.extraction_method,
             "page_count": doc.page_count,
             "text_blocks": text_blocks,
