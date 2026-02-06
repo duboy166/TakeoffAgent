@@ -180,25 +180,48 @@ class EmailService:
     def _notify_telegram(self, email: IncomingEmail, results: list):
         """Send Telegram notification about completed job."""
         try:
-            # Use OpenClaw's message tool if available
-            # For now, just log
+            import subprocess
+            
             total_items = sum(r.get('items', 0) for r in results)
             matched_items = sum(r.get('matched_items', 0) for r in results)
             total_estimate = sum(r.get('estimate', 0) for r in results)
             success_count = sum(1 for r in results if r.get('success'))
+            fail_count = len(results) - success_count
             
-            msg = (
-                f"📧 AutoWork Job Complete\n"
-                f"From: {email.from_addr}\n"
-                f"Files: {success_count}/{len(results)} successful\n"
-                f"Materials Found: {total_items}\n"
-                f"Priced Items: {matched_items}\n"
-                f"Estimate: ${total_estimate:,.2f}"
+            # Build message
+            if success_count == len(results):
+                status = "✅"
+            elif success_count > 0:
+                status = "⚠️"
+            else:
+                status = "❌"
+            
+            msg = f"{status} AutoWork Job Complete\n"
+            msg += f"From: {extract_email_address(email.from_addr)}\n"
+            msg += f"Files: {success_count}/{len(results)} successful"
+            if fail_count > 0:
+                msg += f" ({fail_count} failed)"
+            msg += f"\nMaterials: {total_items}"
+            if matched_items > 0:
+                msg += f" ({matched_items} priced)"
+            if total_estimate > 0:
+                msg += f"\nEstimate: ${total_estimate:,.2f}"
+            
+            # Send via OpenClaw CLI
+            result = subprocess.run(
+                ['openclaw', 'message', 'send', '--channel', 'telegram', '--to', '7570826467', msg],
+                capture_output=True,
+                text=True,
+                timeout=30,
             )
             
-            logger.info(f"Telegram notification: {msg}")
-            # TODO: Integrate with OpenClaw messaging
+            if result.returncode == 0:
+                logger.info("Telegram notification sent")
+            else:
+                logger.warning(f"Telegram notification failed: {result.stderr}")
             
+        except FileNotFoundError:
+            logger.debug("OpenClaw CLI not available for Telegram notifications")
         except Exception as e:
             logger.warning(f"Could not send Telegram notification: {e}")
     
@@ -226,6 +249,17 @@ class EmailService:
                         fetcher.mark_as_processed(email.imap_id)
                     except Exception as e:
                         logger.exception(f"Error processing email: {e}")
+                        # Always respond - never silent failures
+                        try:
+                            sender = extract_email_address(email.from_addr)
+                            subject = email.subject or "(no subject)"
+                            self.sender.send_error(
+                                sender, subject,
+                                "An unexpected error occurred while processing your request. "
+                                "Our team has been notified. Please try again or reply to this email for assistance."
+                            )
+                        except Exception as send_err:
+                            logger.error(f"Could not send error response: {send_err}")
                 
                 return processed
                 
