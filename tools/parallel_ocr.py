@@ -33,10 +33,10 @@ logger = logging.getLogger(__name__)
 @dataclass
 class ParallelOCRConfig:
     """Configuration for parallel OCR processing."""
-    max_workers: int = 4                    # Maximum worker processes
+    max_workers: int = 2                    # Maximum worker processes (2 is safer on most systems)
     min_pages_for_parallel: int = 4         # Don't parallelize small docs
-    memory_per_worker_mb: int = 800         # RAM estimate per worker
-    page_timeout: int = 120                 # Per-page timeout in seconds
+    memory_per_worker_mb: int = 1200        # RAM estimate per worker (PaddleOCR v5 uses more)
+    page_timeout: int = 180                 # Per-page timeout in seconds (increased for init overhead)
     max_dimension: int = 1600               # Max image dimension before resize
 
 

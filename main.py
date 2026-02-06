@@ -90,11 +90,10 @@ Examples:
     )
 
     parser.add_argument(
-        "--no-parallel",
-        dest="parallel",
-        action="store_false",
-        default=True,
-        help="Disable parallel page processing (parallel is enabled by default)"
+        "--parallel",
+        action="store_true",
+        default=False,
+        help="Enable parallel page processing (experimental, use for large scanned PDFs)"
     )
 
     parser.add_argument(
