@@ -45,6 +45,19 @@ except ImportError:
         PRODUCT_FIRST_AVAILABLE = False
         ProductCatalog = None
 
+# Import structure matcher for inlets, manholes, etc.
+try:
+    from .structure_matcher import match_structure, StructureMatch
+    STRUCTURE_MATCHER_AVAILABLE = True
+except ImportError:
+    try:
+        from structure_matcher import match_structure, StructureMatch
+        STRUCTURE_MATCHER_AVAILABLE = True
+    except ImportError:
+        STRUCTURE_MATCHER_AVAILABLE = False
+        match_structure = None
+        StructureMatch = None
+
 # Import summary sheet extraction (Phase 3)
 try:
     from .summary_sheet import (
@@ -2152,6 +2165,53 @@ class TakeoffAnalyzer:
         if fuzzy_match:
             return fuzzy_match
 
+        # Strategy 4: Structure matcher for inlets, manholes, junction boxes, catch basins
+        if STRUCTURE_MATCHER_AVAILABLE:
+            structure_match = self._match_structure(pay_item)
+            if structure_match:
+                return structure_match
+
+        return None
+    
+    def _match_structure(self, pay_item: Dict) -> Optional[Dict]:
+        """
+        Match structures (inlets, manholes, etc.) using the structure_matcher module.
+        
+        This handles the naming mismatch between Vision extraction and FDOT codes:
+        - Vision: "TYPE D INLET (MODIFIED)", "MANHOLE #1"
+        - FDOT: "425-1-549", "425-2-41"
+        
+        Args:
+            pay_item: Pay item dictionary with description
+            
+        Returns:
+            Matched product dictionary or None
+        """
+        if not STRUCTURE_MATCHER_AVAILABLE:
+            return None
+            
+        desc = pay_item.get('description', '')
+        
+        # Only try structure matching for structure-type items
+        desc_upper = desc.upper()
+        if not any(kw in desc_upper for kw in ['INLET', 'MANHOLE', 'MH', 'JUNCTION', 'CATCH BASIN', 'CB']):
+            return None
+        
+        # Try to match using structure_matcher
+        result = match_structure(desc)
+        if result and result.confidence >= 0.6:
+            return {
+                'product_type': result.description,
+                'size': result.subtype,
+                'configuration': 'Standard',
+                'price': result.unit_price,
+                'unit': result.unit,
+                'fdot_code': result.fdot_code,
+                'match_source': 'structure_matcher',
+                'match_confidence': result.confidence,
+                'match_reason': result.match_reason
+            }
+        
         return None
 
     def _fuzzy_match_product(self, description: str, size: str) -> Optional[Dict]:
