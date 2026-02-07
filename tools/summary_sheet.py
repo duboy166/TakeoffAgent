@@ -178,7 +178,8 @@ VALID_UNITS = {'LS', 'EA', 'LF', 'SY', 'CY', 'SF', 'TON', 'GAL', 'AC', 'TN', 'GM
 UNIT_PATTERN = re.compile(r'\b(' + '|'.join(VALID_UNITS) + r')\b', re.IGNORECASE)
 
 # Quantity pattern (handles decimals and commas)
-QUANTITY_PATTERN = re.compile(r'\b(\d{1,3}(?:,\d{3})*(?:\.\d+)?)\b')
+# Updated to handle 1-7 digit numbers with or without commas
+QUANTITY_PATTERN = re.compile(r'\b(\d{1,7}(?:,\d{3})*(?:\.\d+)?)\b')
 
 
 def extract_summary_table(page_text: str, page_num: int = 1) -> SummaryPageResult:
@@ -227,7 +228,7 @@ def _parse_standard_format(page_text: str) -> Tuple[List[SummaryItem], List[str]
         160                                             <- quantity
         LF                                              <- unit
         
-    Or inline format:
+    Or inline format (Vision API output):
         430-175-118 PIPE CULVERT, ROUND, 18" 160 LF
     """
     items = []
@@ -237,12 +238,16 @@ def _parse_standard_format(page_text: str) -> Tuple[List[SummaryItem], List[str]
     lines = page_text.split('\n')
     lines = [line.strip() for line in lines if line.strip()]
     
-    # First pass: find all FDOT code positions
+    # Track which lines have been processed
+    processed_lines = set()
+    
+    # First pass: find all FDOT code positions (multi-line format)
     fdot_positions = []
     for i, line in enumerate(lines):
         fdot_match = FDOT_CODE_PATTERN.match(line)  # Must be at start of line
-        if fdot_match and len(line) < 20:  # FDOT codes are short lines
+        if fdot_match and len(line) < 20:  # FDOT codes are short lines (multi-line format)
             fdot_positions.append((i, fdot_match.group(1)))
+            processed_lines.add(i)
     
     # Process each FDOT code
     for idx, (pos, fdot_code) in enumerate(fdot_positions):
@@ -315,6 +320,36 @@ def _parse_standard_format(page_text: str) -> Tuple[List[SummaryItem], List[str]
             confidence=0.95,
             raw_text=f"{fdot_code}\n{description}\n{quantity}\n{unit}"
         ))
+    
+    # Second pass: try inline parsing for lines not processed by multi-line parser
+    # This handles Vision API output where everything is on one line:
+    # "430-175-118 PIPE CULVERT, SRCP CLASS III, ROUND 18" LF 98"
+    seen_fdot_codes = {item.pay_item_no for item in items}
+    
+    for i, line in enumerate(lines):
+        if i in processed_lines:
+            continue
+            
+        # Look for FDOT codes anywhere in line (inline format)
+        fdot_match = FDOT_CODE_PATTERN.search(line)
+        if not fdot_match:
+            continue
+        
+        fdot_code = fdot_match.group(1)
+        
+        # Skip if we already have this FDOT code
+        if fdot_code in seen_fdot_codes:
+            continue
+        
+        total_lines += 1
+        
+        # Try to parse as inline format
+        inline_item = _try_parse_inline(line, fdot_code)
+        if inline_item:
+            items.append(inline_item)
+            seen_fdot_codes.add(fdot_code)
+        else:
+            errors.append(f"Could not parse inline item: {fdot_code} in '{line[:60]}...'")
     
     return items, errors, total_lines
 
@@ -423,38 +458,56 @@ def _try_parse_inline(line: str, fdot_code: str) -> Optional[SummaryItem]:
     """
     Parse item from single line format.
     
-    Format: 430-175-118 PIPE CULVERT, ROUND, 18" 160 LF
+    Handles multiple formats:
+    - Native: 430-175-118 PIPE CULVERT, ROUND, 18" 160 LF
+    - Vision: 430-175-118 PIPE CULVERT, SRCP CLASS III, ROUND 18" LF 98
     """
     # Remove FDOT code from line
     rest = line.replace(fdot_code, '').strip()
     
-    # Find unit
-    unit_match = UNIT_PATTERN.search(rest)
-    if not unit_match:
+    # Find unit - prefer the LAST unit match (units at end are more likely correct)
+    # This avoids matching "AS" in "AS-BUILT" when "LS" appears later
+    unit_matches = list(UNIT_PATTERN.finditer(rest))
+    if not unit_matches:
         return None
+    
+    # Use the last unit match (most likely the actual unit, not part of description)
+    unit_match = unit_matches[-1]
     unit = unit_match.group(1).upper()
     
     # Find quantity (number near the unit)
-    # Look for number before the unit
     before_unit = rest[:unit_match.start()].strip()
     after_unit = rest[unit_match.end():].strip()
     
     quantity = 0.0
     description = ""
     
-    # Check if quantity is right before unit
-    qty_before = QUANTITY_PATTERN.findall(before_unit)
-    if qty_before:
-        quantity = _parse_number(qty_before[-1])
-        # Description is everything before the quantity
-        qty_pos = before_unit.rfind(qty_before[-1])
-        description = before_unit[:qty_pos].strip()
-    elif after_unit:
-        # Sometimes quantity comes after unit
-        qty_after = QUANTITY_PATTERN.findall(after_unit)
-        if qty_after:
-            quantity = _parse_number(qty_after[0])
+    # PRIORITY: Check for quantity AFTER unit first (Vision API format: "LF 98")
+    # This is more reliable because pipe sizes appear before the unit
+    qty_after = QUANTITY_PATTERN.findall(after_unit)
+    if qty_after:
+        quantity = _parse_number(qty_after[0])
         description = before_unit.strip()
+    else:
+        # Fallback: quantity before unit (native format: "160 LF")
+        qty_before = QUANTITY_PATTERN.findall(before_unit)
+        if qty_before:
+            # Use the LAST number before unit as quantity
+            # But skip numbers that look like pipe sizes (12-96)
+            for q in reversed(qty_before):
+                qty_val = _parse_number(q)
+                # Skip common pipe sizes unless they're > 100 (likely quantities)
+                if qty_val in [12, 15, 18, 24, 30, 36, 42, 48, 54, 60, 66, 72, 84, 96] and qty_val <= 100:
+                    continue
+                quantity = qty_val
+                # Description is everything before the quantity
+                qty_pos = before_unit.rfind(q)
+                description = before_unit[:qty_pos].strip()
+                break
+            
+            # If all numbers were pipe sizes, use the description without extracting qty
+            if quantity == 0:
+                description = before_unit.strip()
     
     if quantity == 0 or not description:
         return None
