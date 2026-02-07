@@ -21,14 +21,14 @@ try:
     from .validation_gates import (
         VALID_PIPE_SIZES, VALID_ELLIPTICAL_SIZES, MAX_PIPE_SIZE,
         validate_quantity, validate_description, validate_pipe_size,
-        validate_all_items, ValidationReport
+        validate_all_items, ValidationReport, is_membrane_material
     )
 except ImportError:
     # Fallback for direct script execution
     from validation_gates import (
         VALID_PIPE_SIZES, VALID_ELLIPTICAL_SIZES, MAX_PIPE_SIZE,
         validate_quantity, validate_description, validate_pipe_size,
-        validate_all_items, ValidationReport
+        validate_all_items, ValidationReport, is_membrane_material
     )
 
 # Import product-first matching modules (Phase 2)
@@ -2122,6 +2122,12 @@ class TakeoffAnalyzer:
         """
         pay_item_no = pay_item.get('pay_item_no', '')
         desc = pay_item.get('description', '').lower()
+        
+        # EARLY BAIL-OUT: Skip membrane/liner materials - they are NOT drainage items
+        # This prevents false matches like "30 MIL GEOMEMBRANE" matching "30 inch pipe"
+        if is_membrane_material(desc):
+            logger.debug(f"Skipping membrane material: {desc[:50]}")
+            return None
 
         # Extract and normalize size from description
         size_match = re.search(r'(\d{1,2})["\s]*(?:inch)?', desc)
