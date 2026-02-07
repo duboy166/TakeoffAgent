@@ -43,6 +43,70 @@ class FoundItem:
     unit: str
 
 
+# =============================================================================
+# False Positive Filters
+# Detect non-pipe materials that have similar number patterns
+# =============================================================================
+
+# Keywords that indicate membrane/liner materials, NOT pipes
+MEMBRANE_KEYWORDS = {
+    'GEOMEMBRANE', 'MEMBRANE', 'LINER', 'FLEXIBLE', 
+    'GEOTEXTILE', 'FABRIC', 'SHEET', 'WATERPROOFING'
+}
+
+# Common membrane thickness values (in mils)
+# "30 MIL", "40 MIL", "60 MIL" - NOT pipe diameters!
+MEMBRANE_THICKNESSES = {20, 30, 40, 60, 80, 100}
+
+
+def is_false_pipe_match(context: str, product_size: str) -> bool:
+    """
+    Detect if a potential pipe match is actually a membrane/liner.
+    
+    False positives occur when:
+    - "30 MIL PVC GEOMEMBRANE" matches to "30 inch RCP"
+    - The number is membrane thickness, not pipe diameter
+    
+    Args:
+        context: The source text context around the match
+        product_size: The size from the matched product (e.g., "30" or "30\"")
+    
+    Returns:
+        True if this is a FALSE match (should be rejected)
+    """
+    context_upper = context.upper()
+    
+    # Extract numeric size from product
+    size_match = re.search(r'(\d+)', product_size)
+    if not size_match:
+        return False
+    size_num = int(size_match.group(1))
+    
+    # Check 1: "MIL" immediately after a number indicates membrane thickness
+    # Pattern: "30 MIL", "40 MIL", "60 MIL" etc.
+    mil_pattern = rf'\b{size_num}\s*MIL\b'
+    if re.search(mil_pattern, context_upper):
+        return True  # This is membrane thickness, not pipe size
+    
+    # Check 2: Membrane/liner keywords in context
+    if any(kw in context_upper for kw in MEMBRANE_KEYWORDS):
+        # Additional check: is the size a common membrane thickness?
+        if size_num in MEMBRANE_THICKNESSES:
+            return True  # Likely a membrane, not a pipe
+        
+        # Even if size isn't a standard membrane thickness,
+        # if GEOMEMBRANE is in the context, it's not a pipe
+        if 'GEOMEMBRANE' in context_upper or 'MEMBRANE' in context_upper:
+            return True
+    
+    # Check 3: Specific FDOT item patterns for geomembranes
+    # "900-4" is geomembrane/liner category in FDOT
+    if re.search(r'\b900-\d', context_upper):
+        return True
+    
+    return False
+
+
 def find_products_in_text(
     text: str, 
     catalog: ProductCatalog,
@@ -76,6 +140,11 @@ def find_products_in_text(
             )
             
             for found in found_items:
+                # FALSE POSITIVE FILTER: Reject membrane/liner false matches
+                # "30 MIL GEOMEMBRANE" should NOT match "30 inch RCP"
+                if is_false_pipe_match(found.raw_match, product.size):
+                    continue  # Skip this false match
+                
                 # Check for overlap with existing matches
                 # (We'll deduplicate later, but skip obvious duplicates)
                 match = Match(

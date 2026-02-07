@@ -86,6 +86,25 @@ INVALID_DESCRIPTION_PATTERNS = [
     r'^[\s]*$',                          # Empty or whitespace only
 ]
 
+# =============================================================================
+# NON-PIPE MATERIAL DETECTION (False Positive Prevention)
+# =============================================================================
+# Keywords that indicate membrane/liner materials that should NOT match pipes
+MEMBRANE_KEYWORDS: Set[str] = {
+    'GEOMEMBRANE', 'MEMBRANE', 'LINER', 'FLEXIBLE', 
+    'GEOTEXTILE', 'FABRIC', 'SHEET', 'WATERPROOFING'
+}
+
+# Membrane thickness values in mils - these are NOT pipe diameters
+# "30 MIL", "40 MIL", "60 MIL" etc.
+MEMBRANE_THICKNESS_MILS: Set[int] = {20, 30, 40, 60, 80, 100}
+
+# FDOT categories that are NOT drainage pipes
+NON_PIPE_FDOT_PREFIXES: Set[str] = {
+    '900-',   # Geomembranes, liners, erosion control
+    '570-',   # Seeding, sodding (landscaping)
+}
+
 
 @dataclass
 class ValidationWarning:
@@ -357,6 +376,93 @@ def validate_description(
             return None, warnings
     
     return description, warnings
+
+
+def is_membrane_material(
+    text: str,
+    size: Optional[int] = None
+) -> bool:
+    """
+    Check if text describes a membrane/liner rather than a pipe.
+    
+    This prevents false positives like "30 MIL PVC GEOMEMBRANE" 
+    being matched to "30 inch RCP".
+    
+    Args:
+        text: Description or context text to check
+        size: Optional size value to validate against membrane thicknesses
+    
+    Returns:
+        True if this appears to be a membrane/liner (NOT a pipe)
+    """
+    if not text:
+        return False
+    
+    text_upper = text.upper()
+    
+    # Check 1: "MIL" after a number indicates membrane thickness
+    # Pattern: "30 MIL", "40 MIL", "60 MIL" etc.
+    if re.search(r'\b\d+\s*MIL\b', text_upper):
+        return True
+    
+    # Check 2: Membrane/liner keywords
+    if any(kw in text_upper for kw in MEMBRANE_KEYWORDS):
+        # Additional check: is the size a common membrane thickness?
+        if size is not None and size in MEMBRANE_THICKNESS_MILS:
+            return True
+        # GEOMEMBRANE or MEMBRANE = definitely not a pipe
+        if 'GEOMEMBRANE' in text_upper or 'MEMBRANE' in text_upper:
+            return True
+        if 'LINER' in text_upper:
+            return True
+    
+    # Check 3: FDOT categories for non-pipe materials
+    for prefix in NON_PIPE_FDOT_PREFIXES:
+        if prefix in text_upper:
+            return True
+    
+    return False
+
+
+def validate_not_membrane(
+    description: str,
+    source_text: str = "",
+    size: Optional[int] = None,
+    item_index: int = -1,
+    pay_item_no: str = ""
+) -> Tuple[bool, List[ValidationWarning]]:
+    """
+    Validate that an item is NOT a membrane/liner (false pipe match).
+    
+    Args:
+        description: Item description
+        source_text: Original source text context
+        size: Pipe size if known
+        item_index: Index of item for reporting
+        pay_item_no: Pay item number for reporting
+    
+    Returns:
+        Tuple of (is_valid_pipe, list of warnings)
+        is_valid_pipe is False if this appears to be a membrane
+    """
+    warnings = []
+    
+    # Check both description and source text
+    check_text = f"{description} {source_text}"
+    
+    if is_membrane_material(check_text, size):
+        warnings.append(ValidationWarning(
+            category=ValidationCategory.DESCRIPTION,
+            severity=ValidationSeverity.REJECT,
+            message=f"Appears to be membrane/liner, not pipe: '{description[:50]}...'",
+            field="description",
+            original_value=description[:100],
+            item_index=item_index,
+            pay_item_no=pay_item_no,
+        ))
+        return False, warnings
+    
+    return True, warnings
 
 
 def validate_price(
