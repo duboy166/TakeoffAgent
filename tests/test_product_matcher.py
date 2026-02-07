@@ -442,18 +442,19 @@ class TestSummaryPageDetection:
     
     def test_detect_summary_page(self):
         """Should detect summary page indicators."""
-        text1 = "SUMMARY OF PAY ITEMS\n\nItem No. Description Qty Unit"
+        # Text must be >100 chars to pass minimum length check
+        text1 = "SUMMARY OF PAY ITEMS\n\nItem No. Description Qty Unit\n430-175-118 PIPE CULVERT 18\" 150 LF\n430-175-124 PIPE CULVERT 24\" 225 LF"
         assert is_summary_page(text1) is True
         
-        text2 = "ESTIMATE OF QUANTITIES\n\nDRAINAGE STRUCTURES"
+        text2 = "ESTIMATE OF QUANTITIES\n\nDRAINAGE STRUCTURES\n430-175-118 PIPE CULVERT 18\" 150 LF\n430-175-124 PIPE CULVERT 24\" 225 LF"
         assert is_summary_page(text2) is True
         
-        text3 = "BID SCHEDULE\n\nPipe 18\" RCP - 450 LF"
+        text3 = "BID SCHEDULE\n\nItem No. Description Qty Unit\n430-175-118 PIPE CULVERT 18\" RCP - 450 LF\n430-175-124 PIPE CULVERT 24\" - 225 LF"
         assert is_summary_page(text3) is True
     
     def test_not_summary_page(self):
         """Should not flag regular pages as summary."""
-        text = "DRAINAGE PLAN SHEET 1\n\n18\" RCP shown"
+        text = "DRAINAGE PLAN SHEET 1\n\n18\" RCP shown on this drawing for connection to existing structure at station 100+50"
         assert is_summary_page(text) is False
 
 
