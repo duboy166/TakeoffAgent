@@ -40,7 +40,7 @@ def _generate_csv_report(
     csv_filename = f"{filename_stem}_takeoff.csv"
     csv_path = output_path / csv_filename
 
-    # Define CSV columns (extended for agentic features)
+    # Define CSV columns (extended for agentic features + Phase 4 improvements)
     fieldnames = [
         'Pay Item No',
         'Description',
@@ -51,6 +51,8 @@ def _generate_csv_report(
         'Page',
         'Source',
         'Confidence',
+        'Confidence Score',  # Phase 4: Numeric 0.0-1.0 score
+        'Needs Review',      # Phase 4: Flag for low-confidence items
         'Matched',
         'Match Source',
         'AI Match Reason'
@@ -64,6 +66,24 @@ def _generate_csv_report(
             # Extract page from source_location if available
             source_loc = item.get('source_location', {})
             page = source_loc.get('page', '') if source_loc else ''
+            
+            # Phase 4: Get numeric confidence score and needs_review flag
+            # If confidence_score not set, infer from confidence label (backward compat)
+            confidence_score = item.get('confidence_score')
+            if confidence_score is None:
+                confidence_label = item.get('confidence', 'medium')
+                if confidence_label == 'high':
+                    confidence_score = 0.90
+                elif confidence_label == 'medium':
+                    confidence_score = 0.75
+                else:  # low
+                    confidence_score = 0.40
+            # Flag for review if: low confidence (<0.6), no quantity, or explicitly flagged
+            needs_review = (
+                confidence_score < 0.6 or 
+                item.get('quantity', 0) == 0 or 
+                item.get('needs_verification', False)
+            )
 
             writer.writerow({
                 'Pay Item No': item.get('pay_item_no', ''),
@@ -75,6 +95,8 @@ def _generate_csv_report(
                 'Page': page,
                 'Source': item.get('source', ''),
                 'Confidence': item.get('confidence', ''),
+                'Confidence Score': f"{confidence_score:.2f}" if confidence_score else '',
+                'Needs Review': 'Yes' if needs_review else '',
                 'Matched': 'Yes' if item.get('matched') else 'No',
                 'Match Source': item.get('match_source', 'rules') if item.get('matched') else '',
                 'AI Match Reason': item.get('ai_match_reason', '')

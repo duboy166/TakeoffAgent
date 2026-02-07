@@ -7,7 +7,7 @@ and returns matches with confidence scores.
 
 import re
 from dataclasses import dataclass, field
-from typing import List, Optional, Tuple, Set
+from typing import List, Optional, Tuple, Set, Dict
 from .product_catalog import Product, ProductCatalog, load_catalog
 
 
@@ -327,17 +327,19 @@ def is_valid_quantity(qty: float, unit: str) -> bool:
 
 def deduplicate_matches(matches: List[Match]) -> List[Match]:
     """
-    Deduplicate and consolidate matches.
+    Deduplicate and consolidate matches with specificity-based selection.
     
-    Strategy:
-    1. Group by product ID
-    2. For each product, keep the highest confidence match
-    3. If multiple quantities, prefer the more specific one
+    Phase 5 Strategy:
+    1. Group matches by size+category (e.g., all 18" RCP variants)
+    2. For each group, check if text specifies a class/configuration
+    3. If text says "CLASS III", only keep CL III - reject CL IV/V
+    4. If text is generic (no class), pick most common (CL III) or flag for review
+    5. Specificity scoring: more specific pattern matches win
     """
     if not matches:
         return []
     
-    # Group by product ID
+    # First pass: group by unique product ID (per-product dedup)
     by_product: dict = {}
     for match in matches:
         pid = match.product.id
@@ -346,21 +348,18 @@ def deduplicate_matches(matches: List[Match]) -> List[Match]:
         by_product[pid].append(match)
     
     # Select best match per product
-    result = []
+    intermediate_result = []
     for pid, product_matches in by_product.items():
-        # Sort by confidence (descending), then by quantity presence
         product_matches.sort(
             key=lambda m: (m.confidence, m.quantity > 0),
             reverse=True
         )
-        
         best = product_matches[0]
         
         # If best has no quantity, try to get from second-best
         if best.quantity == 0 and len(product_matches) > 1:
             for alt in product_matches[1:]:
                 if alt.quantity > 0 and alt.confidence > 0.4:
-                    # Use alt's quantity but keep best's confidence context
                     best = Match(
                         product=best.product,
                         quantity=alt.quantity,
@@ -371,11 +370,142 @@ def deduplicate_matches(matches: List[Match]) -> List[Match]:
                     )
                     break
         
-        result.append(best)
+        intermediate_result.append(best)
+    
+    # Second pass: Phase 5 - deduplicate RCP class variants
+    # Group by size + base product type (ignoring class/configuration)
+    result = _deduplicate_class_variants(intermediate_result)
     
     # Sort by confidence for output
     result.sort(key=lambda m: m.confidence, reverse=True)
     return result
+
+
+def _deduplicate_class_variants(matches: List[Match]) -> List[Match]:
+    """
+    Phase 5: Deduplicate RCP class variants (CL III, CL IV, CL V).
+    
+    Problem: "18" RCP" matches all three class variants
+    Solution: 
+    - If source_text contains "CLASS III" or "CL III", only match CL III
+    - If source_text is generic, prefer CL III (most common) and lower confidence
+    """
+    import re
+    
+    # Group matches by base product (size + category, ignoring class)
+    groups: Dict[str, List[Match]] = {}
+    standalone: List[Match] = []  # Matches that don't need grouping
+    
+    for match in matches:
+        product = match.product
+        config = product.configuration or ''
+        
+        # Only group RCP class variants
+        if product.category == 'RCP_Price_List' and re.match(r'CL\s*[IVX]+', config):
+            # Extract size for grouping key
+            size = product.size.replace('"', '').strip()
+            group_key = f"RCP_{size}"
+            
+            if group_key not in groups:
+                groups[group_key] = []
+            groups[group_key].append(match)
+        else:
+            standalone.append(match)
+    
+    # Process each group - select the best match based on specificity
+    result = standalone.copy()
+    
+    for group_key, group_matches in groups.items():
+        if len(group_matches) == 1:
+            result.append(group_matches[0])
+            continue
+        
+        # Check source texts for class mentions
+        best_match = _select_best_class_variant(group_matches)
+        result.append(best_match)
+    
+    return result
+
+
+def _select_best_class_variant(matches: List[Match]) -> Match:
+    """
+    Select the best RCP class variant from a group of matches.
+    
+    Priority:
+    1. If source_text explicitly mentions a class, use that one
+    2. Otherwise, prefer CL III (most common) with reduced confidence
+    """
+    import re
+    
+    # Class patterns to look for in source text
+    class_patterns = {
+        'III': [r'CLASS\s*III\b', r'CL\s*III\b', r'C-III\b', r'\bIII\s*RCP'],
+        'IV': [r'CLASS\s*IV\b', r'CL\s*IV\b', r'C-IV\b', r'\bIV\s*RCP'],
+        'V': [r'CLASS\s*V\b', r'CL\s*V\b', r'C-V\b', r'\bV\s*RCP'],
+    }
+    
+    # Score each match based on specificity
+    scored_matches = []
+    
+    for match in matches:
+        source_upper = match.source_text.upper()
+        config = match.product.configuration or ''
+        
+        # Determine which class this product is
+        product_class = None
+        for cls, patterns in class_patterns.items():
+            if f'CL {cls}' in config.upper() or f'CL{cls}' in config.upper():
+                product_class = cls
+                break
+        
+        # Check if source text explicitly mentions this class
+        specificity_score = 0
+        text_class = None
+        
+        for cls, patterns in class_patterns.items():
+            for pattern in patterns:
+                if re.search(pattern, source_upper):
+                    text_class = cls
+                    break
+            if text_class:
+                break
+        
+        if text_class and product_class:
+            if text_class == product_class:
+                # Perfect match - text says CLASS III and this is CL III
+                specificity_score = 100
+            else:
+                # Text specifies a different class - reject this match
+                specificity_score = -100
+        elif product_class == 'III':
+            # No class in text, but CL III is the default/most common
+            specificity_score = 10
+        elif product_class == 'IV':
+            specificity_score = 5
+        elif product_class == 'V':
+            specificity_score = 1
+        
+        scored_matches.append((specificity_score, match))
+    
+    # Sort by specificity score (highest first)
+    scored_matches.sort(key=lambda x: (x[0], x[1].confidence), reverse=True)
+    
+    best_score, best_match = scored_matches[0]
+    
+    # If we're defaulting to CL III (no explicit class in text), reduce confidence
+    if best_score <= 10:
+        # Downgrade confidence since we're guessing the class
+        adjusted_confidence = min(best_match.confidence, 0.7)
+        best_match = Match(
+            product=best_match.product,
+            quantity=best_match.quantity,
+            confidence=adjusted_confidence,
+            source_text=best_match.source_text,
+            pattern_used=best_match.pattern_used,
+            unit=best_match.unit
+        )
+    
+    return best_match
 
 
 def match_text(text: str, catalog_path: Optional[str] = None) -> List[Match]:
