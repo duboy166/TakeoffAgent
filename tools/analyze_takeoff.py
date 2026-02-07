@@ -2,6 +2,10 @@
 """
 Construction Takeoff Analyzer
 Parses extracted text from construction plans and matches to FL 2025 price list.
+
+Supports two matching modes:
+- Product-First (default): Uses ProductCatalog to search for known products
+- Legacy Regex: Falls back to regex patterns for items product matcher misses
 """
 
 import csv
@@ -26,6 +30,20 @@ except ImportError:
         validate_quantity, validate_description, validate_pipe_size,
         validate_all_items, ValidationReport
     )
+
+# Import product-first matching modules (Phase 2)
+try:
+    from .product_catalog import ProductCatalog, load_catalog, DEFAULT_CATALOG_PATH
+    from .product_matcher import find_products_in_text, Match, is_summary_page
+    PRODUCT_FIRST_AVAILABLE = True
+except ImportError:
+    try:
+        from product_catalog import ProductCatalog, load_catalog, DEFAULT_CATALOG_PATH
+        from product_matcher import find_products_in_text, Match, is_summary_page
+        PRODUCT_FIRST_AVAILABLE = True
+    except ImportError:
+        PRODUCT_FIRST_AVAILABLE = False
+        ProductCatalog = None
 
 logger = logging.getLogger(__name__)
 
@@ -270,14 +288,34 @@ def generate_material_summary(pay_items: List[Dict]) -> Dict:
 class TakeoffAnalyzer:
     """Analyzes construction plan text and generates takeoff reports."""
 
-    def __init__(self, price_list_path: str = None):
-        """Initialize with optional price list path."""
+    def __init__(self, price_list_path: str = None, use_product_first: bool = True):
+        """
+        Initialize with optional price list path.
+        
+        Args:
+            price_list_path: Path to FL 2025 price list CSV
+            use_product_first: If True (default), use product-first matching as primary.
+                               Falls back to regex patterns for missed items.
+        """
         self.price_list = {}
         self.price_list_by_fdot = {}  # Index by FDOT code for fast lookup
         self.price_list_loaded = False
         self._text_blocks = []  # OCR text blocks with locations
+        
+        # Product-first matching (Phase 2)
+        self.use_product_first = use_product_first and PRODUCT_FIRST_AVAILABLE
+        self.product_catalog = None
+        
         if price_list_path:
             self.load_price_list(price_list_path)
+            # Also load ProductCatalog from same path for product-first matching
+            if self.use_product_first:
+                try:
+                    self.product_catalog = ProductCatalog.from_csv(Path(price_list_path))
+                    logger.info(f"Loaded ProductCatalog with {len(self.product_catalog)} products")
+                except Exception as e:
+                    logger.warning(f"Could not load ProductCatalog: {e}")
+                    self.product_catalog = None
 
     def _find_source_location(self, match_text: str, description: str = None) -> Optional[Dict]:
         """
@@ -412,6 +450,10 @@ class TakeoffAnalyzer:
         """
         Extract pay items from plan text using multiple pattern strategies.
 
+        When use_product_first is enabled (default), uses ProductCatalog-driven
+        matching as the PRIMARY strategy, then falls back to regex patterns
+        for items the product matcher missed.
+
         Args:
             text: Extracted text from construction plans
             text_blocks: Optional list of OCR text blocks with bounding boxes
@@ -424,7 +466,134 @@ class TakeoffAnalyzer:
         self._text_blocks = text_blocks or []
 
         seen = set()  # Avoid duplicates across all strategies
+        
+        # Product-first matching (Phase 2)
+        if self.use_product_first and self.product_catalog:
+            return self._extract_with_product_first(text, seen)
+        
+        # Legacy regex-only path
         return self._extract_items_from_page(text, seen)
+    
+    def _extract_with_product_first(self, text: str, seen: set) -> List[Dict]:
+        """
+        Extract pay items using product-first matching with regex fallback.
+        
+        Strategy:
+        1. Use ProductCatalog to find known products in text
+        2. Convert matches to pay_item format with confidence scores
+        3. Run legacy regex patterns to catch items product matcher missed
+        4. Deduplicate, preferring product-first matches (higher confidence)
+        
+        Returns:
+            List of pay item dictionaries
+        """
+        items = []
+        product_matched_sizes = set()  # Track what product matcher found
+        
+        # Step 1: Product-first matching
+        matches = find_products_in_text(text, self.product_catalog)
+        
+        for match in matches:
+            item = self._match_to_pay_item(match)
+            item_key = f"product_{match.product.id}_{match.quantity}"
+            if item_key not in seen:
+                seen.add(item_key)
+                items.append(item)
+                
+                # Track matched sizes for fallback dedup
+                size_match = re.search(r'(\d+)', match.product.size)
+                if size_match:
+                    product_matched_sizes.add(size_match.group(1))
+        
+        # Step 2: Fall back to regex patterns for items product matcher missed
+        regex_items = self._extract_items_from_page(text, seen.copy())
+        
+        # Step 3: Add regex items that don't duplicate product-first matches
+        for item in regex_items:
+            # Check if this is likely a duplicate of a product match
+            desc = item.get('description', '').upper()
+            pay_item_no = item.get('pay_item_no', '')
+            
+            # Extract size from item
+            size_match = re.search(r'(\d+)', pay_item_no)
+            item_size = size_match.group(1) if size_match else None
+            
+            # Skip if same size already matched by product-first (for same product type)
+            is_duplicate = False
+            if item_size and item_size in product_matched_sizes:
+                # Check if same product category
+                for existing in items:
+                    existing_desc = existing.get('description', '').upper()
+                    # Same size and similar product type = likely duplicate
+                    if item_size in existing.get('pay_item_no', ''):
+                        if ('RCP' in desc and 'RCP' in existing_desc) or \
+                           ('ENDWALL' in desc and 'ENDWALL' in existing_desc) or \
+                           ('MES' in desc and 'MES' in existing_desc):
+                            is_duplicate = True
+                            break
+            
+            if not is_duplicate:
+                # Mark as fallback source with lower confidence
+                if item.get('confidence') in ('high', 'medium'):
+                    item['confidence_score'] = 0.6  # Downgrade regex matches
+                items.append(item)
+        
+        return items
+    
+    def _match_to_pay_item(self, match: 'Match') -> Dict:
+        """
+        Convert a product_matcher.Match to a pay_item dictionary.
+        
+        Preserves confidence scores and adds product catalog metadata.
+        """
+        product = match.product
+        
+        # Build pay item number from product
+        pay_item_no = product.fdot_code or f"{product.category}-{product.size}"
+        
+        # Build description
+        desc_parts = [product.size, product.product_type]
+        if product.configuration:
+            desc_parts.append(product.configuration)
+        description = ' '.join(filter(None, desc_parts))
+        
+        item = {
+            'pay_item_no': pay_item_no,
+            'description': description,
+            'unit': match.unit or product.unit,
+            'quantity': match.quantity,
+            'matched': True,  # Already matched to catalog
+            'unit_price': product.price if product.price > 0 else None,
+            'line_cost': match.quantity * product.price if product.price > 0 else None,
+            'source': 'product_first',
+            'confidence': self._confidence_to_label(match.confidence),
+            'confidence_score': match.confidence,  # Numeric 0.0-1.0
+            'needs_verification': match.quantity == 0 or match.confidence < 0.6,
+            'matched_product': {
+                'product_type': product.product_type,
+                'size': product.size,
+                'configuration': product.configuration,
+                'price': product.price,
+                'unit': product.unit,
+                'fdot_code': product.fdot_code,
+                'category': product.category,
+            }
+        }
+        
+        # Attach source location if available
+        if match.source_text:
+            item['source_text'] = match.source_text[:200]
+        
+        return item
+    
+    def _confidence_to_label(self, confidence: float) -> str:
+        """Convert numeric confidence to label."""
+        if confidence >= 0.85:
+            return 'high'
+        elif confidence >= 0.6:
+            return 'medium'
+        else:
+            return 'low'
 
     def _extract_items_from_page(self, page_text: str, seen: set) -> List[Dict]:
         """
@@ -2209,9 +2378,43 @@ class TakeoffAnalyzer:
         return project_info
 
     def generate_report(self, pay_items: List[Dict], project_info: Dict = None) -> Dict:
-        """Generate complete takeoff report."""
+        """
+        Generate complete takeoff report with category-aware match rates.
+        
+        Provides separate match rates for:
+        - Drainage items (pipes, inlets, manholes, endwalls, MES) - what we sell
+        - Non-drainage items (electrical, signage, earthwork) - not in catalog
+        
+        Also breaks down by confidence level.
+        """
         matched_items = [p for p in pay_items if p.get('matched')]
         total_cost = sum(p.get('line_cost', 0) or 0 for p in pay_items)
+        
+        # Category-aware match rate (Phase 2)
+        drainage_items = []
+        non_drainage_items = []
+        
+        for item in pay_items:
+            if self._is_drainage_item(item):
+                drainage_items.append(item)
+            else:
+                non_drainage_items.append(item)
+        
+        matched_drainage = [p for p in drainage_items if p.get('matched')]
+        drainage_match_rate = (len(matched_drainage) / len(drainage_items) * 100 
+                              if drainage_items else 0)
+        
+        # Confidence breakdown
+        high_confidence = [p for p in pay_items 
+                          if p.get('confidence_score', 0) >= 0.85]
+        medium_confidence = [p for p in pay_items 
+                            if 0.6 <= p.get('confidence_score', 0) < 0.85]
+        needs_review = [p for p in pay_items 
+                       if p.get('confidence_score', 0) < 0.6 or p.get('needs_verification')]
+        
+        # Source breakdown (product-first vs regex fallback)
+        product_first_items = [p for p in pay_items if p.get('source') == 'product_first']
+        regex_fallback_items = [p for p in pay_items if p.get('source') != 'product_first']
 
         report = {
             'project': project_info or {},
@@ -2220,18 +2423,74 @@ class TakeoffAnalyzer:
                 'total_items': len(pay_items),
                 'matched_items': len(matched_items),
                 'match_rate': len(matched_items) / len(pay_items) * 100 if pay_items else 0,
-                'estimated_total': round(total_cost, 2)
+                'estimated_total': round(total_cost, 2),
+                
+                # Category-aware metrics (Phase 2)
+                'drainage_items': len(drainage_items),
+                'drainage_matched': len(matched_drainage),
+                'drainage_match_rate': round(drainage_match_rate, 1),
+                'non_drainage_items': len(non_drainage_items),
+                
+                # Confidence breakdown
+                'high_confidence_count': len(high_confidence),
+                'medium_confidence_count': len(medium_confidence),
+                'needs_review_count': len(needs_review),
+                
+                # Source breakdown
+                'product_first_count': len(product_first_items),
+                'regex_fallback_count': len(regex_fallback_items),
             }
         }
 
         return report
+    
+    def _is_drainage_item(self, item: Dict) -> bool:
+        """
+        Check if an item is a drainage structure (what we sell).
+        
+        Drainage includes: pipes (RCP, PVC, HDPE, etc.), inlets, manholes,
+        endwalls, MES, flared ends, pipe cradles.
+        
+        Non-drainage includes: electrical, signage, pavement, earthwork,
+        maintenance of traffic, mobilization.
+        """
+        desc = item.get('description', '').upper()
+        pay_item_no = item.get('pay_item_no', '').upper()
+        source = item.get('source', '')
+        
+        # Product-first matches are always drainage (by definition)
+        if source == 'product_first':
+            return True
+        
+        # FDOT code patterns for drainage
+        drainage_fdot_prefixes = [
+            '430-',    # Pipes, endwalls, MES
+            '425-',    # Inlets, manholes
+        ]
+        for prefix in drainage_fdot_prefixes:
+            if pay_item_no.startswith(prefix):
+                return True
+        
+        # Keyword detection for drainage
+        drainage_keywords = [
+            'PIPE', 'RCP', 'PVC', 'HDPE', 'CMP', 'DIP', 'SRCP', 'ERCP',
+            'INLET', 'MANHOLE', 'CATCH BASIN', 'JUNCTION BOX',
+            'ENDWALL', 'MES', 'MITERED', 'FLARED END', 'CRADLE',
+            'STORM', 'DRAIN', 'CULVERT'
+        ]
+        for kw in drainage_keywords:
+            if kw in desc:
+                return True
+        
+        return False
 
 
 def analyze_text(
     text: str,
     price_list_path: str = None,
     filename: str = "",
-    validate: bool = True
+    validate: bool = True,
+    use_product_first: bool = True
 ) -> Dict:
     """
     Convenience function to analyze extracted text.
@@ -2241,13 +2500,16 @@ def analyze_text(
         price_list_path: Path to FL 2025 price list CSV
         filename: Original filename for project info
         validate: Whether to run validation gates (default True)
+        use_product_first: If True (default), use product-first matching.
+                          Set False to use legacy regex-only mode for comparison.
 
     Returns:
         Dictionary with analysis results including validation_warnings section
+        and category-aware match rate metrics.
     """
-    analyzer = TakeoffAnalyzer(price_list_path)
+    analyzer = TakeoffAnalyzer(price_list_path, use_product_first=use_product_first)
 
-    # Extract pay items
+    # Extract pay items (uses product-first or regex based on flag)
     pay_items = analyzer.extract_pay_items(text)
     
     # Run validation gates if enabled
@@ -2255,7 +2517,8 @@ def analyze_text(
     if validate:
         pay_items, validation_report = validate_all_items(pay_items)
 
-    # Match to price list
+    # Match to price list (for items not already matched by product-first)
+    # Product-first items already have prices; this catches regex fallback items
     pay_items = analyzer.match_all_items(pay_items)
 
     # Categorize drainage
@@ -2264,20 +2527,15 @@ def analyze_text(
     # Extract project info
     project_info = analyzer.extract_project_info(text, filename)
 
-    # Generate summary
-    matched_items = [p for p in pay_items if p.get('matched')]
-    total_cost = sum(p.get('line_cost', 0) or 0 for p in pay_items)
+    # Generate summary using category-aware reporting
+    report = analyzer.generate_report(pay_items, project_info)
 
     result = {
         "project_info": project_info,
         "pay_items": pay_items,
         "drainage_structures": drainage_structures,
-        "summary": {
-            "total_items": len(pay_items),
-            "matched_items": len(matched_items),
-            "match_rate": len(matched_items) / len(pay_items) * 100 if pay_items else 0,
-            "total_cost": round(total_cost, 2)
-        }
+        "summary": report['summary'],
+        "matching_mode": "product_first" if analyzer.use_product_first else "regex_only",
     }
     
     # Add validation report if validation was run
@@ -2288,6 +2546,8 @@ def analyze_text(
 
 
 if __name__ == '__main__':
+    import sys
+    
     # Example usage with multiple format types including new patterns
     sample_text = """
     SUMMARY OF PAY ITEMS
@@ -2371,12 +2631,57 @@ if __name__ == '__main__':
     PVC 12
     15" HDPE
     """
-
-    result = analyze_text(sample_text, filename="sample_project.pdf")
-    print(json.dumps(result, indent=2))
+    
+    # Allow toggling between modes via command line
+    use_product_first = '--regex-only' not in sys.argv
+    
+    print(f"=== Testing {'PRODUCT-FIRST' if use_product_first else 'REGEX-ONLY'} mode ===\n")
+    
+    # Get price list path
+    price_list_path = Path(__file__).parent.parent / 'references' / 'fl_2025_prices.csv'
+    if not price_list_path.exists():
+        print(f"Warning: Price list not found at {price_list_path}")
+        price_list_path = None
+    
+    result = analyze_text(
+        sample_text, 
+        price_list_path=str(price_list_path) if price_list_path else None,
+        filename="sample_project.pdf",
+        use_product_first=use_product_first
+    )
+    
+    print(f"Matching mode: {result.get('matching_mode', 'unknown')}")
     print(f"\n=== Summary ===")
-    print(f"Total items detected: {result['summary']['total_items']}")
+    summary = result['summary']
+    print(f"Total items: {summary['total_items']}")
+    print(f"Matched items: {summary['matched_items']}")
+    print(f"Overall match rate: {summary['match_rate']:.1f}%")
+    
+    # Category-aware metrics (Phase 2)
+    if 'drainage_items' in summary:
+        print(f"\n=== Drainage Metrics (Category-Aware) ===")
+        print(f"Drainage items: {summary['drainage_items']}")
+        print(f"Drainage matched: {summary['drainage_matched']}")
+        print(f"Drainage match rate: {summary['drainage_match_rate']:.1f}%")
+        print(f"Non-drainage items skipped: {summary['non_drainage_items']}")
+    
+    if 'high_confidence_count' in summary:
+        print(f"\n=== Confidence Breakdown ===")
+        print(f"High confidence: {summary['high_confidence_count']}")
+        print(f"Medium confidence: {summary['medium_confidence_count']}")
+        print(f"Needs review: {summary['needs_review_count']}")
+    
+    if 'product_first_count' in summary:
+        print(f"\n=== Source Breakdown ===")
+        print(f"Product-first matches: {summary['product_first_count']}")
+        print(f"Regex fallback matches: {summary['regex_fallback_count']}")
+    
+    print(f"\n=== Items ===")
     for item in result['pay_items']:
         source = item.get('source', 'unknown')
         conf = item.get('confidence', 'unknown')
-        print(f"  [{source}/{conf}] {item['pay_item_no']}: {item['description']} - {item['quantity']} {item['unit']}")
+        conf_score = item.get('confidence_score', 0)
+        price = item.get('unit_price')
+        price_str = f"${price:.2f}" if price else "N/A"
+        print(f"  [{source}/{conf}/{conf_score:.2f}] {item['pay_item_no']}: "
+              f"{item['description'][:50]} - {item['quantity']} {item['unit']} @ {price_str}")
