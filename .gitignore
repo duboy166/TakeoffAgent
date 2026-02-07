@@ -69,3 +69,4 @@ debug_*.py
 
 # Email service credentials
 config/email_config.yaml
+email_service/.env

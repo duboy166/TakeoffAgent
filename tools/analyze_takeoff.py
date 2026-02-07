@@ -798,6 +798,11 @@ class TakeoffAnalyzer:
             # Example: "51 LF RCP 18""
             (r'(\d+(?:\.\d+)?)\s*(LF|EA)\s+(RCP|PVC|HDPE|CMP|DIP|SRCP)\s*(\d+)\s*["\u201d\u2033]?',
              1, 2, 4, 3, None),
+
+            # Format 8: SIZE" MATERIAL UNIT QTY (Vision API output format)
+            # Example: "12" RCP LF 85" or "18" SRCP LF 200"
+            (r'(\d+)\s*["\u201d\u2033]\s*(RCP|PVC|HDPE|CMP|DIP|SRCP)\s+(LF|EA|SF|SY)\s+(\d+(?:\.\d+)?)',
+             4, 3, 1, 2, None),
         ]
 
         for pattern_tuple in patterns:
