@@ -1,6 +1,17 @@
 # Construction takeoff tools
 from .ocr_extractor import OCRExtractor, ExtractedDocument, TextBlock
 from .analyze_takeoff import TakeoffAnalyzer
+
+# Summary sheet detection (Phase 3)
+from .summary_sheet import (
+    is_summary_page,
+    extract_summary_table,
+    filter_drainage_items,
+    summary_item_to_pay_item,
+    SummaryItem,
+    SummaryPageResult,
+    SummaryPageType,
+)
 from .pdf_splitter import (
     split_pdf,
     needs_splitting,
@@ -53,4 +64,12 @@ __all__ = [
     "get_warmup_status",
     "is_ocr_ready",
     "WarmupStatus",
+    # Summary sheet detection (Phase 3)
+    "is_summary_page",
+    "extract_summary_table",
+    "filter_drainage_items",
+    "summary_item_to_pay_item",
+    "SummaryItem",
+    "SummaryPageResult",
+    "SummaryPageType",
 ]

@@ -35,6 +35,7 @@ class PageType(Enum):
     TOC = "toc"               # Table of contents/sheet index
     NOTES = "notes"           # General notes, legend, specifications
     SITE_PLAN = "site_plan"   # Site plan overview (may need processing)
+    SUMMARY = "summary"       # Summary of quantities / pay items (high-value, Phase 3)
     PAYLOAD = "payload"       # Actual construction plan with quantities
 
 
@@ -64,6 +65,17 @@ class ClassificationResult:
     @property
     def ocr_count(self) -> int:
         return len(self.pages_to_ocr)
+    
+    @property
+    def summary_pages(self) -> List[int]:
+        """Page numbers classified as summary/quantity pages (Phase 3)."""
+        return [c.page_num for c in self.classifications 
+                if c.page_type == PageType.SUMMARY]
+    
+    @property
+    def has_summary_pages(self) -> bool:
+        """True if document contains summary/quantity pages."""
+        return len(self.summary_pages) > 0
 
 
 class PageClassifier:
@@ -96,6 +108,15 @@ class PageClassifier:
         "general notes", "legend", "abbreviations",
         "symbols", "standard notes", "specifications",
         "notes:", "typical sections", "detail sheet"
+    ]
+
+    # Keywords indicating summary/quantities page (Phase 3 - high-value)
+    SUMMARY_KEYWORDS = [
+        "summary of quantities", "summary of pay items",
+        "tabulation of quantities", "estimate of quantities",
+        "pay item summary", "bid schedule", "engineer's estimate",
+        "quantity summary", "pay item no", "fdot item",
+        "grand total", "total this sheet"
     ]
 
     # Keywords indicating actual pay item content (payload)
@@ -300,6 +321,17 @@ class PageClassifier:
                         keywords_found=keywords
                     )
 
+            # Phase 3: Summary pages are HIGH PRIORITY - always process
+            if page_type == PageType.SUMMARY:
+                return PageClassification(
+                    page_num=page_num,
+                    page_type=page_type,
+                    should_ocr=True,
+                    reason="Summary/quantity page detected - high value data",
+                    confidence=confidence,
+                    keywords_found=keywords
+                )
+
             # Payload pages should be processed
             if page_type == PageType.PAYLOAD:
                 return PageClassification(
@@ -409,6 +441,15 @@ class PageClassifier:
             Tuple of (PageType, keywords found, confidence)
         """
         text = text.lower()
+
+        # Phase 3: Check for summary/quantity pages FIRST (highest priority)
+        # Summary pages contain structured pay item data - very valuable
+        summary_hits = [kw for kw in self.SUMMARY_KEYWORDS if kw in text]
+        if summary_hits and len(summary_hits) >= 1:
+            # Summary pages can appear anywhere (usually early, but not always)
+            # High confidence if we find key indicators
+            confidence = min(0.98, 0.7 + 0.1 * len(summary_hits))
+            return PageType.SUMMARY, summary_hits, confidence
 
         # Check for title page keywords (usually first 1-2 pages)
         title_hits = [kw for kw in self.TITLE_KEYWORDS if kw in text]

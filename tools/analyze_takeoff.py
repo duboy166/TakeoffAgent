@@ -45,6 +45,29 @@ except ImportError:
         PRODUCT_FIRST_AVAILABLE = False
         ProductCatalog = None
 
+# Import summary sheet extraction (Phase 3)
+try:
+    from .summary_sheet import (
+        extract_summary_table, 
+        filter_drainage_items,
+        summary_item_to_pay_item,
+        SummaryItem,
+        SummaryPageResult,
+    )
+    SUMMARY_SHEET_AVAILABLE = True
+except ImportError:
+    try:
+        from summary_sheet import (
+            extract_summary_table,
+            filter_drainage_items,
+            summary_item_to_pay_item,
+            SummaryItem,
+            SummaryPageResult,
+        )
+        SUMMARY_SHEET_AVAILABLE = True
+    except ImportError:
+        SUMMARY_SHEET_AVAILABLE = False
+
 logger = logging.getLogger(__name__)
 
 # Re-export for backward compatibility (sizes now come from validation_gates)
@@ -450,9 +473,10 @@ class TakeoffAnalyzer:
         """
         Extract pay items from plan text using multiple pattern strategies.
 
-        When use_product_first is enabled (default), uses ProductCatalog-driven
-        matching as the PRIMARY strategy, then falls back to regex patterns
-        for items the product matcher missed.
+        Extraction priority (Phase 3):
+        1. Summary sheet detection - highest quality, use as primary when found
+        2. Product-first matching - scan for known products
+        3. Regex patterns - fallback for items missed by above
 
         Args:
             text: Extracted text from construction plans
@@ -467,12 +491,85 @@ class TakeoffAnalyzer:
 
         seen = set()  # Avoid duplicates across all strategies
         
+        # Phase 3: Check for summary page first (highest quality data)
+        if SUMMARY_SHEET_AVAILABLE and is_summary_page(text):
+            logger.info("Summary page detected - using summary sheet extraction as primary")
+            return self._extract_from_summary_page(text, seen)
+        
         # Product-first matching (Phase 2)
         if self.use_product_first and self.product_catalog:
             return self._extract_with_product_first(text, seen)
         
         # Legacy regex-only path
         return self._extract_items_from_page(text, seen)
+    
+    def _extract_from_summary_page(self, text: str, seen: set) -> List[Dict]:
+        """
+        Extract pay items from a summary page (Phase 3).
+        
+        Summary pages contain cleaner, tabular data with FDOT codes,
+        descriptions, quantities, and units in a structured format.
+        
+        This is the highest-confidence extraction source.
+        
+        Args:
+            text: Summary page text
+            seen: Set of already-seen items for deduplication
+            
+        Returns:
+            List of pay item dictionaries
+        """
+        items = []
+        
+        # Parse the summary table
+        result = extract_summary_table(text)
+        logger.info(f"Summary sheet parsed: {result.items_extracted} items extracted, "
+                   f"{len(result.parsing_errors)} errors")
+        
+        # Convert summary items to pay_item format
+        for summary_item in result.items:
+            item_key = f"summary_{summary_item.pay_item_no}_{summary_item.quantity}"
+            if item_key in seen:
+                continue
+            seen.add(item_key)
+            
+            pay_item = summary_item_to_pay_item(summary_item)
+            
+            # Try to match to price list by FDOT code
+            if self.price_list_loaded:
+                fdot_code = summary_item.pay_item_no
+                if fdot_code in self.price_list_by_fdot:
+                    products = self.price_list_by_fdot[fdot_code]
+                    if products:
+                        # Use first matching product (usually only one per FDOT code)
+                        product = products[0]
+                        pay_item['matched'] = True
+                        pay_item['unit_price'] = product['price']
+                        pay_item['line_cost'] = summary_item.quantity * product['price']
+            
+            items.append(pay_item)
+        
+        # Also run product-first matching to catch items summary parser might have missed
+        # (especially items without FDOT codes)
+        if self.use_product_first and self.product_catalog:
+            product_matches = find_products_in_text(text, self.product_catalog)
+            
+            for match in product_matches:
+                item_key = f"product_{match.product.id}_{match.quantity}"
+                if item_key not in seen:
+                    # Check if we already have this FDOT code from summary
+                    already_have_fdot = any(
+                        match.product.fdot_code and 
+                        match.product.fdot_code in item.get('pay_item_no', '')
+                        for item in items
+                    )
+                    if not already_have_fdot:
+                        seen.add(item_key)
+                        item = self._match_to_pay_item(match)
+                        item['source'] = 'product_first_supplement'  # Indicate it supplemented summary
+                        items.append(item)
+        
+        return items
     
     def _extract_with_product_first(self, text: str, seen: set) -> List[Dict]:
         """

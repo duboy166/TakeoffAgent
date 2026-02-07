@@ -399,19 +399,50 @@ def match_text(text: str, catalog_path: Optional[str] = None) -> List[Match]:
     return find_products_in_text(text, catalog)
 
 
-# Summary sheet detection
-SUMMARY_INDICATORS = [
-    "SUMMARY OF PAY ITEMS",
-    "ESTIMATE OF QUANTITIES",
-    "QUANTITY SUMMARY", 
-    "PAY ITEM SUMMARY",
-    "BID SCHEDULE",
-    "SUMMARY OF ESTIMATED QUANTITIES",
-    "ENGINEER'S ESTIMATE",
-]
-
-
-def is_summary_page(page_text: str) -> bool:
-    """Check if a page is a summary/quantity page (higher quality data)."""
-    text_upper = page_text.upper()
-    return any(indicator in text_upper for indicator in SUMMARY_INDICATORS)
+# Summary sheet detection - delegate to dedicated module
+# Keeping stub for backward compatibility
+try:
+    from .summary_sheet import (
+        is_summary_page,
+        extract_summary_table,
+        filter_drainage_items,
+        find_summary_pages,
+        extract_all_summary_items,
+        summary_item_to_pay_item,
+        SummaryItem,
+        SummaryPageResult,
+        SummaryPageType,
+    )
+    SUMMARY_SHEET_AVAILABLE = True
+except ImportError:
+    try:
+        from summary_sheet import (
+            is_summary_page,
+            extract_summary_table,
+            filter_drainage_items,
+            find_summary_pages,
+            extract_all_summary_items,
+            summary_item_to_pay_item,
+            SummaryItem,
+            SummaryPageResult,
+            SummaryPageType,
+        )
+        SUMMARY_SHEET_AVAILABLE = True
+    except ImportError:
+        SUMMARY_SHEET_AVAILABLE = False
+        
+        # Fallback stub if module not available
+        SUMMARY_INDICATORS = [
+            "SUMMARY OF PAY ITEMS",
+            "ESTIMATE OF QUANTITIES",
+            "QUANTITY SUMMARY", 
+            "PAY ITEM SUMMARY",
+            "BID SCHEDULE",
+            "SUMMARY OF ESTIMATED QUANTITIES",
+            "ENGINEER'S ESTIMATE",
+        ]
+        
+        def is_summary_page(page_text: str) -> bool:
+            """Check if a page is a summary/quantity page (higher quality data)."""
+            text_upper = page_text.upper()
+            return any(indicator in text_upper for indicator in SUMMARY_INDICATORS)
